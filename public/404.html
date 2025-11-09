@@ -36,14 +36,18 @@
       var search = window.location.search;
       var hash = window.location.hash;
 
+      // Remove the base path from the pathname
+      var basePath = '/ScaleCUA.github.io';
+      var cleanPath = path.startsWith(basePath) ? path.substring(basePath.length) : path;
+
       // Remove the leading slash and encode the path
-      var encodedPath = path.substring(1);
+      var encodedPath = cleanPath.substring(1);
       if (encodedPath && encodedPath !== '404.html') {
         // Redirect to index with the path as hash
-        window.location.href = '/#' + encodedPath + search + hash;
+        window.location.href = '/ScaleCUA.github.io/#' + encodedPath + search + hash;
       } else {
         // If it's the root or 404.html, just go to index
-        window.location.href = '/';
+        window.location.href = '/ScaleCUA.github.io/';
       }
     </script>
   </body>
