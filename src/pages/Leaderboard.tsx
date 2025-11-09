@@ -26,7 +26,7 @@ const Leaderboard: React.FC = () => {
               Fair Evaluation Coming Soon
             </h2>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              We're building a comprehensive leaderboard that evaluates GUI agents on AI-generated environments, ensuring no over-fitting and authentic performance measurement.
+              We&apos;re building a comprehensive leaderboard that evaluates GUI agents on AI-generated environments, ensuring no over-fitting and authentic performance measurement.
             </p>
             <div className="animate-pulse-warm">
               <p className="text-warm-600 font-medium">
