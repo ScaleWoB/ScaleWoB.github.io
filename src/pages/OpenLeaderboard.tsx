@@ -110,11 +110,6 @@ const OpenLeaderboard: React.FC = () => {
       variant: 'primary',
       onClick: () => console.log('Submit agent clicked'),
     },
-    {
-      label: 'Download Test Cases',
-      variant: 'secondary',
-      onClick: () => console.log('Download test cases clicked'),
-    },
   ];
 
   // Define table columns
@@ -287,85 +282,23 @@ const OpenLeaderboard: React.FC = () => {
             }}
           />
 
-          {/* Enhanced Test Cases Preview */}
-          <div className="mt-16 bg-white rounded-3xl shadow-xl border border-warm-100 p-10">
-            <h3 className="text-2xl font-bold text-gray-900 mb-10 text-center">
-              Public Test Cases
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="group bg-linear-to-br from-warm-50 to-white rounded-2xl p-8 border border-warm-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                <div className="absolute inset-0 bg-linear-to-br from-warm-100/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <h4 className="font-bold text-gray-900 mb-4 text-lg">
-                    Web Form Automation
-                  </h4>
-                  <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-                    Complex form filling with validation and dynamic elements
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs bg-linear-to-r from-warm-200 to-warm-300 text-warm-800 px-3 py-2 rounded-xl font-semibold">
-                      Web
-                    </span>
-                    <Link
-                      to="/environment"
-                      className="text-warm-600 hover:text-warm-700 font-semibold text-sm hover:underline transition-colors duration-300"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </div>
-              <div className="group bg-linear-to-br from-warm-50 to-white rounded-2xl p-8 border border-warm-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                <div className="absolute inset-0 bg-linear-to-br from-warm-100/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <h4 className="font-bold text-gray-900 mb-4 text-lg">
-                    Multi-step Navigation
-                  </h4>
-                  <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-                    Navigate through complex application workflows
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs bg-linear-to-r from-warm-200 to-warm-300 text-warm-800 px-3 py-2 rounded-xl font-semibold">
-                      Web
-                    </span>
-                    <Link
-                      to="/environment"
-                      className="text-warm-600 hover:text-warm-700 font-semibold text-sm hover:underline transition-colors duration-300"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </div>
-              <div className="group bg-linear-to-br from-warm-50 to-white rounded-2xl p-8 border border-warm-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                <div className="absolute inset-0 bg-linear-to-br from-warm-100/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <h4 className="font-bold text-gray-900 mb-4 text-lg">
-                    Data Extraction
-                  </h4>
-                  <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-                    Extract and process data from various UI elements
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs bg-linear-to-r from-warm-200 to-warm-300 text-warm-800 px-3 py-2 rounded-xl font-semibold">
-                      Web
-                    </span>
-                    <Link
-                      to="/environment"
-                      className="text-warm-600 hover:text-warm-700 font-semibold text-sm hover:underline transition-colors duration-300"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="text-center mt-12">
+          {/* Environment Navigation CTA */}
+          <div className="mt-16 text-center">
+            <div className="bg-linear-to-br from-warm-50 to-coral-50 rounded-3xl p-12 border border-warm-100">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Explore All Testing Environments
+              </h3>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+                Discover our comprehensive collection of 527 AI-generated test
+                environments across web, desktop, and mobile platforms. Each
+                environment is uniquely generated to ensure fair agent
+                evaluation.
+              </p>
               <Link
-                to="/environment"
-                className="inline-flex items-center px-10 py-4 bg-linear-to-r from-warm-500 to-warm-600 text-white font-bold rounded-2xl hover:from-warm-600 hover:to-warm-700 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 group"
+                to="/environment/demo"
+                className="inline-flex items-center px-8 py-4 bg-linear-to-r from-warm-500 to-coral-500 text-white font-bold rounded-2xl hover:from-warm-600 hover:to-coral-600 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 group"
               >
-                View All Test Cases in Environments (527)
+                Explore All Environments (527)
                 <svg
                   className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300"
                   fill="none"

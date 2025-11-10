@@ -17,7 +17,7 @@ const Environment: React.FC = () => {
         buttons={[
           {
             text: 'Explore Environments',
-            onClick: () => {},
+            to: '/environment/demo',
             variant: 'primary-on-warm',
           },
           {
