@@ -10,7 +10,9 @@
 
   body {
     @apply bg-warm-50 text-gray-900 font-sans;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 
   html {
@@ -42,6 +44,19 @@
 
   .card {
     @apply bg-white rounded-2xl shadow-warm p-6 transition-all duration-200 hover:shadow-warm-lg;
+  }
+
+  /* Optimized benchmark card hover effects */
+  .benchmark-card {
+    @apply will-change-transform;
+  }
+
+  .benchmark-card-glow {
+    will-change: opacity;
+    /* Performance optimization for blur effects */
+    backface-visibility: hidden;
+    perspective: 1000px;
+    transform: translateZ(0);
   }
 
   .gradient-warm {

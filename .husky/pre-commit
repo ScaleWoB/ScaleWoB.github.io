@@ -1,18 +1,31 @@
-# Run ESLint before commit
+echo "🎨 Running code formatting and quality checks..."
+
+# First, format the code with Prettier
+echo "📝 Formatting code with Prettier..."
+npm run format
+
+# Then run ESLint with auto-fix
+echo "🔍 Running ESLint with auto-fix..."
+npm run lint:fix
+
+# Check if there are any remaining ESLint errors after auto-fix
+echo "✅ Checking for remaining ESLint issues..."
 npm run lint
 
-# If ESLint finds errors, prevent the commit
+# If ESLint still finds errors, prevent the commit
 if [ $? -ne 0 ]; then
     echo ""
-    echo "❌ ESLint found errors. Please fix the linting issues before committing."
+    echo "❌ ESLint found errors that couldn't be auto-fixed. Please fix the linting issues before committing."
     echo ""
-    echo "You can fix these issues by running:"
+    echo "You can review the issues by running:"
     echo "  npm run lint"
     echo ""
-    echo "Or use automatic fixing with:"
-    echo "  npm run lint -- --fix"
+    echo "Or try to auto-fix with:"
+    echo "  npm run lint:fix"
+    echo ""
+    echo "Files have been formatted with Prettier. Review the changes and commit again."
     echo ""
     exit 1
 fi
 
-echo "✅ ESLint checks passed!"
+echo "✅ Code formatting and quality checks passed!"

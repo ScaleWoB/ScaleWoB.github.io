@@ -10,6 +10,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
+    'plugin:prettier/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -24,6 +25,7 @@ module.exports = {
     '@typescript-eslint',
     'react',
     'react-hooks',
+    'prettier',
   ],
   rules: {
     'react-refresh/only-export-components': [

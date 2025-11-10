@@ -1,10 +1,10 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom'
-import Layout from './components/common/Layout'
-import Homepage from './pages/Homepage'
-import LeaderboardHome from './components/leaderboard/LeaderboardHome'
-import OpenLeaderboard from './components/leaderboard/OpenLeaderboard'
-import ClosedLeaderboard from './components/leaderboard/ClosedLeaderboard'
-import Environment from './pages/Environment'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/common/Layout';
+import Homepage from './pages/Homepage';
+import LeaderboardHome from './components/leaderboard/LeaderboardHome';
+import OpenLeaderboard from './components/leaderboard/OpenLeaderboard';
+import ClosedLeaderboard from './components/leaderboard/ClosedLeaderboard';
+import Environment from './pages/Environment';
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         </Routes>
       </Layout>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;

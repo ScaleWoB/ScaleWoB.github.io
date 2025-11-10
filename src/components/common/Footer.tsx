@@ -1,7 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 const Footer: React.FC = () => {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -9,28 +9,44 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* About Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-warm-400">ScaleCUA</h3>
+            <h3 className="text-lg font-semibold mb-4 text-warm-400">
+              ScaleCUA
+            </h3>
             <p className="text-gray-300 text-sm">
-              A revolutionary GUI agent benchmark featuring AI-generated testing environments for fair evaluation of graphical interface agents. Unlike LLM benchmarks, ScaleCUA evaluates agents that interact with user interfaces through clicking, typing, and navigation.
+              A revolutionary GUI agent benchmark featuring AI-generated testing
+              environments for fair evaluation of graphical interface agents.
+              Unlike LLM benchmarks, ScaleCUA evaluates agents that interact
+              with user interfaces through clicking, typing, and navigation.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-warm-400">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-warm-400">
+              Quick Links
+            </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="/" className="text-gray-300 hover:text-warm-400 transition-colors duration-200">
+                <a
+                  href="/"
+                  className="text-gray-300 hover:text-warm-400 transition-colors duration-200"
+                >
                   Homepage
                 </a>
               </li>
               <li>
-                <a href="/leaderboard" className="text-gray-300 hover:text-warm-400 transition-colors duration-200">
+                <a
+                  href="/leaderboard"
+                  className="text-gray-300 hover:text-warm-400 transition-colors duration-200"
+                >
                   Leaderboard
                 </a>
               </li>
               <li>
-                <a href="/environment" className="text-gray-300 hover:text-warm-400 transition-colors duration-200">
+                <a
+                  href="/environment"
+                  className="text-gray-300 hover:text-warm-400 transition-colors duration-200"
+                >
                   Environment
                 </a>
               </li>
@@ -39,7 +55,9 @@ const Footer: React.FC = () => {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-warm-400">Resources</h3>
+            <h3 className="text-lg font-semibold mb-4 text-warm-400">
+              Resources
+            </h3>
             <p className="text-gray-300 text-sm mb-2">
               Documentation and research papers coming soon.
             </p>
@@ -69,7 +87,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;
