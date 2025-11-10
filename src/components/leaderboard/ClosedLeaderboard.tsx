@@ -124,7 +124,7 @@ const ClosedLeaderboard: React.FC = () => {
         </div>
 
         {/* Security Notice */}
-        <div className="card border-coral-200 bg-coral-50 mb-8">
+        <div className="card bg-white shadow-lg border border-coral-200 mb-8">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-coral-100 rounded-full flex items-center justify-center mr-3">
               <svg className="w-4 h-4 text-coral-600" fill="currentColor" viewBox="0 0 20 20">
@@ -148,32 +148,46 @@ const ClosedLeaderboard: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="card mb-8">
+        <div className="card bg-white shadow-lg border border-coral-100 mb-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center space-x-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Evaluation Period</label>
-                <select
-                  value={selectedTimeRange}
-                  onChange={(e) => setSelectedTimeRange(e.target.value as "current" | "previous")}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500"
-                >
-                  <option value="current">Current Period</option>
-                  <option value="previous">Previous Period</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedTimeRange}
+                    onChange={(e) => setSelectedTimeRange(e.target.value as "current" | "previous")}
+                    className="appearance-none w-full px-4 py-2 pr-10 border border-coral-200 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-coral-500 focus:border-coral-500 hover:border-coral-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                  >
+                    <option value="current">Current Period</option>
+                    <option value="previous">Previous Period</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-coral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value as "all" | "enterprise" | "research" | "opensource")}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coral-500 focus:border-coral-500"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="enterprise">Enterprise</option>
-                  <option value="research">Research</option>
-                  <option value="opensource">Open Source</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value as "all" | "enterprise" | "research" | "opensource")}
+                    className="appearance-none w-full px-4 py-2 pr-10 border border-coral-200 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-coral-500 focus:border-coral-500 hover:border-coral-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="enterprise">Enterprise</option>
+                    <option value="research">Research</option>
+                    <option value="opensource">Open Source</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-coral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -189,25 +203,25 @@ const ClosedLeaderboard: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="card bg-coral-50 border-coral-200">
+          <div className="card bg-white shadow-md border border-coral-200 hover:shadow-lg transition-shadow">
             <div className="text-center">
               <div className="text-2xl font-bold text-coral-600">{agents.length}</div>
               <div className="text-sm text-gray-600">Verified Agents</div>
             </div>
           </div>
-          <div className="card bg-coral-50 border-coral-200">
+          <div className="card bg-white shadow-md border border-coral-200 hover:shadow-lg transition-shadow">
             <div className="text-center">
               <div className="text-2xl font-bold text-coral-600">Private</div>
               <div className="text-sm text-gray-600">Test Cases</div>
             </div>
           </div>
-          <div className="card bg-coral-50 border-coral-200">
+          <div className="card bg-white shadow-md border border-coral-200 hover:shadow-lg transition-shadow">
             <div className="text-center">
               <div className="text-2xl font-bold text-coral-600">Monthly</div>
               <div className="text-sm text-gray-600">Evaluation Cycles</div>
             </div>
           </div>
-          <div className="card bg-coral-50 border-coral-200">
+          <div className="card bg-white shadow-md border border-coral-200 hover:shadow-lg transition-shadow">
             <div className="text-center">
               <div className="text-2xl font-bold text-coral-600">87.7%</div>
               <div className="text-sm text-gray-600">Avg Success Rate</div>
@@ -216,7 +230,7 @@ const ClosedLeaderboard: React.FC = () => {
         </div>
 
         {/* Leaderboard Table */}
-        <div className="card border-coral-200">
+        <div className="card bg-white shadow-lg border border-coral-100">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -309,7 +323,7 @@ const ClosedLeaderboard: React.FC = () => {
         </div>
 
         {/* Evaluation Process */}
-        <div className="mt-12 card border-coral-200">
+        <div className="mt-12 card bg-white shadow-lg border border-coral-100">
           <h3 className="text-xl font-bold text-gray-900 mb-6">Secure Evaluation Process</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center">

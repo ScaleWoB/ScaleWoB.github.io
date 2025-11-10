@@ -121,33 +121,47 @@ const OpenLeaderboard: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="card mb-8">
+        <div className="card bg-white shadow-lg border border-warm-100 mb-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center space-x-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Time Range</label>
-                <select
-                  value={selectedTimeRange}
-                  onChange={(e) => setSelectedTimeRange(e.target.value as "7d" | "30d" | "90d" | "1y")}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-warm-500"
-                >
-                  <option value="7d">Last 7 Days</option>
-                  <option value="30d">Last 30 Days</option>
-                  <option value="all">All Time</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedTimeRange}
+                    onChange={(e) => setSelectedTimeRange(e.target.value as "7d" | "30d" | "90d" | "1y")}
+                    className="appearance-none w-full px-4 py-2 pr-10 border border-warm-200 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-warm-500 focus:border-warm-500 hover:border-warm-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                  >
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                    <option value="all">All Time</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-warm-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value as "all" | "web" | "desktop" | "mobile")}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-warm-500 focus:border-warm-500"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="web">Web Applications</option>
-                  <option value="desktop">Desktop Apps</option>
-                  <option value="mobile">Mobile Interfaces</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value as "all" | "web" | "desktop" | "mobile")}
+                    className="appearance-none w-full px-4 py-2 pr-10 border border-warm-200 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-warm-500 focus:border-warm-500 hover:border-warm-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="web">Web Applications</option>
+                    <option value="desktop">Desktop Apps</option>
+                    <option value="mobile">Mobile Interfaces</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-warm-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -163,25 +177,25 @@ const OpenLeaderboard: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="card bg-warm-50 border-warm-200">
+          <div className="card bg-white shadow-md border border-warm-200 hover:shadow-lg transition-shadow">
             <div className="text-center">
               <div className="text-2xl font-bold text-warm-600">{agents.length}</div>
               <div className="text-sm text-gray-600">Active Agents</div>
             </div>
           </div>
-          <div className="card bg-warm-50 border-warm-200">
+          <div className="card bg-white shadow-md border border-warm-200 hover:shadow-lg transition-shadow">
             <div className="text-center">
               <div className="text-2xl font-bold text-warm-600">527</div>
               <div className="text-sm text-gray-600">Public Test Cases</div>
             </div>
           </div>
-          <div className="card bg-warm-50 border-warm-200">
+          <div className="card bg-white shadow-md border border-warm-200 hover:shadow-lg transition-shadow">
             <div className="text-center">
               <div className="text-2xl font-bold text-warm-600">2,154</div>
               <div className="text-sm text-gray-600">Total Evaluations</div>
             </div>
           </div>
-          <div className="card bg-warm-50 border-warm-200">
+          <div className="card bg-white shadow-md border border-warm-200 hover:shadow-lg transition-shadow">
             <div className="text-center">
               <div className="text-2xl font-bold text-warm-600">79.8%</div>
               <div className="text-sm text-gray-600">Avg Success Rate</div>
@@ -190,7 +204,7 @@ const OpenLeaderboard: React.FC = () => {
         </div>
 
         {/* Leaderboard Table */}
-        <div className="card">
+        <div className="card bg-white shadow-lg border border-warm-100">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -276,7 +290,7 @@ const OpenLeaderboard: React.FC = () => {
         </div>
 
         {/* Test Cases Preview */}
-        <div className="mt-12 card">
+        <div className="mt-12 card bg-white shadow-lg border border-warm-100">
           <h3 className="text-xl font-bold text-gray-900 mb-6">Public Test Cases</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
