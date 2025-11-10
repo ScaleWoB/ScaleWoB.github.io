@@ -72,17 +72,17 @@
     },
     {
       "id": "env-006",
-      "taskName": "Mobile Gesture Controls",
+      "taskName": "Creating album in Photos",
       "platform": "Mobile Interfaces",
-      "difficulty": "Advanced",
-      "description": "Touch-optimized interfaces with swipe gestures, pinch-to-zoom, and mobile-specific interactions.",
-      "tags": ["Gestures", "Touch", "Mobile"],
+      "difficulty": "Intermediate",
+      "description": "Photo organization tasks including creating new albums, selecting and moving photos, and managing photo collections.",
+      "tags": ["Photos", "Organization", "Media Management"],
       "metrics": {
-        "completion": 85,
-        "complexity": 8
+        "completion": 88,
+        "complexity": 6
       },
-      "icon": "touch",
-      "colorTheme": "gold"
+      "icon": "photo-album",
+      "colorTheme": "warm"
     },
     {
       "id": "env-007",

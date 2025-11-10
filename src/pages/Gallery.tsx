@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HeroSection from '../components/common/HeroSection';
 import FeatureCard from '../components/common/FeatureCard';
 import FilterControls, {
@@ -71,6 +72,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
 );
 
 const Gallery: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
 
@@ -393,7 +395,10 @@ const Gallery: React.FC = () => {
 
                   {/* Action Button */}
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <button className="w-full px-4 py-2 bg-linear-to-r from-warm-500 to-coral-500 text-white rounded-lg font-medium hover:from-warm-600 hover:to-coral-600 transition-all duration-300 transform hover:scale-105">
+                    <button
+                      onClick={() => navigate(`/launcher/${environment.id}`)}
+                      className="w-full px-4 py-2 bg-linear-to-r from-warm-500 to-coral-500 text-white rounded-lg font-medium hover:from-warm-600 hover:to-coral-600 transition-all duration-300 transform hover:scale-105"
+                    >
                       Launch Environment
                     </button>
                   </div>
