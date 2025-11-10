@@ -45,6 +45,10 @@
 
   .text-gradient {
     @apply bg-gradient-to-r from-warm-600 to-coral-600 bg-clip-text text-transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
   }
 }
 

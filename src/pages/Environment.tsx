@@ -6,7 +6,7 @@ const Environment: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gradient mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gradient mb-6 leading-normal" style={{ paddingBottom: '0.1em' }}>
             Interactive AI-Generated Environments
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
