@@ -13,15 +13,15 @@ import { getIcon, getDefaultIcon } from '../utils/iconMapping';
 
 // Loading state component (moved outside to avoid re-creation on render)
 const LoadingState: React.FC = () => (
-  <div className="py-16 bg-linear-to-br from-gray-50 to-white">
+  <div className="py-16 bg-linear-to-br from-warm-50 to-coral-50">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center">
         <div className="w-16 h-16 border-4 border-warm-200 border-t-warm-600 rounded-full animate-spin mx-auto mb-4"></div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Loading Environments
+          Loading Gallery
         </h3>
         <p className="text-gray-600">
-          Please wait while we fetch the latest environment data...
+          Please wait while we fetch the latest gallery data...
         </p>
       </div>
     </div>
@@ -35,7 +35,7 @@ interface ErrorStateProps {
 }
 
 const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
-  <div className="py-16 bg-linear-to-br from-gray-50 to-white">
+  <div className="py-16 bg-linear-to-br from-warm-50 to-coral-50">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -54,11 +54,10 @@ const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
           </svg>
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Failed to Load Environments
+          Failed to Load Gallery
         </h3>
         <p className="text-gray-600 mb-6">
-          {error ||
-            'An unexpected error occurred while loading environment data.'}
+          {error || 'An unexpected error occurred while loading gallery data.'}
         </p>
         <button
           onClick={onRetry}
@@ -71,7 +70,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
   </div>
 );
 
-const EnvironmentViewer: React.FC = () => {
+const Gallery: React.FC = () => {
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
 
@@ -236,11 +235,11 @@ const EnvironmentViewer: React.FC = () => {
       <div className="min-h-screen">
         <HeroSection
           badge={{
-            text: '🔍 Environment Explorer',
+            text: '🖼️ Environment Gallery',
             variant: 'default',
           }}
-          title={['Interactive Environment', 'Preview Gallery']}
-          description="Explore our comprehensive collection of AI-generated testing environments. Each environment is uniquely generated to ensure fair evaluation of GUI agent capabilities across different platforms and complexity levels."
+          title={['Interactive Environment', 'Gallery']}
+          description="Explore our comprehensive collection of AI-generated testing environments. Each environment is uniquely generated to ensure fair evaluation of GUI agent capabilities."
           buttons={[
             {
               text: '← Back to Overview',
@@ -262,11 +261,11 @@ const EnvironmentViewer: React.FC = () => {
       <div className="min-h-screen">
         <HeroSection
           badge={{
-            text: '🔍 Environment Explorer',
+            text: '🖼️ Environment Gallery',
             variant: 'default',
           }}
-          title={['Interactive Environment', 'Preview Gallery']}
-          description="Explore our comprehensive collection of AI-generated testing environments. Each environment is uniquely generated to ensure fair evaluation of GUI agent capabilities across different platforms and complexity levels."
+          title={['Interactive Environment', 'Gallery']}
+          description="Explore our comprehensive collection of AI-generated testing environments. Each environment is uniquely generated to ensure fair evaluation of GUI agent capabilities."
           buttons={[
             {
               text: '← Back to Overview',
@@ -291,7 +290,7 @@ const EnvironmentViewer: React.FC = () => {
           variant: 'default',
         }}
         title={['Interactive Environment', 'Preview Gallery']}
-        description="Explore our comprehensive collection of AI-generated testing environments. Each environment is uniquely generated to ensure fair evaluation of GUI agent capabilities across different platforms and complexity levels."
+        description="Explore our comprehensive collection of AI-generated testing environments. Each environment is uniquely generated to ensure fair evaluation of GUI agent capabilities."
         buttons={[
           {
             text: '← Back to Overview',
@@ -325,18 +324,17 @@ const EnvironmentViewer: React.FC = () => {
       </div>
 
       {/* Environment Grid */}
-      <div className="py-12 bg-linear-to-br from-gray-50 to-white">
+      <div className="py-12 bg-linear-to-br from-warm-50 to-coral-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredEnvironmentsWithIcons.map(environment => (
-              <div key={environment.id} className="group relative">
-                <div className="absolute -inset-1 bg-linear-to-r from-warm-400 to-coral-400 rounded-2xl opacity-0 group-hover:opacity-25 transition-all duration-500 ease-out blur-xl"></div>
-                <div className="relative card p-6 bg-white shadow-lg group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 ease-out">
+              <div key={environment.id} className="group">
+                <div className="card p-6 bg-linear-to-br from-gray-50 to-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <div
-                        className={`w-12 h-12 bg-linear-to-br ${environment.colorTheme === 'warm' ? 'from-warm-400 to-warm-600' : environment.colorTheme === 'coral' ? 'from-coral-400 to-coral-600' : 'from-gold-400 to-gold-600'} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 ease-out`}
+                        className={`w-12 h-12 bg-linear-to-br ${environment.colorTheme === 'warm' ? 'from-warm-400 to-warm-600' : environment.colorTheme === 'coral' ? 'from-coral-400 to-coral-600' : 'from-gold-400 to-gold-600'} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
                       >
                         {environment.icon}
                       </div>
@@ -354,13 +352,13 @@ const EnvironmentViewer: React.FC = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4 group-hover:text-gray-700 transition-colors duration-300">
+                  <p className="text-sm text-gray-600 leading-relaxed mb-4">
                     {environment.description}
                   </p>
 
                   {/* Platform and Tags */}
                   <div className="space-y-3 mb-4">
-                    <div className="flex items-center space-x-2 text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
                       {getPlatformIcon(environment.platform)}
                       <span>{environment.platform}</span>
                     </div>
@@ -369,7 +367,7 @@ const EnvironmentViewer: React.FC = () => {
                       {environment.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium group-hover:bg-gray-200 transition-colors duration-300"
+                          className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium"
                         >
                           {tag}
                         </span>
@@ -380,20 +378,16 @@ const EnvironmentViewer: React.FC = () => {
                   {/* Metrics */}
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
                     <div className="text-center">
-                      <div className="text-lg font-bold text-warm-600 group-hover:scale-105 transition-transform duration-300">
+                      <div className="text-lg font-bold text-warm-600">
                         {environment.metrics.completion}%
                       </div>
-                      <div className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                        Success Rate
-                      </div>
+                      <div className="text-xs text-gray-600">Success Rate</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-coral-600 group-hover:scale-105 transition-transform duration-300">
+                      <div className="text-lg font-bold text-coral-600">
                         {environment.metrics.complexity}/10
                       </div>
-                      <div className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                        Complexity
-                      </div>
+                      <div className="text-xs text-gray-600">Complexity</div>
                     </div>
                   </div>
 
@@ -438,7 +432,7 @@ const EnvironmentViewer: React.FC = () => {
       </div>
 
       {/* Summary Stats */}
-      <div className="py-16 bg-white">
+      <div className="py-16 bg-linear-to-br from-coral-50 via-warm-50 to-gold-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -535,4 +529,4 @@ const EnvironmentViewer: React.FC = () => {
   );
 };
 
-export default EnvironmentViewer;
+export default Gallery;

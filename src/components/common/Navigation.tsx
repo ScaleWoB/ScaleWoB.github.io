@@ -9,6 +9,7 @@ const Navigation: React.FC = () => {
     { name: 'Home', path: '/' },
     { name: 'Leaderboards', path: '/leaderboard' },
     { name: 'Environment', path: '/environment' },
+    { name: 'Gallery', path: '/gallery' },
   ];
 
   const isActive = (path: string) => location.pathname === path;

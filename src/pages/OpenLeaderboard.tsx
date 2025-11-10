@@ -295,10 +295,10 @@ const OpenLeaderboard: React.FC = () => {
                 evaluation.
               </p>
               <Link
-                to="/environment/demo"
+                to="/gallery"
                 className="inline-flex items-center px-8 py-4 bg-linear-to-r from-warm-500 to-coral-500 text-white font-bold rounded-2xl hover:from-warm-600 hover:to-coral-600 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 group"
               >
-                Explore All Environments (527)
+                View Environment Gallery (527)
                 <svg
                   className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300"
                   fill="none"

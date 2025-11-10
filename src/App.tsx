@@ -5,7 +5,7 @@ import LeaderboardHome from './pages/LeaderboardHome';
 import OpenLeaderboard from './pages/OpenLeaderboard';
 import ClosedLeaderboard from './pages/ClosedLeaderboard';
 import Environment from './pages/Environment';
-import EnvironmentViewer from './pages/EnvironmentViewer';
+import Gallery from './pages/Gallery';
 
 function App() {
   return (
@@ -17,7 +17,7 @@ function App() {
           <Route path="/leaderboard/open" element={<OpenLeaderboard />} />
           <Route path="/leaderboard/closed" element={<ClosedLeaderboard />} />
           <Route path="/environment" element={<Environment />} />
-          <Route path="/environment/demo" element={<EnvironmentViewer />} />
+          <Route path="/gallery" element={<Gallery />} />
         </Routes>
       </Layout>
     </Router>
