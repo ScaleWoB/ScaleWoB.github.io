@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Filter option interface
 export interface FilterOption {
   value: string;
@@ -23,19 +21,19 @@ export interface ActionButton {
 }
 
 // FilterControls component props
-export interface FilterControlsProps {
-  filters: FilterConfig<any>[];
+export interface FilterControlsProps<T extends string = string> {
+  filters: FilterConfig<T>[];
   actions: ActionButton[];
   colorTheme: 'warm' | 'coral';
   className?: string;
 }
 
-const FilterControls: React.FC<FilterControlsProps> = ({
+const FilterControls = <T extends string = string>({
   filters,
   actions,
   colorTheme,
   className = '',
-}) => {
+}: FilterControlsProps<T>) => {
   const getThemeColors = (theme: 'warm' | 'coral') => {
     return {
       border: theme === 'warm' ? 'border-warm-200' : 'border-coral-200',

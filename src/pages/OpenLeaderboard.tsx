@@ -154,11 +154,11 @@ const OpenLeaderboard: React.FC = () => {
   const tableActions = [
     {
       label: 'View Details',
-      onClick: (agent: any) => console.log('View details:', agent.id),
+      onClick: (agent: OpenAgent) => console.log('View details:', agent.id),
     },
     {
       label: 'Test Cases',
-      onClick: (agent: any) => console.log('View test cases:', agent.id),
+      onClick: (agent: OpenAgent) => console.log('View test cases:', agent.id),
     },
   ];
 

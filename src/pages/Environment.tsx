@@ -251,7 +251,6 @@ const Environment: React.FC = () => {
             />
 
             <FeatureCard
-              variant="gradient"
               title="Multi-step Tasks"
               description="Complex scenarios requiring agents to complete sequences of actions to achieve goals with state preservation."
               colorTheme="warm"
@@ -273,7 +272,6 @@ const Environment: React.FC = () => {
             />
 
             <FeatureCard
-              variant="gradient"
               title="State Management"
               description="Comprehensive state tracking and persistence for complex multi-step workflows with memory preservation."
               colorTheme="coral"

@@ -24,17 +24,17 @@ export interface ClosedAgent extends BaseAgent {
 }
 
 // Column configuration interface
-export interface ColumnConfig {
-  key: string;
+export interface ColumnConfig<T extends BaseAgent = BaseAgent> {
+  key: keyof T;
   label: string;
   align: 'left' | 'center' | 'right';
-  render?: (value: any, agent: any) => React.ReactNode;
+  render?: (value: T[keyof T], agent: T) => React.ReactNode;
 }
 
 // Table component props
-export interface LeaderboardTableProps {
-  agents: any[];
-  columns: ColumnConfig[];
+export interface LeaderboardTableProps<T extends BaseAgent = BaseAgent> {
+  agents: T[];
+  columns: ColumnConfig<T>[];
   colorTheme: 'warm' | 'coral';
   pagination?: {
     currentPage: number;
@@ -44,19 +44,19 @@ export interface LeaderboardTableProps {
   };
   actions?: {
     label: string;
-    onClick: (agent: any) => void;
+    onClick: (agent: T) => void;
   }[];
   emptyMessage?: string;
 }
 
-const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
+const LeaderboardTable = <T extends BaseAgent = BaseAgent>({
   agents,
   columns,
   colorTheme,
   pagination,
   actions = [],
   emptyMessage = 'No agents found',
-}) => {
+}: LeaderboardTableProps<T>) => {
   const getRankBadgeColor = (rank: number) => {
     switch (rank) {
       case 1:
@@ -119,7 +119,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 
   const themeColors = getThemeColors(colorTheme);
 
-  const renderCellValue = (column: ColumnConfig, agent: any) => {
+  const renderCellValue = (column: ColumnConfig<T>, agent: T) => {
     const value = agent[column.key];
 
     if (column.render) {

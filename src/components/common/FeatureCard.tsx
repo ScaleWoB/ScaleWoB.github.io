@@ -64,7 +64,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       case 'gradient':
         return `${baseClasses} ${sizeClasses} bg-gradient-to-br from-gray-50 to-white ${hoverClasses}`;
       default:
-        return `${baseClasses} ${sizeClasses} bg-white shadow-lg group ${hoverClasses}`;
+        return `${baseClasses} ${sizeClasses} bg-white shadow-lg ${hoverClasses}`;
     }
   };
 

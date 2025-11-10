@@ -127,7 +127,6 @@ const Homepage: React.FC = () => {
             />
 
             <FeatureCard
-              variant="gradient"
               title="Flexible & Extensible"
               description="Adaptive framework that easily incorporates new agent types, environments, and evaluation metrics as the field evolves."
               colorTheme="warm"
@@ -149,7 +148,6 @@ const Homepage: React.FC = () => {
             />
 
             <FeatureCard
-              variant="gradient"
               title="Interactive Demos"
               description="Live interactive environments showcasing agent capabilities in real-time testing scenarios with diverse GUI challenges."
               colorTheme="coral"

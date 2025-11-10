@@ -138,11 +138,11 @@ const ClosedLeaderboard: React.FC = () => {
   const tableActions = [
     {
       label: 'View Report',
-      onClick: (agent: any) => console.log('View report:', agent.id),
+      onClick: (agent: ClosedAgent) => console.log('View report:', agent.id),
     },
     {
       label: 'Method',
-      onClick: (agent: any) => console.log('View method:', agent.id),
+      onClick: (agent: ClosedAgent) => console.log('View method:', agent.id),
     },
   ];
 
