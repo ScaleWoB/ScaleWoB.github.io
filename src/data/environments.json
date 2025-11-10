@@ -1,0 +1,132 @@
+{
+  "environments": [
+    {
+      "id": "env-001",
+      "taskName": "Multi-Step Form Automation",
+      "platform": "Web Applications",
+      "difficulty": "Expert",
+      "description": "Complex multi-step form validation with dynamic field generation, conditional logic, and real-time error handling.",
+      "tags": ["Forms", "Validation", "Dynamic UI"],
+      "metrics": {
+        "completion": 95,
+        "complexity": 8
+      },
+      "icon": "document-form",
+      "colorTheme": "warm"
+    },
+    {
+      "id": "env-002",
+      "taskName": "Data Table Navigation",
+      "platform": "Web Applications",
+      "difficulty": "Advanced",
+      "description": "Navigate complex data tables with sorting, filtering, and pagination while maintaining context across operations.",
+      "tags": ["Data", "Tables", "Navigation"],
+      "metrics": {
+        "completion": 87,
+        "complexity": 7
+      },
+      "icon": "table",
+      "colorTheme": "coral"
+    },
+    {
+      "id": "env-003",
+      "taskName": "E-commerce Checkout Flow",
+      "platform": "Web Applications",
+      "difficulty": "Advanced",
+      "description": "Complete purchase workflows with cart management, payment processing, and order confirmation.",
+      "tags": ["E-commerce", "Checkout", "Payment"],
+      "metrics": {
+        "completion": 92,
+        "complexity": 7
+      },
+      "icon": "shopping-cart",
+      "colorTheme": "gold"
+    },
+    {
+      "id": "env-004",
+      "taskName": "File Management System",
+      "platform": "Desktop Apps",
+      "difficulty": "Intermediate",
+      "description": "File operations including upload, download, folder navigation, and bulk operations.",
+      "tags": ["File System", "Operations", "Management"],
+      "metrics": {
+        "completion": 88,
+        "complexity": 6
+      },
+      "icon": "folder",
+      "colorTheme": "warm"
+    },
+    {
+      "id": "env-005",
+      "taskName": "Menu Navigation Systems",
+      "platform": "Desktop Apps",
+      "difficulty": "Intermediate",
+      "description": "Complex menu navigation with submenus, keyboard shortcuts, and context menus.",
+      "tags": ["Navigation", "Menus", "Shortcuts"],
+      "metrics": {
+        "completion": 91,
+        "complexity": 5
+      },
+      "icon": "menu",
+      "colorTheme": "coral"
+    },
+    {
+      "id": "env-006",
+      "taskName": "Mobile Gesture Controls",
+      "platform": "Mobile Interfaces",
+      "difficulty": "Advanced",
+      "description": "Touch-optimized interfaces with swipe gestures, pinch-to-zoom, and mobile-specific interactions.",
+      "tags": ["Gestures", "Touch", "Mobile"],
+      "metrics": {
+        "completion": 85,
+        "complexity": 8
+      },
+      "icon": "touch",
+      "colorTheme": "gold"
+    },
+    {
+      "id": "env-007",
+      "taskName": "App Authentication Flow",
+      "platform": "Mobile Interfaces",
+      "difficulty": "Expert",
+      "description": "Multi-factor authentication with biometric login, social integration, and secure session management.",
+      "tags": ["Authentication", "Security", "MFA"],
+      "metrics": {
+        "completion": 93,
+        "complexity": 9
+      },
+      "icon": "lock",
+      "colorTheme": "warm"
+    },
+    {
+      "id": "env-008",
+      "taskName": "Data Visualization Dashboard",
+      "platform": "Web Applications",
+      "difficulty": "Expert",
+      "description": "Interactive charts and graphs requiring data interpretation, filtering, and insight extraction.",
+      "tags": ["Visualization", "Charts", "Analytics"],
+      "metrics": {
+        "completion": 89,
+        "complexity": 9
+      },
+      "icon": "chart",
+      "colorTheme": "coral"
+    },
+    {
+      "id": "env-009",
+      "taskName": "Email Client Interface",
+      "platform": "Desktop Apps",
+      "difficulty": "Advanced",
+      "description": "Email management with inbox organization, search functionality, and composition tools.",
+      "tags": ["Email", "Communication", "Organization"],
+      "metrics": {
+        "completion": 90,
+        "complexity": 7
+      },
+      "icon": "email",
+      "colorTheme": "gold"
+    }
+  ],
+  "lastUpdated": "2024-01-15T10:00:00Z",
+  "version": "1.0.0"
+}

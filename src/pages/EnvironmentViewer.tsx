@@ -1,315 +1,165 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import HeroSection from '../components/common/HeroSection';
 import FeatureCard from '../components/common/FeatureCard';
 import FilterControls, {
   FilterConfig,
 } from '../components/leaderboard/FilterControls';
+import { useEnvironmentPreviews } from '../services/environmentService';
+import {
+  EnvironmentPreview,
+  EnvironmentPreviewWithIcon,
+} from '../types/environment';
+import { getIcon, getDefaultIcon } from '../utils/iconMapping';
 
-interface EnvironmentPreview {
-  id: string;
-  taskName: string;
-  platform: 'Web Applications' | 'Desktop Apps' | 'Mobile Interfaces';
-  difficulty: 'Intermediate' | 'Advanced' | 'Expert';
-  description: string;
-  tags: string[];
-  metrics: {
-    completion: number;
-    complexity: number;
-  };
-  icon: React.ReactNode;
-  colorTheme: 'warm' | 'coral' | 'gold';
+// Loading state component (moved outside to avoid re-creation on render)
+const LoadingState: React.FC = () => (
+  <div className="py-16 bg-linear-to-br from-gray-50 to-white">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-warm-200 border-t-warm-600 rounded-full animate-spin mx-auto mb-4"></div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          Loading Environments
+        </h3>
+        <p className="text-gray-600">
+          Please wait while we fetch the latest environment data...
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+// Error state component (moved outside to avoid re-creation on render)
+interface ErrorStateProps {
+  error: string | null;
+  onRetry: () => void;
 }
+
+const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
+  <div className="py-16 bg-linear-to-br from-gray-50 to-white">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center">
+        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg
+            className="w-8 h-8 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          Failed to Load Environments
+        </h3>
+        <p className="text-gray-600 mb-6">
+          {error ||
+            'An unexpected error occurred while loading environment data.'}
+        </p>
+        <button
+          onClick={onRetry}
+          className="px-6 py-2 bg-warm-600 text-white rounded-lg hover:bg-warm-700 transition-colors duration-200"
+        >
+          Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+);
 
 const EnvironmentViewer: React.FC = () => {
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
 
-  // Mock environment data with diverse task examples
-  const environmentPreviews: EnvironmentPreview[] = [
-    {
-      id: 'env-001',
-      taskName: 'Multi-Step Form Automation',
-      platform: 'Web Applications',
-      difficulty: 'Expert',
-      description:
-        'Complex multi-step form validation with dynamic field generation, conditional logic, and real-time error handling.',
-      tags: ['Forms', 'Validation', 'Dynamic UI'],
-      metrics: { completion: 95, complexity: 8 },
-      icon: (
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-      ),
-      colorTheme: 'warm',
-    },
-    {
-      id: 'env-002',
-      taskName: 'Data Table Navigation',
-      platform: 'Web Applications',
-      difficulty: 'Advanced',
-      description:
-        'Navigate complex data tables with sorting, filtering, and pagination while maintaining context across operations.',
-      tags: ['Data', 'Tables', 'Navigation'],
-      metrics: { completion: 87, complexity: 7 },
-      icon: (
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-          />
-        </svg>
-      ),
-      colorTheme: 'coral',
-    },
-    {
-      id: 'env-003',
-      taskName: 'E-commerce Checkout Flow',
-      platform: 'Web Applications',
-      difficulty: 'Advanced',
-      description:
-        'Complete purchase workflows with cart management, payment processing, and order confirmation.',
-      tags: ['E-commerce', 'Checkout', 'Payment'],
-      metrics: { completion: 92, complexity: 7 },
-      icon: (
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-      ),
-      colorTheme: 'gold',
-    },
-    {
-      id: 'env-004',
-      taskName: 'File Management System',
-      platform: 'Desktop Apps',
-      difficulty: 'Intermediate',
-      description:
-        'File operations including upload, download, folder navigation, and bulk operations.',
-      tags: ['File System', 'Operations', 'Management'],
-      metrics: { completion: 88, complexity: 6 },
-      icon: (
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-          />
-        </svg>
-      ),
-      colorTheme: 'warm',
-    },
-    {
-      id: 'env-005',
-      taskName: 'Menu Navigation Systems',
-      platform: 'Desktop Apps',
-      difficulty: 'Intermediate',
-      description:
-        'Complex menu navigation with submenus, keyboard shortcuts, and context menus.',
-      tags: ['Navigation', 'Menus', 'Shortcuts'],
-      metrics: { completion: 91, complexity: 5 },
-      icon: (
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
-      ),
-      colorTheme: 'coral',
-    },
-    {
-      id: 'env-006',
-      taskName: 'Mobile Gesture Controls',
-      platform: 'Mobile Interfaces',
-      difficulty: 'Advanced',
-      description:
-        'Touch-optimized interfaces with swipe gestures, pinch-to-zoom, and mobile-specific interactions.',
-      tags: ['Gestures', 'Touch', 'Mobile'],
-      metrics: { completion: 85, complexity: 8 },
-      icon: (
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-          />
-        </svg>
-      ),
-      colorTheme: 'gold',
-    },
-    {
-      id: 'env-007',
-      taskName: 'App Authentication Flow',
-      platform: 'Mobile Interfaces',
-      difficulty: 'Expert',
-      description:
-        'Multi-factor authentication with biometric login, social integration, and secure session management.',
-      tags: ['Authentication', 'Security', 'MFA'],
-      metrics: { completion: 93, complexity: 9 },
-      icon: (
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-          />
-        </svg>
-      ),
-      colorTheme: 'warm',
-    },
-    {
-      id: 'env-008',
-      taskName: 'Data Visualization Dashboard',
-      platform: 'Web Applications',
-      difficulty: 'Expert',
-      description:
-        'Interactive charts and graphs requiring data interpretation, filtering, and insight extraction.',
-      tags: ['Visualization', 'Charts', 'Analytics'],
-      metrics: { completion: 89, complexity: 9 },
-      icon: (
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-          />
-        </svg>
-      ),
-      colorTheme: 'coral',
-    },
-    {
-      id: 'env-009',
-      taskName: 'Email Client Interface',
-      platform: 'Desktop Apps',
-      difficulty: 'Advanced',
-      description:
-        'Email management with inbox organization, search functionality, and composition tools.',
-      tags: ['Email', 'Communication', 'Organization'],
-      metrics: { completion: 90, complexity: 7 },
-      icon: (
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-          />
-        </svg>
-      ),
-      colorTheme: 'gold',
-    },
-  ];
+  // Load environment data using the new service
+  const hookResult = useEnvironmentPreviews() as {
+    data: EnvironmentPreview[] | null;
+    loading: boolean;
+    error: string | null;
+    retry: () => void;
+  };
 
-  // Filter configurations
-  const filterConfigs: FilterConfig<string>[] = [
-    {
-      key: 'platform',
-      label: 'Platform',
-      value: selectedPlatform,
-      options: [
-        { value: 'all', label: 'All Platforms' },
-        { value: 'Web Applications', label: 'Web Applications' },
-        { value: 'Desktop Apps', label: 'Desktop Apps' },
-        { value: 'Mobile Interfaces', label: 'Mobile Interfaces' },
-      ],
-      onChange: setSelectedPlatform,
-    },
-    {
-      key: 'difficulty',
-      label: 'Difficulty Level',
-      value: selectedDifficulty,
-      options: [
-        { value: 'all', label: 'All Levels' },
-        { value: 'Intermediate', label: 'Intermediate' },
-        { value: 'Advanced', label: 'Advanced' },
-        { value: 'Expert', label: 'Expert' },
-      ],
-      onChange: setSelectedDifficulty,
-    },
-  ];
+  const { data: environmentsData, loading, error, retry } = hookResult;
+
+  // Enhanced filter configurations using data from the service
+  const filterConfigs: FilterConfig<string>[] = useMemo(
+    () => [
+      {
+        key: 'platform',
+        label: 'Platform',
+        value: selectedPlatform,
+        options: [
+          { value: 'all', label: 'All Platforms' },
+          { value: 'Web Applications', label: 'Web Applications' },
+          { value: 'Desktop Apps', label: 'Desktop Apps' },
+          { value: 'Mobile Interfaces', label: 'Mobile Interfaces' },
+        ],
+        onChange: setSelectedPlatform,
+      },
+      {
+        key: 'difficulty',
+        label: 'Difficulty Level',
+        value: selectedDifficulty,
+        options: [
+          { value: 'all', label: 'All Levels' },
+          { value: 'Intermediate', label: 'Intermediate' },
+          { value: 'Advanced', label: 'Advanced' },
+          { value: 'Expert', label: 'Expert' },
+        ],
+        onChange: setSelectedDifficulty,
+      },
+    ],
+    [selectedPlatform, selectedDifficulty]
+  );
 
   // Action buttons for filter controls
-  const filterActions = [
-    {
-      label: 'Reset Filters',
-      variant: 'secondary' as const,
-      onClick: () => {
-        setSelectedPlatform('all');
-        setSelectedDifficulty('all');
+  const filterActions = useMemo(
+    () => [
+      {
+        label: 'Reset Filters',
+        variant: 'secondary' as const,
+        onClick: () => {
+          setSelectedPlatform('all');
+          setSelectedDifficulty('all');
+        },
       },
-    },
-  ];
+    ],
+    []
+  );
 
-  // Filter environments based on selected filters
-  const filteredEnvironments = environmentPreviews.filter(env => {
-    const platformMatch =
-      selectedPlatform === 'all' || env.platform === selectedPlatform;
-    const difficultyMatch =
-      selectedDifficulty === 'all' || env.difficulty === selectedDifficulty;
-    return platformMatch && difficultyMatch;
-  });
+  // Map environment data to include React icon components
+  const environmentsWithIcons = useMemo((): EnvironmentPreviewWithIcon[] => {
+    if (!environmentsData) return [];
+
+    return environmentsData.map(env => {
+      const IconComponent = getIcon(env.icon) || getDefaultIcon();
+      return {
+        ...env,
+        icon: <IconComponent />,
+      };
+    });
+  }, [environmentsData]);
+
+  // Get filtered environments with icons
+  const filteredEnvironmentsWithIcons = useMemo(() => {
+    if (!environmentsWithIcons) return [];
+
+    // Apply platform filter
+    let filtered = environmentsWithIcons.filter(env =>
+      selectedPlatform === 'all' || env.platform === selectedPlatform
+    );
+
+    // Apply difficulty filter
+    filtered = filtered.filter(env =>
+      selectedDifficulty === 'all' || env.difficulty === selectedDifficulty
+    );
+
+    return filtered;
+  }, [environmentsWithIcons, selectedPlatform, selectedDifficulty]);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -379,6 +229,58 @@ const EnvironmentViewer: React.FC = () => {
     }
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <HeroSection
+          badge={{
+            text: '🔍 Environment Explorer',
+            variant: 'default',
+          }}
+          title={['Interactive Environment', 'Preview Gallery']}
+          description="Explore our comprehensive collection of AI-generated testing environments. Each environment is uniquely generated to ensure fair evaluation of GUI agent capabilities across different platforms and complexity levels."
+          buttons={[
+            {
+              text: '← Back to Overview',
+              to: '/environment',
+              variant: 'secondary-on-warm',
+            },
+          ]}
+          backgroundVariant="warm-gradient"
+          showPulseDots={true}
+        />
+        <LoadingState />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen">
+        <HeroSection
+          badge={{
+            text: '🔍 Environment Explorer',
+            variant: 'default',
+          }}
+          title={['Interactive Environment', 'Preview Gallery']}
+          description="Explore our comprehensive collection of AI-generated testing environments. Each environment is uniquely generated to ensure fair evaluation of GUI agent capabilities across different platforms and complexity levels."
+          buttons={[
+            {
+              text: '← Back to Overview',
+              to: '/environment',
+              variant: 'secondary-on-warm',
+            },
+          ]}
+          backgroundVariant="warm-gradient"
+          showPulseDots={true}
+        />
+        <ErrorState error={error} onRetry={retry} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -408,8 +310,8 @@ const EnvironmentViewer: React.FC = () => {
               Environment Gallery
             </h2>
             <p className="text-gray-600">
-              Showing {filteredEnvironments.length} of{' '}
-              {environmentPreviews.length} environments
+              Showing {filteredEnvironmentsWithIcons.length} of{' '}
+              {environmentsWithIcons.length} environments
             </p>
           </div>
 
@@ -425,7 +327,7 @@ const EnvironmentViewer: React.FC = () => {
       <div className="py-12 bg-linear-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredEnvironments.map(environment => (
+            {filteredEnvironmentsWithIcons.map(environment => (
               <div key={environment.id} className="group relative">
                 <div className="absolute -inset-1 bg-linear-to-r from-warm-400 to-coral-400 rounded-2xl opacity-0 group-hover:opacity-25 transition-all duration-500 ease-out blur-xl"></div>
                 <div className="relative card p-6 bg-white shadow-lg group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 ease-out">
@@ -506,7 +408,7 @@ const EnvironmentViewer: React.FC = () => {
           </div>
 
           {/* Empty State */}
-          {filteredEnvironments.length === 0 && (
+          {filteredEnvironmentsWithIcons.length === 0 && (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
