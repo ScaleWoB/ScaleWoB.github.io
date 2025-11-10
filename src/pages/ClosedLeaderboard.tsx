@@ -4,6 +4,7 @@ import BackgroundDecorations from '../components/common/BackgroundDecorations';
 import StatCard from '../components/common/StatCard';
 import LeaderboardTable, {
   ColumnConfig,
+  ClosedAgent,
 } from '../components/leaderboard/LeaderboardTable';
 import FilterControls, {
   FilterConfig,
@@ -19,7 +20,7 @@ const ClosedLeaderboard: React.FC = () => {
   >('all');
 
   // Placeholder data with more realistic closed test results
-  const agents = [
+  const agents: ClosedAgent[] = [
     {
       id: '1',
       name: 'Enterprise-GUI-Pro',
@@ -117,7 +118,7 @@ const ClosedLeaderboard: React.FC = () => {
   ];
 
   // Define table columns
-  const tableColumns: ColumnConfig[] = [
+  const tableColumns: ColumnConfig<ClosedAgent>[] = [
     { key: 'rank', label: 'Rank', align: 'left' },
     { key: 'name', label: 'Agent', align: 'left' },
     { key: 'organization', label: 'Organization', align: 'left' },

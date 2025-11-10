@@ -359,7 +359,7 @@ const Homepage: React.FC = () => {
               {
                 text: 'Explore Environments',
                 to: '/environment',
-                variant: 'outline',
+                variant: 'outline-solid',
               },
             ]}
             className="mb-12"

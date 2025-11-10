@@ -166,9 +166,10 @@ const LeaderboardTable = <T extends BaseAgent = BaseAgent>({
         if ('category' in agent) {
           return (
             <span
-              className={`text-xs px-3 py-2 rounded-xl font-semibold ${getCategoryBadge(agent.category)} group-hover:scale-105 transition-transform duration-300`}
+              className={`text-xs px-3 py-2 rounded-xl font-semibold ${getCategoryBadge(String(agent.category))} group-hover:scale-105 transition-transform duration-300`}
             >
-              {agent.category.charAt(0).toUpperCase() + agent.category.slice(1)}
+              {String(agent.category).charAt(0).toUpperCase() +
+                String(agent.category).slice(1)}
             </span>
           );
         }

@@ -71,7 +71,7 @@ const FilterControls = <T extends string = string>({
               <div className="relative">
                 <select
                   value={filter.value}
-                  onChange={e => filter.onChange(e.target.value)}
+                  onChange={e => filter.onChange(e.target.value as T)}
                   className={`appearance-none w-full px-6 py-3 pr-12 border ${themeColors.border} rounded-2xl bg-white text-gray-900 ${themeColors.focusRing} ${themeColors.focusBorder} ${themeColors.hoverBorder} transition-all duration-300 cursor-pointer shadow-xs hover:shadow-md font-medium`}
                 >
                   {filter.options.map(option => (

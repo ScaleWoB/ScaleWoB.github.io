@@ -4,6 +4,7 @@ import BackgroundDecorations from '../components/common/BackgroundDecorations';
 import StatCard from '../components/common/StatCard';
 import LeaderboardTable, {
   ColumnConfig,
+  OpenAgent,
 } from '../components/leaderboard/LeaderboardTable';
 import FilterControls, {
   FilterConfig,
@@ -117,7 +118,7 @@ const OpenLeaderboard: React.FC = () => {
   ];
 
   // Define table columns
-  const tableColumns: ColumnConfig[] = [
+  const tableColumns: ColumnConfig<OpenAgent>[] = [
     { key: 'rank', label: 'Rank', align: 'left' },
     { key: 'name', label: 'Agent', align: 'left' },
     { key: 'organization', label: 'Organization', align: 'left' },
