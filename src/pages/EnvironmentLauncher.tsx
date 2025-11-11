@@ -2,6 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useEnvironmentData } from '../services/environmentService';
 import { EnvironmentPreview } from '../types/environment';
+import {
+  getEnvironmentUrl,
+  getCdnUrl,
+  hasCdnUrl,
+} from '../config/environmentUrls';
 
 interface ConsoleEntry {
   id: string;
@@ -37,6 +42,13 @@ const EnvironmentLauncher = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isScriptInjected, setIsScriptInjected] = useState(false);
+  const [useCdn, setUseCdn] = useState(true);
+  const [cdnStatus, setCdnStatus] = useState<
+    'checking' | 'available' | 'failed' | 'config-error'
+  >('checking');
+  const [loadingSource, setLoadingSource] = useState<
+    'cdn' | 'local' | 'fallback'
+  >('cdn');
 
   // Event type preferences
   const [eventPreferences, setEventPreferences] = useState({
@@ -111,6 +123,176 @@ const EnvironmentLauncher = () => {
     };
     setConsoleEntries(prev => [...prev.slice(-99), newEntry]); // Keep last 100 entries
   };
+
+  // Enhanced CDN availability checking with header validation and CORS handling
+  const checkCdnAvailability = useCallback(
+    async (url: string): Promise<boolean> => {
+      let hasConfigError = false;
+
+      // First try with CORS to get detailed header information
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout for CORS
+
+        const response = await fetch(url, {
+          method: 'HEAD',
+          mode: 'cors',
+          cache: 'no-cache',
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        // Check for problematic headers that would cause download behavior
+        const contentDisposition = response.headers.get('content-disposition');
+        const forceDownload = response.headers.get('x-oss-force-download');
+
+        if (
+          contentDisposition?.includes('attachment') ||
+          forceDownload === 'true'
+        ) {
+          hasConfigError = true;
+          if (eventPreferences.error) {
+            addConsoleEntry(
+              'error',
+              'CDN configuration issue: Content-Disposition forces download instead of iframe display',
+              {
+                url,
+                contentDisposition,
+                forceDownload,
+                recommendation:
+                  'Configure CDN to remove Content-Disposition: attachment header for HTML files',
+              }
+            );
+          }
+        }
+
+        return !hasConfigError;
+      } catch (error) {
+        // If CORS fails, try basic accessibility check with no-cors
+        if (
+          error instanceof Error &&
+          (error.message.includes('CORS') ||
+            error.message.includes('Failed to fetch'))
+        ) {
+          if (eventPreferences.error) {
+            addConsoleEntry(
+              'error',
+              'CDN CORS not enabled - cannot check headers, but will test basic accessibility',
+              { url, corsIssue: true }
+            );
+          }
+
+          // Fallback: Basic accessibility test without CORS
+          try {
+            const fallbackController = new AbortController();
+            const fallbackTimeout = setTimeout(
+              () => fallbackController.abort(),
+              5000
+            );
+
+            await fetch(url, {
+              method: 'HEAD',
+              mode: 'no-cors',
+              cache: 'no-cache',
+              signal: fallbackController.signal,
+            });
+
+            clearTimeout(fallbackTimeout);
+
+            // Assume config error since we know from testing that Content-Disposition: attachment is set
+            if (eventPreferences.error) {
+              addConsoleEntry(
+                'error',
+                'CDN has known configuration issues (Content-Disposition: attachment, CORS disabled) - use local environment',
+                {
+                  url,
+                  contentDisposition: 'attachment',
+                  corsEnabled: false,
+                  recommendation:
+                    'Configure CDN: 1) Enable CORS, 2) Remove Content-Disposition: attachment for HTML files',
+                }
+              );
+            }
+
+            setCdnStatus('config-error');
+            return false;
+          } catch (fallbackError) {
+            if (eventPreferences.error) {
+              addConsoleEntry(
+                'error',
+                'CDN completely inaccessible - both CORS and basic requests failed',
+                {
+                  url,
+                  corsError: error.message,
+                  basicAccessError:
+                    fallbackError instanceof Error
+                      ? fallbackError.message
+                      : 'Unknown',
+                }
+              );
+            }
+            return false;
+          }
+        }
+
+        // Handle other types of errors (timeout, network issues)
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.warn('CDN check timed out');
+          if (eventPreferences.error) {
+            addConsoleEntry(
+              'error',
+              'CDN availability check timed out after 3 seconds'
+            );
+          }
+        } else {
+          console.warn('CDN not available, falling back to local:', error);
+          if (eventPreferences.error) {
+            addConsoleEntry(
+              'error',
+              'CDN not accessible, falling back to local environment',
+              {
+                error: error instanceof Error ? error.message : 'Unknown error',
+              }
+            );
+          }
+        }
+        return false;
+      }
+    },
+    [eventPreferences.error]
+  );
+
+  // Get the current iframe source URL
+  const getIframeSrc = useCallback(() => {
+    const currentEnvId = envId || 'env-006';
+    if (useCdn && hasCdnUrl(currentEnvId)) {
+      return getEnvironmentUrl(currentEnvId, true);
+    }
+    return getEnvironmentUrl(currentEnvId, false);
+  }, [useCdn, envId]);
+
+  // Handle iframe loading errors with CDN fallback
+  const handleIframeError = useCallback(() => {
+    if (useCdn) {
+      if (eventPreferences.error) {
+        addConsoleEntry(
+          'error',
+          'CDN environment failed to load, switching to local'
+        );
+      }
+      setUseCdn(false);
+      setCdnStatus('failed');
+      setLoadingSource('fallback');
+    } else {
+      if (eventPreferences.error) {
+        addConsoleEntry(
+          'error',
+          'Both CDN and local environments failed to load'
+        );
+      }
+    }
+  }, [useCdn, eventPreferences.error]);
 
   // Toggle expand/collapse for entry metadata
   const toggleEntryExpansion = (entryId: string) => {
@@ -254,6 +436,65 @@ const EnvironmentLauncher = () => {
         consoleContentRef.current.scrollHeight;
     }
   }, [consoleEntries]);
+
+  // Initialize CDN availability on component mount
+  useEffect(() => {
+    const initializeEnvironment = async () => {
+      const currentEnvId = envId || 'env-006';
+      const cdnUrl = getCdnUrl(currentEnvId);
+
+      if (useCdn && cdnUrl) {
+        setCdnStatus('checking');
+        setLoadingSource('cdn');
+
+        if (eventPreferences.info) {
+          addConsoleEntry(
+            'info',
+            `Checking CDN availability for ${currentEnvId}...`
+          );
+        }
+
+        const isCdnAvailable = await checkCdnAvailability(cdnUrl);
+
+        if (isCdnAvailable) {
+          setCdnStatus('available');
+          if (eventPreferences.success) {
+            addConsoleEntry(
+              'success',
+              'CDN environment is available and loading'
+            );
+          }
+        } else {
+          setCdnStatus('failed');
+          setUseCdn(false);
+          setLoadingSource('local');
+          if (eventPreferences.info) {
+            addConsoleEntry(
+              'info',
+              'CDN not available, switching to local environment'
+            );
+          }
+        }
+      } else {
+        setCdnStatus('failed');
+        setLoadingSource('local');
+        if (eventPreferences.info) {
+          addConsoleEntry(
+            'info',
+            'Using local environment (CDN not configured or disabled)'
+          );
+        }
+      }
+    };
+
+    initializeEnvironment();
+  }, [
+    envId,
+    useCdn,
+    checkCdnAvailability,
+    eventPreferences.info,
+    eventPreferences.success,
+  ]);
 
   // Enhanced event tracking script injection
   const injectEventTrackingScript = () => {
@@ -1022,6 +1263,42 @@ const EnvironmentLauncher = () => {
                 </div>
               </div>
 
+              {/* CDN Status Indicator */}
+              {cdnStatus === 'checking' && (
+                <div className="flex items-center space-x-2 bg-yellow-50 px-3 py-1 rounded-lg border border-yellow-200">
+                  <div className="h-2 w-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-medium text-yellow-700">
+                    Checking CDN...
+                  </span>
+                </div>
+              )}
+              {cdnStatus === 'available' && (
+                <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-xs font-medium text-blue-700">
+                    CDN Active
+                  </span>
+                </div>
+              )}
+              {cdnStatus === 'config-error' && (
+                <div className="flex items-center space-x-2 bg-red-50 px-3 py-1 rounded-lg border border-red-200">
+                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                  <span className="text-xs font-medium text-red-700">
+                    CDN Config Error
+                  </span>
+                </div>
+              )}
+              {cdnStatus === 'failed' && (
+                <div className="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-lg border border-gray-200">
+                  <div className="h-2 w-2 bg-gray-500 rounded-full"></div>
+                  <span className="text-xs font-medium text-gray-700">
+                    {loadingSource === 'fallback'
+                      ? 'Local (CDN Failed)'
+                      : 'Local Only'}
+                  </span>
+                </div>
+              )}
+
               {/* Status Indicator */}
               {isLoading && (
                 <div className="flex items-center space-x-2 bg-warm-50 px-3 py-2 rounded-lg border border-warm-200">
@@ -1038,6 +1315,38 @@ const EnvironmentLauncher = () => {
                     Active
                   </span>
                 </div>
+              )}
+
+              {/* Source Toggle Button */}
+              {hasCdnUrl(envId || 'env-006') && (
+                <button
+                  onClick={() => {
+                    const newUseCdn = !useCdn;
+                    setUseCdn(newUseCdn);
+                    if (newUseCdn) {
+                      setCdnStatus('checking');
+                      setLoadingSource('cdn');
+                      if (eventPreferences.info) {
+                        addConsoleEntry('info', 'Switching to CDN environment');
+                      }
+                    } else {
+                      setCdnStatus(
+                        cdnStatus === 'config-error' ? 'config-error' : 'failed'
+                      );
+                      setLoadingSource('local');
+                      if (eventPreferences.info) {
+                        addConsoleEntry(
+                          'info',
+                          'Switching to local environment'
+                        );
+                      }
+                    }
+                  }}
+                  className="px-3 py-1.5 text-xs bg-warm-100 text-warm-700 rounded-lg hover:bg-warm-200 transition-colors duration-200 font-medium border border-warm-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isLoading}
+                >
+                  {useCdn ? 'Use Local' : 'Use CDN'}
+                </button>
               )}
             </div>
           </div>
@@ -1211,7 +1520,7 @@ const EnvironmentLauncher = () => {
                   {/* Iframe - Perfect fit with no spacing */}
                   <iframe
                     ref={iframeRef}
-                    src={'/env/index.html'}
+                    src={getIframeSrc()}
                     className="absolute inset-0 w-full h-full bg-white"
                     style={{
                       width: '100%',
@@ -1223,10 +1532,11 @@ const EnvironmentLauncher = () => {
                     title="Environment"
                     onLoad={() => {
                       setIsLoading(false);
+                      const source = useCdn ? 'CDN' : 'local';
                       if (eventPreferences.success) {
                         addConsoleEntry(
                           'success',
-                          'Mobile environment loaded successfully'
+                          `Mobile environment loaded successfully from ${source}`
                         );
                       }
 
@@ -1235,12 +1545,7 @@ const EnvironmentLauncher = () => {
                         injectEventTrackingScript();
                       }, 500);
                     }}
-                    onError={() => {
-                      addConsoleEntry(
-                        'error',
-                        'Failed to load environment iframe'
-                      );
-                    }}
+                    onError={handleIframeError}
                   />
                 </div>
               </div>
