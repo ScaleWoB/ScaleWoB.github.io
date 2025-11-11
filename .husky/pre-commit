@@ -1,1 +1,5 @@
-npm run precommit
+npm run format && \
+npm run lint:fix && \
+git add -u && \
+npm run lint && \
+npm run build
