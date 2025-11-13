@@ -1,95 +1,130 @@
-# ScaleWoB Benchmark Website
+# CLAUDE.md
 
-This is the official website for the **ScaleWoB** GUI Agent Benchmark - a revolutionary platform for fair evaluation of GUI agents using AI-generated environments.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-ScaleWoB is a comprehensive GUI agent benchmark that solves critical problems in AI evaluation by creating unique testing scenarios for each evaluation, preventing over-fitting and ensuring fair assessment of agent capabilities.
+ScaleWoB is a GUI Agent Benchmark website for fair evaluation of GUI agents using AI-generated environments. This React/TypeScript application showcases benchmark environments, leaderboards, and provides interactive demonstrations.
 
-### Key Features
+## Core Commands
 
-- **AI-Generated Environments**: Dynamic testing environments unique to each evaluation
-- **Fair Evaluation Methodology**: Eliminates memorization issues found in fixed benchmarks
-- **Multi-platform Support**: Web applications, desktop apps, and mobile interfaces
-- **Real-time Interaction Testing**: Clicking, typing, navigation, and multi-step operations
+### Development
 
-## Technology Stack
+- `npm run dev` - Start development server on port 3000
+- `npm run build` - Production build (runs TypeScript compilation + Vite build)
+- `npm run preview` - Preview production build locally
 
-- **React 18.2.0** - Modern UI framework with TypeScript support
-- **Vite** - Fast build tool and development server
-- **TypeScript** - Type-safe development
-- **React Router DOM 6.15.0** - Client-side routing with HashRouter for GitHub Pages compatibility
-- **Tailwind CSS 3.3.3** - Utility-first CSS framework with custom design system
-- **ESLint** - Code quality and linting
+### Code Quality
 
-## Development Guidelines
+- `npm run lint` - Run ESLint checks
+- `npm run lint:fix` - Auto-fix ESLint issues
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting
+- `npm run precommit` - Run full pre-commit check (format + lint:fix + lint + build)
 
-### Project Structure
+## Architecture Overview
+
+### Application Structure
+
+- **React 19.2.0** with TypeScript and functional components using hooks
+- **HashRouter** for GitHub Pages compatibility (not BrowserRouter)
+- **Vite** as build tool and development server
+- **Tailwind CSS v4** for styling with custom warm color palette
+
+### Key Directories
 
 ```
 src/
-├── pages/           # Main page components
-├── components/      # Reusable UI components
-│   └── common/      # Shared layout components
-├── styles/          # Global CSS and Tailwind extensions
-└── main.tsx         # Application entry point
+├── pages/              # Route-level components (Homepage, LeaderboardHome, Gallery, etc.)
+├── components/
+│   └── common/         # Shared layout components (Layout, Navigation, Footer, etc.)
+├── types/              # TypeScript type definitions
+├── config/             # Configuration files (environment URLs)
+├── services/           # Business logic and data services
+├── scripts/            # Bridge script for CDN environments
+├── data/               # Static data (environments.json)
+└── styles/             # Global CSS and Tailwind extensions
 ```
 
-### Available Scripts
+### Routing Architecture
 
-- `npm run dev` - Development server on port 3000
-- `npm run build` - Production build
-- `npm run preview` - Preview production build locally
-- `npm run deploy` - Deploy to GitHub Pages
-- `npm run lint` - Run ESLint code quality checks
+The app uses HashRouter with these main routes:
 
-### Design System
+- `/` - Homepage with hero section and features
+- `/leaderboard` - Agent performance rankings
+- `/gallery` - Environment showcase with filtering
+- `/launcher/:envId` - Environment launcher pages
+- `/launcher/env-006` - Special dedicated launcher for env-006
 
-The website uses a custom warm color palette:
+### Environment Integration
 
-- **Warm colors**: Primary branding colors
-- **Coral accents**: Highlight and interactive elements
-- **Gold details**: Premium feature indicators
+The core feature is the **ScaleWoB Bridge** (`src/scripts/scalewob-bridge.js`) - a sophisticated communication layer that:
 
-### Key Development Notes
+- Enables two-way communication between CDN-hosted environments and the main website
+- Tracks user interactions (clicks, typing, scrolling, navigation)
+- Executes commands from parent window (click, type, navigate, get-state)
+- Uses postMessage API for secure cross-origin communication
+- Provides comprehensive event tracking with debounced scroll detection
 
-- Uses **HashRouter** for GitHub Pages compatibility
+### Data Management
+
+- **Environment data**: Static JSON in `src/data/environments.json` with TypeScript interfaces
+- **URL configuration**: Centralized in `src/config/environmentUrls.ts` for CDN links
+- **Type safety**: Comprehensive TypeScript types for all environment-related data in `src/types/environment.ts`
+
+## Development Patterns
+
+### Component Architecture
+
+- Functional components with TypeScript interfaces for props
+- Custom hooks for complex state logic
 - Responsive design with mobile-first approach
-- Component-based architecture following React best practices
-- TypeScript for type safety and better developer experience
+- Consistent styling using Tailwind CSS utility classes
 
-## Deployment
+### State Management
 
-- Configured for GitHub Pages deployment
-- Base URL: `https://ScaleWoB.github.io`
-- Build output in `dist/` directory
-- Uses `gh-pages` branch for deployment
+- React built-in state (useState, useEffect) - no external state library
+- Environment data loaded asynchronously with proper loading states
+- Error handling for failed environment loads
 
-## Code Quality
+### Styling System
 
-- ESLint configuration for React + TypeScript
-- Prettier formatting (if configured)
-- Clean component structure with proper TypeScript types
-- Modern React patterns with hooks and functional components
+- Custom warm color palette (warm, coral, gold themes)
+- Tailwind CSS v4 with custom configuration
+- Responsive breakpoints and mobile-first design
+- Consistent spacing and typography scales
 
-## Content Sections
+## Deployment Configuration
 
-- **Homepage**: Hero section, features, and benchmark statistics
-- **Leaderboard**: Agent performance rankings (placeholder for upcoming data)
-- **Environment**: Interactive environment showcase and demonstrations
+### GitHub Pages Setup
 
-## Development Best Practices
+- Repository name: `ScaleWoB.github.io`
+- Base URL: `/` (configured in vite.config.ts)
+- Automatic deployment via GitHub Actions workflow
+- HashRouter essential for proper routing on GitHub Pages
 
-1. Follow existing component structure and naming conventions
-2. Use TypeScript types for all props and state
-3. Maintain responsive design principles
-4. Use Tailwind CSS classes for styling
-5. Test locally before deployment
-6. Keep build size optimized for GitHub Pages
+### Build Process
 
-## GitHub Pages Configuration
+1. TypeScript compilation (`tsc`)
+2. Vite build to `dist/` directory
+3. GitHub Actions automatically deploys to GitHub Pages on push to main branch
 
-- Repository name must match the deployment URL
-- HashRouter ensures proper routing on GitHub Pages
-- Base URL configured in Vite for asset loading
-- Automatic deployment via npm scripts
+## Environment System
+
+### Environment Structure
+
+Each environment has:
+
+- Unique ID (e.g., `env-006`)
+- Task name and description
+- Platform (Web Applications, Desktop Apps, Mobile Interfaces)
+- Difficulty level (Intermediate, Advanced, Expert)
+- Performance metrics (completion, complexity)
+- Color theme for visual consistency
+
+### CDN Integration
+
+- Environments hosted externally on CDN
+- Bridge script injected for communication
+- URL management through configuration system
+- Fallback handling for missing environments
