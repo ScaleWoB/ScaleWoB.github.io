@@ -527,17 +527,12 @@ const LeaderboardHome: React.FC = () => {
                         Open Benchmark
                       </h4>
                     </div>
-                    <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                    <p className="text-sm text-gray-700 leading-relaxed">
                       Publicly accessible evaluation environment where
                       researchers can test agents and view results openly.
                       Perfect for initial development, experimentation, and
                       collaborative research.
                     </p>
-                    <ul className="text-xs text-gray-600 space-y-1">
-                      <li>• Public results and rankings</li>
-                      <li>• Unlimited testing opportunities</li>
-                      <li>• Community-driven development</li>
-                    </ul>
                   </div>
 
                   {/* Closed Benchmark */}
@@ -562,17 +557,12 @@ const LeaderboardHome: React.FC = () => {
                         Closed Benchmark
                       </h4>
                     </div>
-                    <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                    <p className="text-sm text-gray-700 leading-relaxed">
                       Private evaluation track designed to ensure fairness and
                       prevent overfitting. Only authorized teams can
                       participate, with controlled access to maintain evaluation
                       integrity.
                     </p>
-                    <ul className="text-xs text-gray-600 space-y-1">
-                      <li>• Authorized access only</li>
-                      <li>• Prevents overfitting and score gaming</li>
-                      <li>• Ensures fair, meaningful competition</li>
-                    </ul>
                   </div>
                 </div>
 
