@@ -22,7 +22,7 @@ const Homepage: React.FC = () => {
                 </div>
               </div>
               {/* GitHub-style Avatar */}
-              <div className="ml-6 flex-shrink-0">
+              <div className="ml-6 shrink-0">
                 <div className="w-20 h-20 rounded-lg border-2 border-gray-300 bg-gray-100 flex items-center justify-center shadow-sm">
                   <svg
                     className="w-10 h-10 text-gray-600"
@@ -48,7 +48,7 @@ const Homepage: React.FC = () => {
               <div className="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">
                 Abstract
               </div>
-              <p className="text-base text-gray-700 leading-relaxed mb-8 break-words">
+              <p className="text-base text-gray-700 leading-relaxed mb-8 wrap-break-words">
                 ScaleWoB presents a revolutionary approach to GUI agent
                 benchmarking through AI-generated testing environments. This
                 comprehensive platform eliminates over-fitting issues found in
@@ -150,7 +150,7 @@ const Homepage: React.FC = () => {
                     <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
                       AI-Generated Environments
                     </h4>
-                    <p className="text-sm md:text-base text-gray-700 leading-relaxed break-words">
+                    <p className="text-sm md:text-base text-gray-700 leading-relaxed wrap-break-words">
                       Unique testing scenarios generated dynamically for each
                       evaluation session, preventing agent memorization and
                       ensuring authentic assessment of capabilities rather than
@@ -161,7 +161,7 @@ const Homepage: React.FC = () => {
               </div>
 
               {/* Column 2 */}
-              <div className="md:border-r md:border-gray-200 md:px-6 md:px-4 px-2 md:py-0 py-4">
+              <div className="md:border-r md:border-gray-200 md:px-6 px-2 md:py-0 py-4">
                 <div className="text-sm font-bold uppercase text-gray-700 mb-3 md:mb-4">
                   Evaluation
                 </div>
@@ -170,7 +170,7 @@ const Homepage: React.FC = () => {
                     <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
                       Fair Assessment Protocol
                     </h4>
-                    <p className="text-sm md:text-base text-gray-700 leading-relaxed break-words">
+                    <p className="text-sm md:text-base text-gray-700 leading-relaxed wrap-break-words">
                       Eliminates critical over-fitting issues prevalent in
                       fixed-environment benchmarks, providing genuine
                       performance measurement across diverse testing scenarios.
@@ -189,7 +189,7 @@ const Homepage: React.FC = () => {
                     <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
                       Cross-Platform Testing
                     </h4>
-                    <p className="text-sm md:text-base text-gray-700 leading-relaxed break-words">
+                    <p className="text-sm md:text-base text-gray-700 leading-relaxed wrap-break-words">
                       Comprehensive evaluation framework supporting web
                       applications, desktop interfaces, and mobile platforms
                       within unified testing methodology.
@@ -267,14 +267,14 @@ const Homepage: React.FC = () => {
                 <h4 className="text-xl font-bold text-gray-900 mb-4">
                   Customized Testing Scenarios
                 </h4>
-                <p className="text-base text-gray-700 leading-relaxed break-words mb-4">
+                <p className="text-base text-gray-700 leading-relaxed wrap-break-words mb-4">
                   We provide bespoke environment and task generation services
                   tailored to specific evaluation requirements. Our AI-powered
                   system creates unique testing scenarios that match your exact
                   specifications, ensuring comprehensive coverage of edge cases
                   and real-world use cases.
                 </p>
-                <p className="text-base text-gray-700 leading-relaxed break-words mb-4">
+                <p className="text-base text-gray-700 leading-relaxed wrap-break-words mb-4">
                   Perfect for research institutions and organizations requiring
                   specialized benchmark environments with custom difficulty
                   levels, specific application types, or domain-specific
@@ -296,13 +296,13 @@ const Homepage: React.FC = () => {
                 <h4 className="text-xl font-bold text-gray-900 mb-4">
                   Systematic Performance Assessment
                 </h4>
-                <p className="text-base text-gray-700 leading-relaxed break-words mb-4">
+                <p className="text-base text-gray-700 leading-relaxed wrap-break-words mb-4">
                   Our comprehensive evaluation framework provides systematic
                   assessment of GUI agent performance across multiple dimensions
                   including task completion rate, efficiency, adaptability, and
                   robustness in novel environments.
                 </p>
-                <p className="text-base text-gray-700 leading-relaxed break-words mb-4">
+                <p className="text-base text-gray-700 leading-relaxed wrap-break-words mb-4">
                   We deliver detailed performance analytics, comparative
                   analysis against baseline models, and actionable insights for
                   improving agent capabilities through rigorous testing
