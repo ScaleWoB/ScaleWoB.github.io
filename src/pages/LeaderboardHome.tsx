@@ -9,15 +9,29 @@ const LeaderboardHome: React.FC = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Newspaper Header */}
           <div className="py-8 border-b-2 border-gray-400">
-            <div className="text-center">
-              <div className="text-sm font-bold uppercase tracking-wider text-gray-600 mb-2">
-                Performance Rankings
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="text-sm font-bold uppercase tracking-wider text-gray-600 mb-2">
+                  Performance Rankings
+                </div>
+                <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-2 leading-none">
+                  LEADERBOARD
+                </h1>
+                <div className="text-lg font-medium text-gray-700">
+                  Competitive GUI Agent Evaluation
+                </div>
               </div>
-              <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-2 leading-none">
-                LEADERBOARD
-              </h1>
-              <div className="text-lg font-medium text-gray-700">
-                Competitive GUI Agent Evaluation
+              {/* Trophy Icon */}
+              <div className="ml-6 shrink-0">
+                <div className="w-20 h-20 rounded-lg border-2 border-gray-300 bg-gray-100 flex items-center justify-center shadow-sm">
+                  <svg
+                    className="w-10 h-10 text-gray-600"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 003.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
