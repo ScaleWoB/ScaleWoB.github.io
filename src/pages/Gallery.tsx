@@ -237,13 +237,13 @@ const Gallery: React.FC = () => {
       <div className="sticky top-0 bg-white z-20 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Newspaper Header */}
-          <div className="py-6 border-b-2 border-gray-400">
+          <div className="py-8 border-b-2 border-gray-400">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="text-sm font-bold uppercase tracking-wider text-gray-600 mb-2">
                   Environment Collection
                 </div>
-                <h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-2 leading-none">
+                <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-2 leading-none">
                   GALLERY
                 </h1>
                 <div className="text-lg font-medium text-gray-700">
@@ -252,7 +252,7 @@ const Gallery: React.FC = () => {
               </div>
               {/* Gallery Icon */}
               <div className="ml-6 shrink-0">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg border-2 border-gray-300 bg-gray-100 flex items-center justify-center shadow-sm">
+                <div className="w-20 h-20 rounded-lg border-2 border-gray-300 bg-gray-100 flex items-center justify-center shadow-sm">
                   <svg
                     className="w-8 h-8 md:w-10 md:h-10 text-gray-600"
                     fill="none"
