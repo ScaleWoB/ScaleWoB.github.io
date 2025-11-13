@@ -754,7 +754,7 @@ const EnvironmentLauncher = () => {
                       <div className="mt-3 p-4 bg-white bg-opacity-90 rounded-lg border border-gray-200 w-full max-w-none">
                         <div className="text-xs font-mono">
                           {Object.entries(entry.details).map(([key, value]) => (
-                            <div key={key} className="mb-2 break-words">
+                            <div key={key} className="mb-2 wrap-break-words">
                               <span className="font-semibold text-gray-600">
                                 {key}:
                               </span>{' '}
@@ -785,7 +785,7 @@ const EnvironmentLauncher = () => {
           {/* Iframe Container with Fixed Size */}
           <div className="flex-1 flex items-center justify-center p-8 bg-gray-50 overflow-auto min-h-0">
             <div
-              className="relative flex-shrink-0"
+              className="relative shrink-0"
               style={{
                 width: `${mobileDimensions.width}px`,
                 height: `${mobileDimensions.height}px`,
