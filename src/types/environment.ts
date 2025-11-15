@@ -27,6 +27,7 @@ export interface EnvironmentPreview {
   metrics: EnvironmentMetrics;
   icon?: string; // Icon identifier string
   colorTheme: ColorTheme;
+  cdnUrl?: string; // CDN URL for the environment
 }
 
 // Extended interface for environment with React icon component
@@ -79,6 +80,7 @@ export interface RawEnvironmentPreview {
   };
   icon?: string;
   colorTheme?: ColorTheme;
+  cdnUrl?: string; // CDN URL for the environment
 }
 
 export interface RawEnvironmentData {

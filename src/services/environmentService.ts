@@ -12,6 +12,7 @@ import {
   RawEnvironmentData,
   RawEnvironmentPreview,
 } from '../types/environment';
+import { populateEnvironmentUrls } from '../config/environmentUrls';
 
 /**
  * Configuration for environment data loading
@@ -54,18 +55,21 @@ class EnvironmentDataService {
    */
   private async loadDataFromSource<T>(filePath: string): Promise<T> {
     try {
-      // For now, load from local JSON file
-      const response = await fetch(filePath);
+      // Load from CDN if it's environments data, otherwise load from local file
+      const url = filePath.includes('environments')
+        ? 'https://niumascript.com/scalewob-env/environments.json'
+        : filePath;
+
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(
-          `Failed to load data: ${response.status} ${response.statusText}`
+          `Failed to load data from ${url}: ${response.status} ${response.statusText}`
         );
       }
       return await response.json();
     } catch (error) {
-      // In a real implementation, this would be replaced with API calls
       throw new Error(
-        `Data loading failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Data loading failed from ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }
@@ -116,43 +120,73 @@ class EnvironmentDataService {
       attempt++
     ) {
       try {
-        return await this.loadDataWithCache<EnvironmentData>(
+        const result = await this.loadDataWithCache<EnvironmentData>(
           'environments',
           '/data/environments.json',
           (raw: unknown): EnvironmentData => {
-            const rawData = raw as RawEnvironmentData;
-            // Validate and transform data if needed
-            if (!rawData.environments || !Array.isArray(rawData.environments)) {
+            // Handle both new format (direct array) and old format (object with environments property)
+            let environments: RawEnvironmentPreview[];
+            let lastUpdated = new Date().toISOString();
+            let version = '1.0.0';
+
+            if (Array.isArray(raw)) {
+              // New format: direct array of environments
+              environments = raw;
+            } else if (
+              raw &&
+              typeof raw === 'object' &&
+              'environments' in raw
+            ) {
+              // Old format: object with environments property
+              const rawData = raw as RawEnvironmentData;
+              environments = rawData.environments;
+              lastUpdated = rawData.lastUpdated || lastUpdated;
+              version = rawData.version || version;
+            } else {
               throw new Error('Invalid environment data format');
             }
+
+            if (!Array.isArray(environments)) {
+              throw new Error('Invalid environment data format');
+            }
+
+            const processedEnvironments = environments.map(
+              (env: RawEnvironmentPreview): EnvironmentPreview => ({
+                ...env,
+                // Ensure all required fields are present
+                id: env.id || `env-${Date.now()}`,
+                taskName: env.taskName || 'Untitled Environment',
+                platform: env.platform || 'Web Applications',
+                difficulty: env.difficulty || 'Intermediate',
+                description: env.description || '',
+                tags: Array.isArray(env.tags) ? env.tags : [],
+                metrics: {
+                  completion:
+                    typeof env.metrics?.completion === 'number'
+                      ? env.metrics.completion
+                      : 0,
+                  complexity:
+                    typeof env.metrics?.complexity === 'number'
+                      ? env.metrics.complexity
+                      : 1,
+                },
+                colorTheme: env.colorTheme || 'warm',
+                cdnUrl: env.cdnUrl, // Pass through CDN URL if present
+              })
+            );
+
+            // Populate the environment URLs for the config module
+            populateEnvironmentUrls(processedEnvironments);
+
             return {
-              ...rawData,
-              environments: rawData.environments.map(
-                (env: RawEnvironmentPreview): EnvironmentPreview => ({
-                  ...env,
-                  // Ensure all required fields are present
-                  id: env.id || `env-${Date.now()}`,
-                  taskName: env.taskName || 'Untitled Environment',
-                  platform: env.platform || 'Web Applications',
-                  difficulty: env.difficulty || 'Intermediate',
-                  description: env.description || '',
-                  tags: Array.isArray(env.tags) ? env.tags : [],
-                  metrics: {
-                    completion:
-                      typeof env.metrics?.completion === 'number'
-                        ? env.metrics.completion
-                        : 0,
-                    complexity:
-                      typeof env.metrics?.complexity === 'number'
-                        ? env.metrics.complexity
-                        : 1,
-                  },
-                  colorTheme: env.colorTheme || 'warm',
-                })
-              ),
+              environments: processedEnvironments,
+              lastUpdated,
+              version,
             };
           }
         );
+
+        return result;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error('Unknown error');
 

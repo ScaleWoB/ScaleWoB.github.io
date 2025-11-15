@@ -133,17 +133,21 @@ const EnvironmentPlaceholder = () => {
           <div className="text-xs text-gray-400">Environment ID: {envId}</div>
 
           {/* Available Demo Hint */}
-          {envId !== 'env-006' && (
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-sm">
-              <p className="text-sm text-blue-800">
-                💡{' '}
-                <strong>
-                  Try the &quot;Creating album in Photos&quot; environment
-                </strong>{' '}
-                for a fully interactive demo experience.
-              </p>
-            </div>
-          )}
+          {(() => {
+            // Find the first available environment to suggest as demo
+            const demoEnv = environmentData?.environments?.[0];
+            return demoEnv && envId !== demoEnv.id ? (
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-sm">
+                <p className="text-sm text-blue-800">
+                  💡{' '}
+                  <strong>
+                    Try the &quot;{demoEnv.taskName}&quot; environment
+                  </strong>{' '}
+                  for a fully interactive demo experience.
+                </p>
+              </div>
+            ) : null;
+          })()}
         </div>
 
         {/* Additional Info */}

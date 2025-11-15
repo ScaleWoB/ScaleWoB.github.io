@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getEnvironmentUrl } from '../config/environmentUrls';
 import { useEnvironmentData } from '../services/environmentService';
 import { EnvironmentPreview } from '../types/environment';
 
@@ -42,33 +41,17 @@ const EnvironmentLauncher = () => {
   // Load environment data from service
   const { data: environmentData } = useEnvironmentData();
 
-  // Get specific environment or fallback to env-006
-  const getEnvironment = (id: string): EnvironmentPreview => {
+  // Get specific environment from loaded data
+  const getEnvironment = (id: string): EnvironmentPreview | null => {
     if (!environmentData?.environments) {
-      // Fallback data
-      return {
-        id: 'env-006',
-        taskName: 'Creating album in Photos',
-        description:
-          'Photo organization tasks including creating new albums, selecting and moving photos, and managing photo collections.',
-        platform: 'Mobile Interfaces',
-        difficulty: 'Intermediate',
-        tags: ['Photos', 'Organization', 'Media Management'],
-        metrics: {
-          completion: 88,
-          complexity: 6,
-        },
-        icon: 'photo-album',
-        colorTheme: 'warm',
-      };
+      return null;
     }
-    return (
-      environmentData.environments.find(env => env.id === id) ||
-      environmentData.environments[0]
-    );
+
+    const env = environmentData.environments.find(env => env.id === id);
+    return env || null;
   };
 
-  const environment = getEnvironment(envId || 'env-006');
+  const environment = getEnvironment(envId || '');
 
   // Event type preferences
   const [eventPreferences, setEventPreferences] = useState({
@@ -511,8 +494,14 @@ const EnvironmentLauncher = () => {
 
   // Get the current iframe source URL - CDN only
   const getIframeSrc = useCallback(() => {
-    const currentEnvId = envId || 'env-006';
-    return getEnvironmentUrl(currentEnvId);
+    const currentEnvId = envId || '';
+
+    if (!currentEnvId) {
+      throw new Error('No environment ID provided');
+    }
+
+    // Construct CDN URL by concatenating base URL with environment ID
+    return `https://niumascript.com/scalewob-env/${currentEnvId}/index.html`;
   }, [envId]);
 
   // Set up message listener for ScaleWoB bridge communication
@@ -614,6 +603,44 @@ const EnvironmentLauncher = () => {
 
   // Mobile dimensions for preview
   const mobileDimensions = { width: 390, height: 844 };
+
+  // If environment is not found, show error
+  if (!environment) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center p-8">
+        <div className="max-w-2xl w-full text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">❌</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Environment Not Found
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Environment &quot;{envId}&quot; is not available.
+          </p>
+          <Link
+            to="/gallery"
+            className="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-sm hover:bg-gray-700 transition-colors"
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to Gallery
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">

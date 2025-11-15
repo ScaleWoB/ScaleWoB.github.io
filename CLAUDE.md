@@ -53,8 +53,7 @@ The app uses HashRouter with these main routes:
 - `/` - Homepage with hero section and features
 - `/leaderboard` - Agent performance rankings
 - `/gallery` - Environment showcase with filtering
-- `/launcher/:envId` - Environment launcher pages
-- `/launcher/env-006` - Special dedicated launcher for env-006
+- `/launcher/:envId` - Dynamic environment launcher (shows launcher for CDN environments, placeholder for others)
 
 ### Environment Integration
 
@@ -115,7 +114,6 @@ The core feature is the **ScaleWoB Bridge** (`src/scripts/scalewob-bridge.js`) -
 
 Each environment has:
 
-- Unique ID (e.g., `env-006`)
 - Task name and description
 - Platform (Web Applications, Desktop Apps, Mobile Interfaces)
 - Difficulty level (Intermediate, Advanced, Expert)

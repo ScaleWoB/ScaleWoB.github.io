@@ -4,8 +4,7 @@ import Homepage from './pages/Homepage';
 import LeaderboardHome from './pages/LeaderboardHome';
 
 import Gallery from './pages/Gallery';
-import EnvironmentLauncher from './pages/EnvironmentLauncher';
-import EnvironmentPlaceholder from './pages/EnvironmentPlaceholder';
+import EnvironmentWrapper from './pages/EnvironmentWrapper';
 
 function App() {
   return (
@@ -36,15 +35,7 @@ function App() {
             </Layout>
           }
         />
-        <Route path="/launcher/env-006" element={<EnvironmentLauncher />} />
-        <Route
-          path="/launcher/:envId"
-          element={
-            <Layout>
-              <EnvironmentPlaceholder />
-            </Layout>
-          }
-        />
+        <Route path="/launcher/:envId" element={<EnvironmentWrapper />} />
       </Routes>
     </Router>
   );
