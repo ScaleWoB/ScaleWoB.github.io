@@ -165,6 +165,9 @@ const Environments: React.FC = () => {
     Number(searchParams.get('page')) || 1
   );
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [pageInput, setPageInput] = useState<string>(
+    String(searchParams.get('page') || 1)
+  );
 
   // Track whether we're restoring state from sessionStorage
   const isRestoringState = useRef(false);
@@ -225,6 +228,11 @@ const Environments: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
 
+  // Sync pageInput with currentPage
+  useEffect(() => {
+    setPageInput(String(currentPage));
+  }, [currentPage]);
+
   // Sync state to URL params
   useEffect(() => {
     const params = new URLSearchParams();
@@ -249,6 +257,27 @@ const Environments: React.FC = () => {
     setSelectedTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
+  };
+
+  // Handle page input change
+  const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPageInput(e.target.value);
+  };
+
+  // Handle page input submit
+  const handlePageInputSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const pageNum = parseInt(pageInput, 10);
+    if (
+      !isNaN(pageNum) &&
+      pageNum >= 1 &&
+      pageNum <= filteredAndPaginatedEnvironments.totalPages
+    ) {
+      setCurrentPage(pageNum);
+    } else {
+      // Reset to current page if invalid
+      setPageInput(String(currentPage));
+    }
   };
 
   // Derive all unique tags from environment data
@@ -914,7 +943,7 @@ const Environments: React.FC = () => {
 
                 {/* Pagination Controls */}
                 {filteredAndPaginatedEnvironments.totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-8">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
                     <button
                       onClick={() =>
                         setCurrentPage(prev => Math.max(1, prev - 1))
@@ -924,10 +953,28 @@ const Environments: React.FC = () => {
                     >
                       Previous
                     </button>
-                    <span className="px-4 py-2 text-sm font-bold text-gray-900">
-                      Page {currentPage} of{' '}
-                      {filteredAndPaginatedEnvironments.totalPages}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-gray-900">
+                        Page
+                      </span>
+                      <form
+                        onSubmit={handlePageInputSubmit}
+                        className="flex items-center gap-2"
+                      >
+                        <input
+                          type="number"
+                          min="1"
+                          max={filteredAndPaginatedEnvironments.totalPages}
+                          value={pageInput}
+                          onChange={handlePageInputChange}
+                          onBlur={handlePageInputSubmit}
+                          className="w-16 px-2 py-1 border-2 border-gray-300 text-center text-sm font-bold text-gray-900 focus:outline-none focus:border-gray-400"
+                        />
+                        <span className="text-sm font-bold text-gray-900">
+                          of {filteredAndPaginatedEnvironments.totalPages}
+                        </span>
+                      </form>
+                    </div>
                     <button
                       onClick={() =>
                         setCurrentPage(prev =>
