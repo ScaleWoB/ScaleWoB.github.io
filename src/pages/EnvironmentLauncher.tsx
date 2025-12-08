@@ -269,15 +269,15 @@ const EnvironmentLauncher = () => {
   const getConsoleEntryStyle = (type: ConsoleEntry['type']) => {
     switch (type) {
       case 'action':
-        return 'relative bg-gray-50 border-l-4 border-blue-500 text-gray-800 hover:border-blue-600 hover:bg-gray-100 transition-all duration-200';
+        return 'relative bg-white border-l-4 border-blue-500 text-gray-900 hover:border-blue-600 hover:bg-blue-50 transition-all duration-200';
       case 'info':
-        return 'relative bg-gray-50 border-l-4 border-gray-400 text-gray-800 hover:border-gray-500 hover:bg-gray-100 transition-all duration-200';
+        return 'relative bg-white border-l-4 border-gray-400 text-gray-900 hover:border-gray-500 hover:bg-gray-50 transition-all duration-200';
       case 'error':
-        return 'relative bg-gray-50 border-l-4 border-red-500 text-gray-800 hover:border-red-600 hover:bg-gray-100 transition-all duration-200';
+        return 'relative bg-white border-l-4 border-red-500 text-gray-900 hover:border-red-600 hover:bg-red-50 transition-all duration-200';
       case 'success':
-        return 'relative bg-gray-50 border-l-4 border-green-500 text-gray-800 hover:border-green-600 hover:bg-gray-100 transition-all duration-200';
+        return 'relative bg-white border-l-4 border-green-500 text-gray-900 hover:border-green-600 hover:bg-green-50 transition-all duration-200';
       default:
-        return 'relative bg-gray-50 border-l-4 border-gray-400 text-gray-800 hover:border-gray-500 hover:bg-gray-100 transition-all duration-200';
+        return 'relative bg-white border-l-4 border-gray-400 text-gray-900 hover:border-gray-500 hover:bg-gray-50 transition-all duration-200';
     }
   };
 
@@ -955,6 +955,7 @@ const EnvironmentLauncher = () => {
       <div className="bg-white border-b border-gray-300 flex-shrink-0">
         <div className="px-4 py-2">
           <div className="flex items-center justify-between">
+            {/* Left Section: Back button + Task name */}
             <div className="flex items-center space-x-3 min-w-0 flex-1">
               {/* Back to Environments Button */}
               <button
@@ -982,7 +983,27 @@ const EnvironmentLauncher = () => {
               </h1>
             </div>
 
-            <div className="flex items-center space-x-2 flex-shrink-0">
+            {/* Center Section: Mode Indicator */}
+            <div className="flex items-center space-x-3 flex-shrink-0">
+              {/* Mode Indicator */}
+              <div
+                className={`flex items-center space-x-2 px-3 py-1 border-2 text-xs font-bold uppercase tracking-wide flex-shrink-0 ${
+                  isPlayMode
+                    ? 'bg-green-50 border-green-300 text-green-700'
+                    : 'bg-blue-50 border-blue-300 text-blue-700'
+                }`}
+              >
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isPlayMode ? 'bg-green-500 animate-pulse' : 'bg-blue-500'
+                  }`}
+                ></div>
+                <span>{isPlayMode ? 'Play' : 'Evaluate'}</span>
+              </div>
+            </div>
+
+            {/* Right Section: Status Indicator */}
+            <div className="flex items-center space-x-2 flex-shrink-0 ml-3">
               {/* Environment Status - Newspaper Theme */}
               <div
                 className={`flex items-center space-x-2 px-3 py-1 border-2 text-xs font-bold uppercase tracking-wide ${
@@ -1079,7 +1100,7 @@ const EnvironmentLauncher = () => {
           </div>
 
           {/* Tab Content Panel */}
-          <div className="w-80 flex-shrink-0 bg-gray-50 flex flex-col">
+          <div className="w-96 flex-shrink-0 bg-gray-50 flex flex-col">
             {/* Functions Tab */}
             {activeTab === 'functions' && (
               <>
@@ -1088,80 +1109,187 @@ const EnvironmentLauncher = () => {
                     Functions
                   </h2>
                 </div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                  {/* Task Description */}
-                  <div className="p-4 bg-white border-2 border-gray-300 rounded-lg">
-                    <h3 className="text-sm font-bold text-gray-900 mb-2">
-                      Task Description
-                    </h3>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      {environment.description}
-                    </p>
+                <div className="flex-1 overflow-y-auto flex flex-col min-h-0">
+                  {/* Fixed content area - Task Description + Parameters */}
+                  <div className="p-4 space-y-4 flex-shrink-0">
+                    {/* Task Description */}
+                    <div className="p-4 bg-white border-2 border-gray-300 rounded-lg">
+                      <h3 className="text-sm font-bold text-gray-900 mb-2">
+                        Task Description
+                      </h3>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        {environment.description}
+                      </p>
+                    </div>
+
+                    {/* Evaluation Controls - In a row */}
+                    <div className="flex items-center space-x-3">
+                      {/* Start Evaluation Button */}
+                      <button
+                        onClick={startEvaluation}
+                        disabled={isEvaluationStarted && !isEvaluating}
+                        className={`flex-1 px-4 py-2 text-sm font-bold uppercase tracking-wide rounded transition-colors duration-200 flex items-center justify-center ${
+                          isEvaluationStarted && !isEvaluating
+                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300'
+                            : 'bg-green-600 text-white hover:bg-green-700 border-2 border-green-500'
+                        }`}
+                      >
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        {isEvaluationStarted && !isEvaluating
+                          ? 'In Progress'
+                          : 'Start'}
+                      </button>
+
+                      {/* Finish Evaluation Button */}
+                      <button
+                        onClick={finishEvaluation}
+                        disabled={!isEvaluationStarted || isEvaluating}
+                        className={`flex-1 px-4 py-2 text-sm font-bold uppercase tracking-wide rounded transition-colors duration-200 flex items-center justify-center ${
+                          !isEvaluationStarted || isEvaluating
+                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300'
+                            : 'bg-blue-600 text-white hover:bg-blue-700 border-2 border-blue-500'
+                        }`}
+                      >
+                        {isEvaluating && (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        )}
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Finish
+                      </button>
+                    </div>
+
+                    {/* Evaluation Parameters - Only show if environment requires parameters */}
+                    {environment?.params &&
+                      Object.keys(environment.params).length > 0 && (
+                        <ParameterInput
+                          params={environment.params}
+                          onParametersChange={setParameters}
+                          disabled={!isEvaluationStarted}
+                          disabledReason="not-started"
+                        />
+                      )}
                   </div>
 
-                  {/* Evaluation Controls */}
-                  <div className="space-y-4">
-                    <div className="p-4 bg-white border-2 border-gray-300 rounded-lg">
-                      <h3 className="text-sm font-bold text-gray-900 mb-3">
-                        Evaluation Controls
+                  {/* Event Console Section - Scrollable */}
+                  <div className="flex-1 flex flex-col min-h-0 border-t-2 border-gray-300">
+                    {/* Console Header */}
+                    <div className="p-3 border-b border-gray-200 bg-gray-100 flex-shrink-0">
+                      <h3 className="text-sm font-bold uppercase text-gray-700">
+                        Event Console
                       </h3>
-                      <div className="text-xs text-gray-500 space-y-1 mb-4">
-                        <p>
-                          • Press START to start your task session. The
-                          environment will be reset to the initial state.
-                        </p>
-                        <p>
-                          • Press FINISH to end your task session. The
-                          environment will output the task score.
-                        </p>
-                      </div>
+                    </div>
 
-                      <div className="space-y-3">
-                        <button
-                          onClick={startEvaluation}
-                          disabled={isEvaluationStarted && !isEvaluating}
-                          className={`w-full px-4 py-2 text-sm font-bold uppercase tracking-wide rounded transition-colors duration-200 flex items-center justify-center ${
-                            isEvaluationStarted && !isEvaluating
-                              ? 'bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300'
-                              : 'bg-green-600 text-white hover:bg-green-700 border-2 border-green-500'
-                          }`}
-                        >
-                          <svg
-                            className="w-4 h-4 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                    {/* Console entries - scrollable */}
+                    <div
+                      ref={consoleContentRef}
+                      className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-3 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400"
+                    >
+                      {consoleEntries
+                        .filter(entry => shouldDisplayEvent(entry.type))
+                        .map(entry => (
+                          <div
+                            key={entry.id}
+                            className={`${getConsoleEntryStyle(entry.type)} p-2 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100`}
+                            onClick={() => toggleEntryExpansion(entry.id)}
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          {isEvaluationStarted && !isEvaluating
-                            ? 'Evaluation in Progress'
-                            : 'Start Evaluation'}
-                        </button>
+                            <div className="flex flex-col">
+                              {/* Icon + message row */}
+                              <div className="flex items-start justify-between">
+                                <div className="flex items-start space-x-2 flex-1">
+                                  {getConsoleIcon(entry.type)}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-xs font-medium">
+                                      {entry.message}
+                                    </div>
+                                    <div className="text-xs opacity-75 mt-0.5">
+                                      {new Date(
+                                        entry.timestamp
+                                      ).toLocaleTimeString()}
+                                    </div>
+                                  </div>
+                                </div>
+                                {/* Expand button */}
+                                <div className="flex items-center space-x-1 ml-2">
+                                  {entry.details && (
+                                    <button
+                                      onClick={e => {
+                                        e.stopPropagation();
+                                        toggleEntryExpansion(entry.id);
+                                      }}
+                                      className="text-gray-400 hover:text-gray-600 transition-colors duration-200 text-xs"
+                                    >
+                                      {expandedEntries.has(entry.id)
+                                        ? '▼'
+                                        : '▶'}
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
 
-                        <button
-                          onClick={finishEvaluation}
-                          disabled={!isEvaluationStarted || isEvaluating}
-                          className={`w-full px-4 py-2 text-sm font-bold uppercase tracking-wide rounded transition-colors duration-200 flex items-center justify-center ${
-                            !isEvaluationStarted || isEvaluating
-                              ? 'bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300'
-                              : 'bg-blue-600 text-white hover:bg-blue-700 border-2 border-blue-500'
-                          }`}
-                        >
-                          <>
+                              {/* Expanded metadata */}
+                              {expandedEntries.has(entry.id) &&
+                                entry.details && (
+                                  <div className="mt-2 p-2 bg-white bg-opacity-90 rounded border border-gray-200 w-full">
+                                    <div className="text-xs font-mono">
+                                      {Object.entries(entry.details).map(
+                                        ([key, value]) => (
+                                          <div
+                                            key={key}
+                                            className="mb-1 wrap-break-words"
+                                          >
+                                            <span className="font-semibold text-gray-600">
+                                              {key}:
+                                            </span>{' '}
+                                            <span className="text-gray-800 whitespace-pre-wrap">
+                                              {typeof value === 'object'
+                                                ? JSON.stringify(value, null, 2)
+                                                : String(value)}
+                                            </span>
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                            </div>
+                          </div>
+                        ))}
+
+                      {consoleEntries.length === 0 && (
+                        <div className="text-center py-8">
+                          <div className="w-12 h-12 bg-gray-100 border-2 border-gray-300 rounded-lg flex items-center justify-center mx-auto mb-3">
                             <svg
-                              className="w-4 h-4 mr-2"
+                              className="w-6 h-6 text-gray-600"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -1173,26 +1301,17 @@ const EnvironmentLauncher = () => {
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                               />
                             </svg>
-                            {isEvaluating ? (
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                            ) : null}
-                            Finish Evaluation
-                          </>
-                        </button>
-                      </div>
+                          </div>
+                          <h3 className="text-xs font-bold text-gray-900 mb-1 uppercase tracking-wide">
+                            No Events Yet
+                          </h3>
+                          <p className="text-xs text-gray-600">
+                            Waiting for activity...
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Evaluation Parameters - Only show if environment requires parameters */}
-                  {environment?.params &&
-                    Object.keys(environment.params).length > 0 && (
-                      <ParameterInput
-                        params={environment.params}
-                        onParametersChange={setParameters}
-                        disabled={!isEvaluationStarted}
-                        disabledReason="not-started"
-                      />
-                    )}
                 </div>
               </>
             )}
@@ -1501,126 +1620,6 @@ const EnvironmentLauncher = () => {
                 {/* Close scaled container wrapper */}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Event Console - Right Side */}
-        <div className="w-80 flex-shrink-0 bg-white border-l-2 border-gray-300 flex flex-col">
-          <div className="p-4 border-b-2 border-gray-300 bg-gray-50">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase text-gray-700">
-                Event Console
-              </h2>
-
-              {/* Current Mode Indicator */}
-              <div
-                className={`flex items-center space-x-2 px-3 py-1 border-2 text-xs font-bold uppercase tracking-wide flex-shrink-0 ${
-                  isPlayMode
-                    ? 'bg-green-50 border-green-300 text-green-700'
-                    : 'bg-blue-50 border-blue-300 text-blue-700'
-                }`}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    isPlayMode ? 'bg-green-500 animate-pulse' : 'bg-blue-500'
-                  }`}
-                ></div>
-                <span>{isPlayMode ? 'Play Mode' : 'Evaluate Mode'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Console entries */}
-          <div
-            ref={consoleContentRef}
-            className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400"
-          >
-            {consoleEntries
-              .filter(entry => shouldDisplayEvent(entry.type))
-              .map(entry => (
-                <div
-                  key={entry.id}
-                  className={`${getConsoleEntryStyle(entry.type)} p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100`}
-                  onClick={() => toggleEntryExpansion(entry.id)}
-                >
-                  <div className="flex flex-col">
-                    {/* Icon + message row */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-3 flex-1">
-                        {getConsoleIcon(entry.type)}
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium">
-                            {entry.message}
-                          </div>
-                          <div className="text-xs opacity-75 mt-1">
-                            {new Date(entry.timestamp).toLocaleTimeString()}
-                          </div>
-                        </div>
-                      </div>
-                      {/* Expand button */}
-                      <div className="flex items-center space-x-2 ml-3">
-                        {entry.details && (
-                          <button
-                            onClick={e => {
-                              e.stopPropagation();
-                              toggleEntryExpansion(entry.id);
-                            }}
-                            className="text-gray-400 hover:text-gray-600 transition-colors duration-200 text-sm"
-                          >
-                            {expandedEntries.has(entry.id) ? '▼' : '▶'}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Expanded metadata - spans full width below */}
-                    {expandedEntries.has(entry.id) && entry.details && (
-                      <div className="mt-3 p-4 bg-white bg-opacity-90 rounded-lg border border-gray-200 w-full max-w-none">
-                        <div className="text-xs font-mono">
-                          {Object.entries(entry.details).map(([key, value]) => (
-                            <div key={key} className="mb-2 wrap-break-words">
-                              <span className="font-semibold text-gray-600">
-                                {key}:
-                              </span>{' '}
-                              <span className="text-gray-800 whitespace-pre-wrap">
-                                {typeof value === 'object'
-                                  ? JSON.stringify(value, null, 2)
-                                  : String(value)}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-            {consoleEntries.length === 0 && (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 border-2 border-gray-300 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-sm font-bold text-gray-900 mb-1 uppercase tracking-wide">
-                  No Events Yet
-                </h3>
-                <p className="text-xs text-gray-600">
-                  Waiting for environment activity...
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>
