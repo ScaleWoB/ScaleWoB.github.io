@@ -847,8 +847,22 @@ const EnvironmentLauncher = () => {
     isEvaluating,
   ]);
 
-  // Mobile dimensions for preview
-  const mobileDimensions = { width: 390, height: 844 };
+  // Get platform-specific dimensions based on environment platform
+  const getPlatformDimensions = () => {
+    if (!environment) return { width: 390, height: 844 };
+
+    switch (environment.platform) {
+      case 'Mobile Interfaces':
+        return { width: 390, height: 844 }; // Mobile phone aspect ratio
+      case 'Web Applications':
+      case 'Desktop Apps':
+        return { width: 1280, height: 800 }; // Desktop/Web aspect ratio (16:10)
+      default:
+        return { width: 390, height: 844 }; // Default to mobile
+    }
+  };
+
+  const platformDimensions = getPlatformDimensions();
 
   // Calculate and update scale based on container size
   useEffect(() => {
@@ -867,8 +881,8 @@ const EnvironmentLauncher = () => {
       const availableHeight = containerHeight - bufferHeight;
 
       // Calculate scale ratios for both dimensions
-      const scaleX = availableWidth / mobileDimensions.width;
-      const scaleY = availableHeight / mobileDimensions.height;
+      const scaleX = availableWidth / platformDimensions.width;
+      const scaleY = availableHeight / platformDimensions.height;
 
       // Use the smaller scale to ensure it fits in both dimensions
       const newScale = Math.min(scaleX, scaleY, 1); // Cap at 1 to avoid upscaling
@@ -895,7 +909,7 @@ const EnvironmentLauncher = () => {
       resizeObserver.disconnect();
       window.removeEventListener('resize', calculateScale);
     };
-  }, [mobileDimensions.width, mobileDimensions.height]);
+  }, [platformDimensions.width, platformDimensions.height]);
 
   // If environment is not found, show error
   if (!environment) {
@@ -1002,9 +1016,9 @@ const EnvironmentLauncher = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Functional Panel - Left Side */}
-        <div className="flex border-r-2 border-gray-300">
+        <div className="flex flex-shrink-0 border-r-2 border-gray-300">
           {/* Vertical Tab Selector */}
           <div className="w-12 bg-gray-800 border-r-2 border-gray-300 flex flex-col">
             <div className="flex-1 flex flex-col py-2 space-y-1">
@@ -1065,7 +1079,7 @@ const EnvironmentLauncher = () => {
           </div>
 
           {/* Tab Content Panel */}
-          <div className="w-80 bg-gray-50 flex flex-col">
+          <div className="w-80 flex-shrink-0 bg-gray-50 flex flex-col">
             {/* Functions Tab */}
             {activeTab === 'functions' && (
               <>
@@ -1325,143 +1339,173 @@ const EnvironmentLauncher = () => {
         </div>
 
         {/* Iframe Container - Middle */}
-        <div className="flex-1 flex flex-col bg-white">
+        <div className="flex-1 min-w-0 flex flex-col bg-white overflow-hidden">
           {/* Iframe Container with Fixed Size - Newspaper Style */}
           <div
             ref={containerRef}
             className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-gray-50 overflow-hidden"
           >
             <div className="w-full max-w-fit">
-              {/* Mobile Device Frame */}
+              {/* Scaled container wrapper - matches visual size to layout size */}
               <div
-                className="relative mx-auto shrink-0"
+                className="mx-auto"
                 style={{
-                  width: `${mobileDimensions.width}px`,
-                  height: `${mobileDimensions.height}px`,
-                  transform: `scale(${scale})`,
-                  transformOrigin: 'center center',
-                  transition:
-                    scale === 0.5 ? 'none' : 'transform 0.3s ease-out',
+                  width: `${platformDimensions.width * scale}px`,
+                  height: `${platformDimensions.height * scale}px`,
+                  position: 'relative',
                 }}
               >
-                <div className="absolute inset-0 bg-gray-800 rounded-2xl p-2 shadow-lg border-2 border-gray-600">
-                  <div className="relative w-full h-full bg-white rounded-xl overflow-hidden">
-                    {/* Iframe */}
-                    <iframe
-                      ref={iframeRef}
-                      src={getIframeSrc()}
-                      className="absolute inset-0 w-full h-full bg-white"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        margin: '0',
-                        padding: '0',
-                        display: 'block',
-                        pointerEvents:
-                          environmentStatus === 'online' &&
-                          (isPlayMode || isEvaluationStarted)
-                            ? 'auto'
-                            : 'none',
-                      }}
-                      title="Environment"
-                      onLoad={() => {
-                        setEnvironmentStatus('online');
-                        const source = 'CDN';
-                        const isTestEnv = envId?.includes('test');
+                {/* Device Frame - Platform-specific styling */}
+                <div
+                  className="absolute top-0 left-0"
+                  style={{
+                    width: `${platformDimensions.width}px`,
+                    height: `${platformDimensions.height}px`,
+                    transform: `scale(${scale})`,
+                    transformOrigin: 'top left',
+                    transition:
+                      scale === 0.5 ? 'none' : 'transform 0.3s ease-out',
+                  }}
+                >
+                  <div
+                    className={`absolute inset-0 bg-gray-800 p-2 shadow-lg border-2 border-gray-600 ${
+                      environment.platform === 'Mobile Interfaces'
+                        ? 'rounded-2xl'
+                        : 'rounded-lg'
+                    }`}
+                  >
+                    <div
+                      className={`relative w-full h-full bg-white overflow-hidden ${
+                        environment.platform === 'Mobile Interfaces'
+                          ? 'rounded-xl'
+                          : 'rounded-md'
+                      }`}
+                    >
+                      {/* Iframe */}
+                      <iframe
+                        ref={iframeRef}
+                        src={getIframeSrc()}
+                        className="absolute inset-0 w-full h-full bg-white"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          margin: '0',
+                          padding: '0',
+                          display: 'block',
+                          pointerEvents:
+                            environmentStatus === 'online' &&
+                            (isPlayMode || isEvaluationStarted)
+                              ? 'auto'
+                              : 'none',
+                        }}
+                        title="Environment"
+                        onLoad={() => {
+                          setEnvironmentStatus('online');
+                          const source = 'CDN';
+                          const isTestEnv = envId?.includes('test');
+                          const platformType =
+                            environment.platform === 'Mobile Interfaces'
+                              ? 'Mobile'
+                              : 'Desktop';
 
-                        // Only show success message if this is not an evaluation refresh
-                        if (!isEvaluationRefresh && eventPreferences.success) {
-                          addConsoleEntry(
-                            'success',
-                            `Mobile environment loaded successfully from ${source}`
-                          );
-                        }
+                          // Only show success message if this is not an evaluation refresh
+                          if (
+                            !isEvaluationRefresh &&
+                            eventPreferences.success
+                          ) {
+                            addConsoleEntry(
+                              'success',
+                              `${platformType} environment loaded successfully from ${source}`
+                            );
+                          }
 
-                        // Reset the evaluation refresh flag
-                        if (isEvaluationRefresh) {
-                          setIsEvaluationRefresh(false);
-                        }
+                          // Reset the evaluation refresh flag
+                          if (isEvaluationRefresh) {
+                            setIsEvaluationRefresh(false);
+                          }
 
-                        // Check if this is a bridge-enabled environment
-                        if (isTestEnv) {
-                          if (eventPreferences.info) {
+                          // Check if this is a bridge-enabled environment
+                          if (isTestEnv) {
+                            if (eventPreferences.info) {
+                              addConsoleEntry(
+                                'info',
+                                'Bridge-enabled environment loaded - Waiting for ScaleWoB Bridge initialization...',
+                                {
+                                  bridgeExpected: true,
+                                  environmentType: 'test',
+                                  source: 'test-cdn',
+                                }
+                              );
+                            }
+                          } else if (eventPreferences.info) {
                             addConsoleEntry(
                               'info',
-                              'Bridge-enabled environment loaded - Waiting for ScaleWoB Bridge initialization...',
+                              'CDN environment loaded - Full event tracking enabled via ScaleWoB Bridge',
                               {
-                                bridgeExpected: true,
-                                environmentType: 'test',
-                                source: 'test-cdn',
+                                source: 'cdn',
                               }
                             );
                           }
-                        } else if (eventPreferences.info) {
-                          addConsoleEntry(
-                            'info',
-                            'CDN environment loaded - Full event tracking enabled via ScaleWoB Bridge',
-                            {
-                              source: 'cdn',
-                            }
-                          );
-                        }
-                      }}
-                      onError={() => {
-                        setEnvironmentStatus('offline');
-                        if (eventPreferences.error) {
-                          addConsoleEntry(
-                            'error',
-                            'Failed to load environment from CDN'
-                          );
-                        }
-                      }}
-                    />
+                        }}
+                        onError={() => {
+                          setEnvironmentStatus('offline');
+                          if (eventPreferences.error) {
+                            addConsoleEntry(
+                              'error',
+                              'Failed to load environment from CDN'
+                            );
+                          }
+                        }}
+                      />
 
-                    {/* Loading Overlay - Blocks interactions during loading */}
-                    {environmentStatus !== 'online' && (
-                      <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-10 rounded-xl">
-                        <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-gray-300 text-center max-w-xs mx-4">
-                          {/* Loading Spinner */}
-                          <div className="w-8 h-8 border-3 border-gray-300 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
+                      {/* Loading Overlay - Blocks interactions during loading */}
+                      {environmentStatus !== 'online' && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-10 rounded-xl">
+                          <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-gray-300 text-center max-w-xs mx-4">
+                            {/* Loading Spinner */}
+                            <div className="w-8 h-8 border-3 border-gray-300 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
 
-                          {/* Loading Status Text */}
-                          <div className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">
-                            {environmentStatus === 'loading'
-                              ? 'Loading'
-                              : 'Offline'}
-                          </div>
-
-                          <div className="text-xs text-gray-600 leading-tight">
-                            {environmentStatus === 'loading'
-                              ? 'Environment is loading. Please wait...'
-                              : 'Failed to load environment. Please try again.'}
-                          </div>
-
-                          {/* Additional loading indicator */}
-                          {environmentStatus === 'loading' && (
-                            <div className="mt-3 flex items-center justify-center space-x-1">
-                              <div className="w-1 h-1 bg-gray-400 rounded-full animate-pulse"></div>
-                              <div
-                                className="w-1 h-1 bg-gray-400 rounded-full animate-pulse"
-                                style={{ animationDelay: '0.2s' }}
-                              ></div>
-                              <div
-                                className="w-1 h-1 bg-gray-400 rounded-full animate-pulse"
-                                style={{ animationDelay: '0.4s' }}
-                              ></div>
+                            {/* Loading Status Text */}
+                            <div className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">
+                              {environmentStatus === 'loading'
+                                ? 'Loading'
+                                : 'Offline'}
                             </div>
-                          )}
+
+                            <div className="text-xs text-gray-600 leading-tight">
+                              {environmentStatus === 'loading'
+                                ? 'Environment is loading. Please wait...'
+                                : 'Failed to load environment. Please try again.'}
+                            </div>
+
+                            {/* Additional loading indicator */}
+                            {environmentStatus === 'loading' && (
+                              <div className="mt-3 flex items-center justify-center space-x-1">
+                                <div className="w-1 h-1 bg-gray-400 rounded-full animate-pulse"></div>
+                                <div
+                                  className="w-1 h-1 bg-gray-400 rounded-full animate-pulse"
+                                  style={{ animationDelay: '0.2s' }}
+                                ></div>
+                                <div
+                                  className="w-1 h-1 bg-gray-400 rounded-full animate-pulse"
+                                  style={{ animationDelay: '0.4s' }}
+                                ></div>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
+                {/* Close scaled container wrapper */}
               </div>
             </div>
           </div>
         </div>
 
         {/* Event Console - Right Side */}
-        <div className="w-80 bg-white border-l-2 border-gray-300 flex flex-col">
+        <div className="w-80 flex-shrink-0 bg-white border-l-2 border-gray-300 flex flex-col">
           <div className="p-4 border-b-2 border-gray-300 bg-gray-50">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold uppercase text-gray-700">
