@@ -307,14 +307,28 @@ const Environments: React.FC = () => {
 
     let filtered = environmentsWithIcons;
 
-    // 1. Search filter
+    // 1. Search filter - search across environment name and ALL task descriptions
     if (debouncedSearch) {
       const query = debouncedSearch.toLowerCase();
-      filtered = filtered.filter(
-        env =>
-          env.taskName.toLowerCase().includes(query) ||
-          env.description.toLowerCase().includes(query)
-      );
+      filtered = filtered.filter(env => {
+        // Search in environment name
+        const nameMatch = (env.name || env.taskName || '')
+          .toLowerCase()
+          .includes(query);
+
+        // Search in all task descriptions
+        const taskMatch =
+          env.tasks?.some(
+            task =>
+              task.name.toLowerCase().includes(query) ||
+              task.description.toLowerCase().includes(query)
+          ) || false;
+
+        // Fallback to old description field
+        const descMatch = (env.description || '').toLowerCase().includes(query);
+
+        return nameMatch || taskMatch || descMatch;
+      });
     }
 
     // 2. Platform filter
@@ -848,7 +862,7 @@ const Environments: React.FC = () => {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex flex-wrap items-center gap-2 mb-1">
                                     <h3 className="text-base md:text-lg font-bold text-gray-900">
-                                      {environment.taskName}
+                                      {environment.name || environment.taskName}
                                     </h3>
                                     <span
                                       className={`px-2 py-1 text-xs font-bold uppercase tracking-wide border inline-block ${
@@ -862,9 +876,30 @@ const Environments: React.FC = () => {
                                     >
                                       {environment.difficulty}
                                     </span>
+                                    {/* Task count badge */}
+                                    {environment.tasks &&
+                                      environment.tasks.length > 1 && (
+                                        <span className="px-2 py-1 text-xs font-bold uppercase tracking-wide border bg-gray-50 text-gray-700 border-gray-300 inline-flex items-center">
+                                          <svg
+                                            className="w-3 h-3 mr-1"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth="2"
+                                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                            />
+                                          </svg>
+                                          {environment.tasks.length} tasks
+                                        </span>
+                                      )}
                                   </div>
                                   <p className="text-xs md:text-sm text-gray-700 leading-relaxed line-clamp-2">
-                                    {environment.description}
+                                    {environment.tasks?.[0]?.description ||
+                                      environment.description}
                                   </p>
                                 </div>
                               </div>

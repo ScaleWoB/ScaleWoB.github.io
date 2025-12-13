@@ -11,6 +11,7 @@ import {
   EnvironmentServiceResponse,
   RawEnvironmentData,
   RawEnvironmentPreview,
+  Task,
 } from '../types/environment';
 import { populateEnvironmentUrls } from '../config/environmentUrls';
 
@@ -151,29 +152,60 @@ class EnvironmentDataService {
             }
 
             const processedEnvironments = environments.map(
-              (env: RawEnvironmentPreview): EnvironmentPreview => ({
-                ...env,
-                // Ensure all required fields are present
-                id: env.id || `env-${Date.now()}`,
-                taskName: env.taskName || 'Untitled Environment',
-                platform: env.platform || 'Web Applications',
-                difficulty: env.difficulty || 'Basic',
-                description: env.description || '',
-                tags: Array.isArray(env.tags) ? env.tags : [],
-                metrics: {
-                  completion:
-                    typeof env.metrics?.completion === 'number'
-                      ? env.metrics.completion
-                      : 0,
-                  complexity:
-                    typeof env.metrics?.complexity === 'number'
-                      ? env.metrics.complexity
-                      : 1,
-                },
-                colorTheme: env.colorTheme || 'warm',
-                cdnUrl: env.cdnUrl, // Pass through CDN URL if present
-                params: env.params, // Pass through parameters if present
-              })
+              (env: RawEnvironmentPreview): EnvironmentPreview => {
+                // Determine environment name (prefer 'name', fallback to 'taskName')
+                const envName =
+                  env.name || env.taskName || 'Untitled Environment';
+
+                // Process tasks array
+                let tasks: Task[];
+                if (
+                  env.tasks &&
+                  Array.isArray(env.tasks) &&
+                  env.tasks.length > 0
+                ) {
+                  // New format: use tasks array
+                  tasks = env.tasks.map((task, index) => ({
+                    name: task.name || `Task ${index + 1}`,
+                    description: task.description || '',
+                    params: task.params,
+                  }));
+                } else {
+                  // Old format: create single task from environment-level properties
+                  tasks = [
+                    {
+                      name: envName,
+                      description: env.description || '',
+                      params: env.params,
+                    },
+                  ];
+                }
+
+                return {
+                  ...env,
+                  id: env.id || `env-${Date.now()}`,
+                  name: envName,
+                  taskName: envName, // Keep for backward compatibility
+                  platform: env.platform || 'Web Applications',
+                  difficulty: env.difficulty || 'Basic',
+                  description: tasks[0]?.description || env.description || '', // Default to first task
+                  tags: Array.isArray(env.tags) ? env.tags : [],
+                  metrics: {
+                    completion:
+                      typeof env.metrics?.completion === 'number'
+                        ? env.metrics.completion
+                        : 0,
+                    complexity:
+                      typeof env.metrics?.complexity === 'number'
+                        ? env.metrics.complexity
+                        : 1,
+                  },
+                  colorTheme: env.colorTheme || 'warm',
+                  cdnUrl: env.cdnUrl,
+                  params: tasks[0]?.params || env.params, // Default to first task params
+                  tasks: tasks,
+                };
+              }
             );
 
             // Populate the environment URLs for the config module
@@ -466,6 +498,30 @@ export const EnvironmentUtils = {
   ): EnvironmentPreview[] => {
     if (tags.length === 0) return environments;
     return environments.filter(env => tags.some(tag => env.tags.includes(tag)));
+  },
+
+  /**
+   * Get a specific task from an environment by index
+   */
+  getTaskByIndex: (
+    environment: EnvironmentPreview,
+    taskIndex: number
+  ): Task | null => {
+    if (
+      !environment.tasks ||
+      taskIndex < 0 ||
+      taskIndex >= environment.tasks.length
+    ) {
+      return null;
+    }
+    return environment.tasks[taskIndex];
+  },
+
+  /**
+   * Get task count for an environment
+   */
+  getTaskCount: (environment: EnvironmentPreview): number => {
+    return environment.tasks?.length || 1;
   },
 };
 

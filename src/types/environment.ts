@@ -23,18 +23,27 @@ export interface EnvironmentMetrics {
   complexity: number;
 }
 
+// Task definition for multi-task environments
+export interface Task {
+  name: string;
+  description: string;
+  params?: EnvironmentParameters;
+}
+
 export interface EnvironmentPreview {
   id: string;
-  taskName: string;
+  name: string; // Environment name (renamed from taskName)
+  taskName?: string; // Deprecated: kept for backward compatibility
   platform: Platform;
   difficulty: Difficulty;
-  description: string;
+  description?: string; // Optional: fallback for single-task environments
   tags: string[];
   metrics: EnvironmentMetrics;
   icon?: string; // Icon identifier string
   colorTheme: ColorTheme;
   cdnUrl?: string; // CDN URL for the environment
-  params?: EnvironmentParameters; // Parameters required for evaluation
+  params?: EnvironmentParameters; // Optional: fallback for single-task environments
+  tasks: Task[]; // Array of tasks (always present after processing)
 }
 
 // Extended interface for environment with React icon component
@@ -76,10 +85,11 @@ export interface FilterConfig<T> {
  */
 export interface RawEnvironmentPreview {
   id?: string;
-  taskName?: string;
+  name?: string; // New format: environment name
+  taskName?: string; // Old format: task name (backward compatibility)
   platform?: Platform;
   difficulty?: Difficulty;
-  description?: string;
+  description?: string; // Old format or fallback
   tags?: string[];
   metrics?: {
     completion?: number;
@@ -88,7 +98,13 @@ export interface RawEnvironmentPreview {
   icon?: string;
   colorTheme?: ColorTheme;
   cdnUrl?: string; // CDN URL for the environment
-  params?: EnvironmentParameters; // Parameters required for evaluation
+  params?: EnvironmentParameters; // Old format or fallback
+  tasks?: Array<{
+    // New format: tasks array
+    name?: string;
+    description?: string;
+    params?: EnvironmentParameters;
+  }>;
 }
 
 export interface RawEnvironmentData {

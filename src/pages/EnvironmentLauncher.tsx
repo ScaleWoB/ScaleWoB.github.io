@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useEnvironmentData } from '../services/environmentService';
 import { EnvironmentPreview } from '../types/environment';
 import ParameterInput from '../components/common/ParameterInput';
@@ -31,6 +31,7 @@ interface ConsoleEntry {
 const EnvironmentLauncher = () => {
   const { envId } = useParams<{ envId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const consoleContentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,6 +54,12 @@ const EnvironmentLauncher = () => {
   const [isPlayMode, setIsPlayMode] = useState(true);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [isEvaluationStarted, setIsEvaluationStarted] = useState(false);
+
+  // Task selection state
+  const taskIdParam = searchParams.get('taskId');
+  const [selectedTaskIndex, setSelectedTaskIndex] = useState<number>(
+    taskIdParam ? parseInt(taskIdParam, 10) : 0
+  );
 
   // Parameter state for evaluation
   const [parameters, setParameters] = useState<
@@ -85,6 +92,20 @@ const EnvironmentLauncher = () => {
   };
 
   const environment = getEnvironment(envId || '');
+
+  // Get the currently selected task
+  const selectedTask = useMemo(() => {
+    if (!environment?.tasks || environment.tasks.length === 0) {
+      // Fallback for environments without tasks array
+      return {
+        name: environment?.name || environment?.taskName || 'Unknown Task',
+        description: environment?.description || '',
+        params: environment?.params,
+      };
+    }
+    const index = Math.min(selectedTaskIndex, environment.tasks.length - 1);
+    return environment.tasks[index];
+  }, [environment, selectedTaskIndex]);
 
   // Event type preferences
   const [eventPreferences, setEventPreferences] = useState({
@@ -257,6 +278,31 @@ const EnvironmentLauncher = () => {
     []
   );
 
+  // Handle task selection change
+  const handleTaskChange = useCallback(
+    (newIndex: number) => {
+      setSelectedTaskIndex(newIndex);
+      setSearchParams({ taskId: String(newIndex) });
+
+      // Reset evaluation state when task changes
+      setIsEvaluationStarted(false);
+      setIsEvaluating(false);
+      setParameters({});
+      setTrajectory([]);
+
+      // Log task change
+      addConsoleEntry(
+        'info',
+        `Switched to task: ${environment?.tasks?.[newIndex]?.name || 'Unknown'}`,
+        {
+          taskIndex: newIndex,
+          taskName: environment?.tasks?.[newIndex]?.name,
+        }
+      );
+    },
+    [environment, setSearchParams, addConsoleEntry]
+  );
+
   // Auto-scroll to bottom when new entries are added
   useEffect(() => {
     if (consoleContentRef.current) {
@@ -371,9 +417,9 @@ const EnvironmentLauncher = () => {
     // Prevent multiple finish clicks by checking if already evaluating
     if (isEvaluating) return;
 
-    // Check if environment requires parameters and validate them
-    if (environment?.params && Object.keys(environment.params).length > 0) {
-      const requiredParams = Object.keys(environment.params);
+    // Check if selected task requires parameters and validate them
+    if (selectedTask?.params && Object.keys(selectedTask.params).length > 0) {
+      const requiredParams = Object.keys(selectedTask.params);
       const providedParams = Object.keys(parameters);
 
       // Check if all required parameters are provided
@@ -385,7 +431,7 @@ const EnvironmentLauncher = () => {
         addConsoleEntry(
           'error',
           `Missing required parameters: ${missingParams.join(', ')}`,
-          { missingParams, requiredParams: environment.params }
+          { missingParams, requiredParams: selectedTask.params }
         );
         return;
       }
@@ -399,7 +445,10 @@ const EnvironmentLauncher = () => {
       id: `command_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       payload: {
         command: 'evaluate',
-        params: parameters,
+        params: {
+          ...parameters,
+          taskId: selectedTaskIndex,
+        },
         trajectory: trajectory,
       },
     };
@@ -664,9 +713,10 @@ const EnvironmentLauncher = () => {
       throw new Error('No environment ID provided');
     }
 
-    // Construct CDN URL by concatenating base URL with environment ID
-    return `https://niumascript.com/scalewob-env/${currentEnvId}/index.html`;
-  }, [envId]);
+    // Construct CDN URL with taskId parameter
+    const baseUrl = `https://niumascript.com/scalewob-env/${currentEnvId}/index.html`;
+    return `${baseUrl}?taskId=${selectedTaskIndex}`;
+  }, [envId, selectedTaskIndex]);
 
   // Set up message listener for ScaleWoB bridge communication
   useEffect(() => {
@@ -926,7 +976,7 @@ const EnvironmentLauncher = () => {
             Environment &quot;{envId}&quot; is not available.
           </p>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/environments')}
             className="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-sm hover:bg-gray-700 transition-colors"
           >
             <svg
@@ -959,7 +1009,7 @@ const EnvironmentLauncher = () => {
             <div className="flex items-center space-x-3 min-w-0 flex-1">
               {/* Back to Environments Button */}
               <button
-                onClick={() => navigate(-1)}
+                onClick={() => navigate('/environments')}
                 className="px-3 py-1 bg-gray-900 text-white text-xs font-bold uppercase tracking-wide hover:bg-gray-800 transition-colors flex items-center flex-shrink-0"
               >
                 <svg
@@ -1110,16 +1160,113 @@ const EnvironmentLauncher = () => {
                   </h2>
                 </div>
                 <div className="flex-1 overflow-y-auto flex flex-col min-h-0">
-                  {/* Fixed content area - Task Description + Parameters */}
+                  {/* Fixed content area - Task Selector + Task Description + Parameters */}
                   <div className="p-4 space-y-4 flex-shrink-0">
-                    {/* Task Description */}
-                    <div className="p-4 bg-white border-2 border-gray-300 rounded-lg">
-                      <h3 className="text-sm font-bold text-gray-900 mb-2">
-                        Task Description
-                      </h3>
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        {environment.description}
-                      </p>
+                    {/* Task Panel - Combined Selection and Description */}
+                    <div className="bg-white border-2 border-gray-300 rounded-lg overflow-hidden">
+                      {/* Header */}
+                      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b-2 border-gray-300">
+                        <h3 className="text-sm font-bold text-gray-900">
+                          Task Description
+                        </h3>
+                        {environment?.tasks && environment.tasks.length > 1 && (
+                          <span className="text-xs text-gray-600 font-semibold">
+                            {environment.tasks.length} tasks
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Task Description - Centered */}
+                      <div className="flex items-center justify-center px-4 py-8 min-h-[120px]">
+                        <p className="text-sm text-gray-700 leading-relaxed text-center max-w-md">
+                          {selectedTask?.description ||
+                            environment?.description}
+                        </p>
+                      </div>
+
+                      {/* Navigation Controls - only show if multiple tasks */}
+                      {environment?.tasks && environment.tasks.length > 1 && (
+                        <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border-t-2 border-gray-300">
+                          {/* Previous Button */}
+                          <button
+                            onClick={() => {
+                              const newIndex =
+                                selectedTaskIndex === 0
+                                  ? environment.tasks.length - 1
+                                  : selectedTaskIndex - 1;
+                              handleTaskChange(newIndex);
+                            }}
+                            className="px-2 py-1.5 bg-white hover:bg-gray-100 border border-gray-300 rounded transition-colors flex items-center justify-center"
+                            title="Previous task"
+                          >
+                            <svg
+                              className="w-3.5 h-3.5 text-gray-700"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M15 19l-7-7 7-7"
+                              />
+                            </svg>
+                          </button>
+
+                          {/* Task Number Input */}
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              min="1"
+                              max={environment.tasks.length}
+                              value={selectedTaskIndex + 1}
+                              onChange={e => {
+                                const value = parseInt(e.target.value, 10);
+                                if (
+                                  !isNaN(value) &&
+                                  value >= 1 &&
+                                  value <= environment.tasks.length
+                                ) {
+                                  handleTaskChange(value - 1);
+                                }
+                              }}
+                              className="w-14 px-2 py-1.5 text-center text-xs font-semibold border border-gray-300 rounded focus:outline-none focus:border-blue-500 bg-white"
+                            />
+                            <span className="text-xs text-gray-600 font-medium">
+                              of {environment.tasks.length}
+                            </span>
+                          </div>
+
+                          {/* Next Button */}
+                          <button
+                            onClick={() => {
+                              const newIndex =
+                                selectedTaskIndex ===
+                                environment.tasks.length - 1
+                                  ? 0
+                                  : selectedTaskIndex + 1;
+                              handleTaskChange(newIndex);
+                            }}
+                            className="px-2 py-1.5 bg-white hover:bg-gray-100 border border-gray-300 rounded transition-colors flex items-center justify-center"
+                            title="Next task"
+                          >
+                            <svg
+                              className="w-3.5 h-3.5 text-gray-700"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     {/* Evaluation Controls - In a row */}
@@ -1188,11 +1335,11 @@ const EnvironmentLauncher = () => {
                       </button>
                     </div>
 
-                    {/* Evaluation Parameters - Only show if environment requires parameters */}
-                    {environment?.params &&
-                      Object.keys(environment.params).length > 0 && (
+                    {/* Evaluation Parameters - Only show if selected task requires parameters */}
+                    {selectedTask?.params &&
+                      Object.keys(selectedTask.params).length > 0 && (
                         <ParameterInput
-                          params={environment.params}
+                          params={selectedTask.params}
                           onParametersChange={setParameters}
                           disabled={!isEvaluationStarted}
                           disabledReason="not-started"

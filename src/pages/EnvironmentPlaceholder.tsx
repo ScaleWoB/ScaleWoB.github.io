@@ -14,6 +14,7 @@ const EnvironmentPlaceholder = () => {
       // Fallback data
       return {
         id: 'unknown',
+        name: 'Unknown Environment',
         taskName: 'Unknown Environment',
         description: 'Environment not found',
         platform: 'Web Applications',
@@ -22,6 +23,12 @@ const EnvironmentPlaceholder = () => {
         metrics: { completion: 0, complexity: 1 },
         icon: 'help',
         colorTheme: 'warm',
+        tasks: [
+          {
+            name: 'Unknown Task',
+            description: 'Environment not found',
+          },
+        ],
       };
     }
     return (
@@ -92,7 +99,7 @@ const EnvironmentPlaceholder = () => {
 
           {/* Title */}
           <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-            {environment.taskName}
+            {environment.name || environment.taskName}
           </h1>
 
           {/* Environment Meta */}
@@ -110,7 +117,7 @@ const EnvironmentPlaceholder = () => {
 
           {/* Description */}
           <p className="text-gray-600 mb-6 leading-relaxed">
-            {environment.description}
+            {environment.tasks?.[0]?.description || environment.description}
           </p>
 
           {/* Coming Soon Message */}
@@ -141,7 +148,8 @@ const EnvironmentPlaceholder = () => {
                 <p className="text-sm text-blue-800">
                   💡{' '}
                   <strong>
-                    Try the &quot;{demoEnv.taskName}&quot; environment
+                    Try the &quot;{demoEnv.name || demoEnv.taskName}&quot;
+                    environment
                   </strong>{' '}
                   for a fully interactive demo experience.
                 </p>
