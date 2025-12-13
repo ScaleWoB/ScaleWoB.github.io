@@ -473,7 +473,8 @@ const EnvironmentLauncher = () => {
     addConsoleEntry,
     isEvaluating,
     isEvaluationStarted,
-    environment,
+    selectedTask,
+    selectedTaskIndex,
     parameters,
     trajectory,
   ]);
