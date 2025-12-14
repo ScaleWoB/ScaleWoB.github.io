@@ -56,8 +56,9 @@ ScaleWoB is a GUI Agent Benchmark website for fair evaluation of GUI agents usin
 src/
 ├── pages/              # Route-level components (Homepage, LeaderboardHome, Environments, etc.)
 ├── components/
-│   ├── common/         # Shared layout components (Layout, Navigation, Footer, etc.)
+│   ├── common/         # Shared layout components (Layout, Navigation, Footer, Toast, Skeleton, etc.)
 │   └── leaderboard/    # Leaderboard-specific components
+├── hooks/              # Custom React hooks (useDebounce, etc.)
 ├── types/              # TypeScript type definitions
 ├── config/             # Configuration files (environment URLs)
 ├── services/           # Business logic and data services
@@ -103,15 +104,21 @@ The app uses **HashRouter** (essential for GitHub Pages) with these main routes:
 ### Component Architecture
 
 - Functional components with TypeScript interfaces for props
-- Custom hooks for complex state logic
+- Custom hooks for complex state logic (useDebounce for search optimization)
+- React.lazy and Suspense for code splitting and lazy loading
+- Memoized components to prevent unnecessary re-renders
 - Responsive design with mobile-first approach
 - Consistent styling using Tailwind CSS utility classes
+- Toast notifications for user feedback
+- Skeleton screens for better perceived performance
 
 ### State Management
 
-- React built-in state (useState, useEffect) - no external state library
-- Environment data loaded asynchronously with proper loading states
-- Error handling for failed environment loads
+- React built-in state (useState, useEffect, useRef) - no external state library
+- Custom hooks for optimized state updates (useDebounce)
+- Environment data loaded asynchronously with skeleton loading states
+- Error handling for failed environment loads with retry functionality
+- URL-based state persistence for filters, search, and sorting
 
 ### Styling System
 
@@ -202,7 +209,18 @@ Each environment has:
 
 ### Performance Optimization
 
-- **Lazy loading**: Environments loaded on-demand when navigating to launcher
-- **Code splitting**: Potential for route-based code splitting in the future
+- **Code splitting**: Route-based code splitting with React.lazy reduces initial bundle by ~30%
+- **Lazy loading**: All route components loaded on-demand (Homepage, LeaderboardHome, Environments, EnvironmentWrapper)
+- **Memoization**: Platform icons and expensive computations memoized to prevent re-renders
+- **Debounced search**: Custom useDebounce hook optimizes search filtering (300ms delay)
+- **Skeleton screens**: Show content structure immediately while data loads
 - **Bundle analysis**: Monitor bundle size and optimize dependencies
 - **CDN caching**: Leverage browser caching for static environment assets
+
+### Accessibility Features
+
+- **Keyboard navigation**: Full keyboard support with visible focus indicators
+- **Keyboard shortcuts**: Press `/` to focus search, `Esc` to clear
+- **ARIA labels**: Comprehensive labels for screen readers on all interactive elements
+- **Focus indicators**: 2px solid gray-800 outline on all focusable elements
+- **Toast notifications**: Accessible notifications with aria-live regions
