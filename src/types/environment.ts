@@ -47,8 +47,10 @@ export interface EnvironmentPreview {
 }
 
 // Extended interface for environment with React icon component
-export interface EnvironmentPreviewWithIcon
-  extends Omit<EnvironmentPreview, 'icon'> {
+export interface EnvironmentPreviewWithIcon extends Omit<
+  EnvironmentPreview,
+  'icon'
+> {
   icon: ReactNode; // React icon component (IconType or any ReactNode)
 }
 
