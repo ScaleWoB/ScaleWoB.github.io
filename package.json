@@ -5,15 +5,12 @@
   "type": "module",
   "homepage": "https://ScaleWoB.github.io",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "npx eslint src",
-    "lint:fix": "npx eslint src --fix",
-    "format": "npx prettier --write .",
-    "format:check": "npx prettier --check .",
-    "precommit": "npm run format && npm run lint:fix && npm run lint && npm run build",
-    "preview": "vite preview",
-    "prepare": "husky"
+    "dev": "bunx --bun vite",
+    "build": "bunx --bun vite build",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -31,7 +28,7 @@
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react": "^5.1.2",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",

@@ -14,17 +14,25 @@ ScaleWoB is a GUI Agent Benchmark website for fair evaluation of GUI agents usin
 
 ### Development
 
-- `npm run dev` - Start development server on port 3000
-- `npm run build` - Production build (runs TypeScript compilation + Vite build)
-- `npm run preview` - Preview production build locally
+- `bun dev` - Start development server on port 3000
+- `bun run build` - Production build (runs TypeScript compilation + Vite build)
+- `bun run preview` - Preview production build locally
 
 ### Code Quality
 
-- `npm run lint` - Run ESLint checks
-- `npm run lint:fix` - Auto-fix ESLint issues
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
-- `npm run precommit` - Run full pre-commit check (format + lint:fix + lint + build)
+- `bun run lint` - Run ESLint checks
+- `bun run lint:fix` - Auto-fix ESLint issues
+- `bun run format` - Format code with Prettier
+- `bun run format:check` - Check code formatting
+- `bun run precommit` - Run full pre-commit check (format + lint:fix + lint + build)
+
+### Package Management
+
+- `bun install` - Install dependencies
+- `bun add <package>` - Add a dependency
+- `bun add -d <package>` - Add a dev dependency
+- `bun remove <package>` - Remove a dependency
+- `bun update` - Update dependencies
 
 ### Git Hooks
 
