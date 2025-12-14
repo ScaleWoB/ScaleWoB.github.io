@@ -8,89 +8,106 @@ import {
   EnvironmentPreview,
   EnvironmentPreviewWithIcon,
 } from '../types/environment';
+import { useDebounce } from '../hooks/useDebounce';
+import Toast from '../components/common/Toast';
+import { EnvironmentGridSkeleton } from '../components/common/Skeleton';
 
-// Function to generate platform-specific icon
-const generatePlatformIcon = (platform: string): React.ReactNode => {
-  switch (platform) {
-    case 'Web Applications':
-      return (
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-          />
-        </svg>
-      );
-    case 'Desktop Apps':
-      return (
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-          />
-        </svg>
-      );
-    case 'Mobile Interfaces':
-      return (
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-          />
-        </svg>
-      );
-    default:
-      return (
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-          />
-        </svg>
-      );
-  }
+// Memoized platform icon components to avoid re-creation on every render
+const PlatformIcons = {
+  'Web Applications': (
+    <svg
+      className="w-full h-full"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+      />
+    </svg>
+  ),
+  'Desktop Apps': (
+    <svg
+      className="w-full h-full"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      />
+    </svg>
+  ),
+  'Mobile Interfaces': (
+    <svg
+      className="w-full h-full"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+      />
+    </svg>
+  ),
+  default: (
+    <svg
+      className="w-full h-full"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+      />
+    </svg>
+  ),
 };
 
-// Loading state component (moved outside to avoid re-creation on render)
+// Function to get platform-specific icon
+const generatePlatformIcon = (platform: string): React.ReactNode => {
+  return (
+    PlatformIcons[platform as keyof typeof PlatformIcons] ||
+    PlatformIcons.default
+  );
+};
+
+// Loading state component with skeleton screens
 const LoadingState: React.FC = () => (
-  <div className="py-16 bg-white">
+  <div className="py-8 bg-white">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center">
-        <div className="w-20 h-20 border-4 border-gray-200 border-t-gray-800 rounded-full animate-spin mx-auto mb-6"></div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2 uppercase tracking-wide">
-          Loading Environments
-        </h3>
-        <p className="text-lg text-gray-700">
-          Please wait while we fetch the latest environment data...
-        </p>
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Sidebar skeleton */}
+        <div className="hidden lg:block lg:w-64">
+          <div className="bg-gray-50 border-2 border-gray-300 p-6 animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-24 mb-4"></div>
+            <div className="h-10 bg-gray-200 rounded mb-6"></div>
+            <div className="space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-20"></div>
+              <div className="space-y-2">
+                <div className="h-8 bg-gray-200 rounded"></div>
+                <div className="h-8 bg-gray-200 rounded"></div>
+                <div className="h-8 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Content skeleton */}
+        <div className="flex-1">
+          <EnvironmentGridSkeleton count={10} />
+        </div>
       </div>
     </div>
   </div>
@@ -155,9 +172,8 @@ const Environments: React.FC = () => {
   const [searchInput, setSearchInput] = useState<string>(
     searchParams.get('search') || ''
   );
-  const [debouncedSearch, setDebouncedSearch] = useState<string>(
-    searchParams.get('search') || ''
-  );
+  // Use the custom debounce hook instead of manual setTimeout
+  const debouncedSearch = useDebounce(searchInput, 300);
   const [selectedTags, setSelectedTags] = useState<string[]>(
     searchParams.get('tags')?.split(',').filter(Boolean) || []
   );
@@ -165,9 +181,14 @@ const Environments: React.FC = () => {
     Number(searchParams.get('page')) || 1
   );
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
   const [pageInput, setPageInput] = useState<string>(
     String(searchParams.get('page') || 1)
   );
+  const [sortBy, setSortBy] = useState<string>(
+    searchParams.get('sort') || 'name'
+  );
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Track whether we're restoring state from sessionStorage
   const isRestoringState = useRef(false);
@@ -205,11 +226,7 @@ const Environments: React.FC = () => {
 
   const { data: environmentsData, loading, error, retry } = hookResult;
 
-  // Debounce search input
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchInput), 300);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
+  // Debounce is now handled by the useDebounce hook
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -242,6 +259,7 @@ const Environments: React.FC = () => {
       params.set('difficulty', selectedDifficulty);
     if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
     if (currentPage > 1) params.set('page', String(currentPage));
+    if (sortBy !== 'name') params.set('sort', sortBy);
     setSearchParams(params, { replace: true });
   }, [
     debouncedSearch,
@@ -249,8 +267,34 @@ const Environments: React.FC = () => {
     selectedDifficulty,
     selectedTags,
     currentPage,
+    sortBy,
     setSearchParams,
   ]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Focus search on "/" key
+      if (
+        e.key === '/' &&
+        !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
+      ) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      // Clear search on Escape key when search is focused
+      if (
+        e.key === 'Escape' &&
+        document.activeElement === searchInputRef.current
+      ) {
+        setSearchInput('');
+        searchInputRef.current?.blur();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Tag toggle function
   const toggleTag = (tag: string) => {
@@ -349,11 +393,33 @@ const Environments: React.FC = () => {
       ) as EnvironmentPreviewWithIcon[];
     }
 
+    // 5. Sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return (a.name || a.taskName || '').localeCompare(
+            b.name || b.taskName || ''
+          );
+        case 'difficulty': {
+          const difficultyOrder = { Basic: 1, Advanced: 2, Expert: 3 };
+          return (
+            (difficultyOrder[a.difficulty as keyof typeof difficultyOrder] ||
+              0) -
+            (difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0)
+          );
+        }
+        case 'platform':
+          return a.platform.localeCompare(b.platform);
+        default:
+          return 0;
+      }
+    });
+
     // Store total count before pagination
     const totalCount = filtered.length;
     const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
-    // 5. Pagination
+    // 6. Pagination
     const startIndex = (currentPage - 1) * PAGE_SIZE;
     const paginated = filtered.slice(startIndex, startIndex + PAGE_SIZE);
 
@@ -365,6 +431,7 @@ const Environments: React.FC = () => {
     selectedDifficulty,
     selectedTags,
     currentPage,
+    sortBy,
   ]);
 
   // Show loading state
@@ -378,14 +445,11 @@ const Environments: React.FC = () => {
             <div className="py-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="text-sm font-bold uppercase tracking-wider text-gray-600 mb-2">
-                    Environment Collection
-                  </div>
-                  <h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-2 leading-none">
-                    GALLERY
+                  <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-2 leading-none">
+                    Environments
                   </h1>
                   <div className="text-lg font-medium text-gray-700">
-                    Explore AI-Generated Testing Environments
+                    View Environments Available in ScaleWoB
                   </div>
                 </div>
                 {/* Environment Icon */}
@@ -426,14 +490,11 @@ const Environments: React.FC = () => {
             <div className="py-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="text-sm font-bold uppercase tracking-wider text-gray-600 mb-2">
-                    Environment Collection
-                  </div>
-                  <h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-2 leading-none">
-                    GALLERY
+                  <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-2 leading-none">
+                    Environments
                   </h1>
                   <div className="text-lg font-medium text-gray-700">
-                    Explore AI-Generated Testing Environments
+                    View Environments Available in ScaleWoB
                   </div>
                 </div>
                 {/* Environment Icon */}
@@ -527,6 +588,19 @@ const Environments: React.FC = () => {
                   onChange={e => setSearchInput(e.target.value)}
                 />
 
+                <div className="mb-4">
+                  <select
+                    value={sortBy}
+                    onChange={e => setSortBy(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 bg-white text-gray-700 focus:outline-none focus:border-gray-400 mb-2"
+                    aria-label="Sort environments"
+                  >
+                    <option value="name">Sort: Name (A-Z)</option>
+                    <option value="difficulty">Sort: Difficulty</option>
+                    <option value="platform">Sort: Platform</option>
+                  </select>
+                </div>
+
                 <div className="flex gap-2 mb-4">
                   <select
                     value={selectedPlatform}
@@ -605,14 +679,34 @@ const Environments: React.FC = () => {
                   </div>
 
                   <input
+                    ref={searchInputRef}
                     type="text"
-                    placeholder="Search environments..."
+                    placeholder="Search environments"
                     className="w-full px-4 py-2 mb-6 border-2 border-gray-300 text-sm focus:outline-none focus:border-gray-400"
                     value={searchInput}
                     onChange={e => setSearchInput(e.target.value)}
+                    aria-label="Search environments"
                   />
 
                   <div className="space-y-6">
+                    <div>
+                      <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
+                        Sort By
+                      </h3>
+                      <select
+                        value={sortBy}
+                        onChange={e => setSortBy(e.target.value)}
+                        className="w-full px-4 py-2 text-sm border-2 border-gray-300 bg-white text-gray-700 focus:outline-none focus:border-gray-400"
+                        aria-label="Sort environments"
+                      >
+                        <option value="name">Name (A-Z)</option>
+                        <option value="difficulty">
+                          Difficulty (Easy → Hard)
+                        </option>
+                        <option value="platform">Platform</option>
+                      </select>
+                    </div>
+
                     <div>
                       <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
                         Platform
@@ -911,10 +1005,12 @@ const Environments: React.FC = () => {
                                         environment.id
                                       );
                                       setCopiedId(environment.id);
+                                      setShowToast(true);
                                       setTimeout(() => setCopiedId(null), 2000);
                                     }}
                                     className="p-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 flex items-center justify-center border border-gray-300 group relative"
                                     title="Copy environment ID"
+                                    aria-label="Copy environment ID"
                                   >
                                     <svg
                                       className="w-4 h-4 group-hover:scale-110 transition-transform duration-200"
@@ -930,11 +1026,6 @@ const Environments: React.FC = () => {
                                       />
                                     </svg>
                                   </button>
-                                  {copiedId === environment.id && (
-                                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs font-medium rounded whitespace-nowrap animate-fade-in">
-                                      Copied!
-                                    </div>
-                                  )}
                                 </div>
                                 <button
                                   onClick={() => {
@@ -1072,6 +1163,15 @@ const Environments: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Toast notification for copy action */}
+      {showToast && copiedId && (
+        <Toast
+          message="Environment ID copied to clipboard!"
+          type="success"
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 };
