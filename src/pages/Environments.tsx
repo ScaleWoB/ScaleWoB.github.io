@@ -189,6 +189,7 @@ const Environments: React.FC = () => {
     searchParams.get('sort') || 'name'
   );
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [showAllTags, setShowAllTags] = useState<boolean>(false);
 
   // Track whether we're restoring state from sessionStorage
   const isRestoringState = useRef(false);
@@ -324,12 +325,40 @@ const Environments: React.FC = () => {
     }
   };
 
-  // Derive all unique tags from environment data
-  const allTags = useMemo(() => {
-    if (!environmentsData) return [];
-    const tagSet = new Set<string>();
-    environmentsData.forEach(env => env.tags.forEach(tag => tagSet.add(tag)));
-    return Array.from(tagSet).sort();
+  // Calculate tag counts and sort by frequency
+  const { tagCountsMap, sortedTagsByFrequency, topTags } = useMemo(() => {
+    if (!environmentsData) {
+      return {
+        tagCountsMap: new Map(),
+        sortedTagsByFrequency: [],
+        topTags: [],
+      };
+    }
+
+    // Count tag frequency across all environments
+    const counts = new Map<string, number>();
+    environmentsData.forEach(env => {
+      env.tags.forEach(tag => {
+        counts.set(tag, (counts.get(tag) || 0) + 1);
+      });
+    });
+
+    // Sort tags by frequency (descending), then alphabetically (ascending)
+    const sorted = Array.from(counts.entries())
+      .sort((a, b) => {
+        if (b[1] !== a[1]) return b[1] - a[1]; // Sort by count descending
+        return a[0].localeCompare(b[0]); // Then alphabetically
+      })
+      .map(([tag]) => tag);
+
+    // Top 12 tags for default view
+    const top = sorted.slice(0, 12);
+
+    return {
+      tagCountsMap: counts,
+      sortedTagsByFrequency: sorted,
+      topTags: top,
+    };
   }, [environmentsData]);
 
   // Map environment data to include React icon components
@@ -625,29 +654,53 @@ const Environments: React.FC = () => {
                   </select>
                 </div>
 
-                {allTags.length > 0 && (
+                {sortedTagsByFrequency.length > 0 && (
                   <div className="mb-4">
                     <div className="text-xs font-bold uppercase text-gray-700 mb-2">
                       Tags
                     </div>
-                    <div className="space-y-2">
-                      {allTags.map(tag => (
-                        <label
-                          key={tag}
-                          className="flex items-center space-x-2 cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedTags.includes(tag)}
-                            onChange={() => toggleTag(tag)}
-                            className="w-4 h-4 border-2 border-gray-300"
-                          />
-                          <span className="text-sm font-medium text-gray-700">
-                            {tag}
-                          </span>
-                        </label>
-                      ))}
+
+                    {/* Mobile Tags Container */}
+                    <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300">
+                      {(showAllTags ? sortedTagsByFrequency : topTags).map(
+                        tag => (
+                          <label
+                            key={tag}
+                            className="flex items-center space-x-2 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedTags.includes(tag)}
+                              onChange={() => toggleTag(tag)}
+                              className="w-4 h-4 border-2 border-gray-300"
+                              aria-label={`Filter by tag: ${tag}`}
+                            />
+                            <span className="text-sm font-medium text-gray-700 flex-1">
+                              {tag}
+                            </span>
+                            <span className="text-xs text-gray-500 font-semibold">
+                              ({tagCountsMap.get(tag) || 0})
+                            </span>
+                          </label>
+                        )
+                      )}
                     </div>
+
+                    {/* Mobile Expand Button */}
+                    {sortedTagsByFrequency.length > 12 && (
+                      <button
+                        onClick={() => setShowAllTags(!showAllTags)}
+                        className="w-full mt-2 px-3 py-2 text-xs font-bold uppercase tracking-wide text-gray-700 border-2 border-gray-300 hover:bg-gray-100 transition-all duration-200"
+                        aria-expanded={showAllTags}
+                        aria-label={
+                          showAllTags ? 'Show fewer tags' : 'Show all tags'
+                        }
+                      >
+                        {showAllTags
+                          ? `Show fewer (${topTags.length})`
+                          : `Show all (${sortedTagsByFrequency.length})`}
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -756,29 +809,70 @@ const Environments: React.FC = () => {
                       </div>
                     </div>
 
-                    {allTags.length > 0 && (
+                    {sortedTagsByFrequency.length > 0 && (
                       <div>
                         <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
                           Tags
                         </h3>
+
+                        {/* Tags Container - Show top tags or all tags */}
                         <div className="space-y-2">
-                          {allTags.map(tag => (
-                            <label
-                              key={tag}
-                              className="flex items-center space-x-2 cursor-pointer"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={selectedTags.includes(tag)}
-                                onChange={() => toggleTag(tag)}
-                                className="w-4 h-4 border-2 border-gray-300"
-                              />
-                              <span className="text-sm font-medium text-gray-700">
-                                {tag}
-                              </span>
-                            </label>
-                          ))}
+                          {(showAllTags ? sortedTagsByFrequency : topTags).map(
+                            tag => (
+                              <label
+                                key={tag}
+                                className="flex items-center space-x-2 cursor-pointer group"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedTags.includes(tag)}
+                                  onChange={() => toggleTag(tag)}
+                                  className="w-4 h-4 border-2 border-gray-300 group-hover:border-gray-400 transition-colors"
+                                  aria-label={`Filter by tag: ${tag}`}
+                                />
+                                <span className="text-sm font-medium text-gray-700 flex-1">
+                                  {tag}
+                                </span>
+                                <span className="text-xs text-gray-500 font-semibold">
+                                  ({tagCountsMap.get(tag) || 0})
+                                </span>
+                              </label>
+                            )
+                          )}
                         </div>
+
+                        {/* Expand/Collapse Button */}
+                        {sortedTagsByFrequency.length > 12 && (
+                          <button
+                            onClick={() => setShowAllTags(!showAllTags)}
+                            className="w-full mt-4 px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 border-2 border-gray-300 hover:bg-gray-100 transition-all duration-200 flex items-center justify-center gap-2 group"
+                            aria-expanded={showAllTags}
+                            aria-label={
+                              showAllTags ? 'Show fewer tags' : 'Show all tags'
+                            }
+                          >
+                            <span>
+                              {showAllTags
+                                ? `Show fewer tags (${topTags.length})`
+                                : `Show all tags (${sortedTagsByFrequency.length})`}
+                            </span>
+                            <svg
+                              className={`w-4 h-4 transition-transform duration-200 ${
+                                showAllTags ? 'rotate-180' : ''
+                              }`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M19 9l-7 7-7-7"
+                              />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
