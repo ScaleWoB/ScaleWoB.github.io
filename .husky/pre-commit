@@ -8,6 +8,5 @@ if [ -n "$STAGED_FILES" ]; then
     echo "$STAGED_FILES" | xargs git add
 fi
 
-# Run final checks
-bun run lint && \
-bun run build
+# Run lint (only staged files) and type checking (all files) + build
+bun run precommit && bun run build

@@ -10,7 +10,8 @@
     "lint": "tsc --noEmit && eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "precommit": "git diff --cached --name-only | grep -E '\\.(js|jsx|ts|tsx)$' | xargs -r bunx eslint && tsc --noEmit"
   },
   "dependencies": {
     "@rjsf/core": "^6.1.2",
