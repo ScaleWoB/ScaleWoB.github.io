@@ -9,10 +9,10 @@ import { JSONSchemaDefinition } from '../../types/environment';
 
 interface ParameterInputProps {
   schema: JSONSchemaDefinition;
-  onParametersChange: (parameters: Record<string, any>) => void;
+  onParametersChange: (parameters: Record<string, unknown>) => void;
   disabled?: boolean;
   disabledReason?: 'play-mode' | 'not-started' | 'both';
-  initialValues?: Record<string, any>;
+  initialValues?: Record<string, unknown>;
 }
 
 const ParameterInput: React.FC<ParameterInputProps> = ({

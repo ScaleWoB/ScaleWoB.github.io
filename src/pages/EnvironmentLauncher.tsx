@@ -7,6 +7,7 @@ import {
 } from '../services/environmentService';
 import {
   ParameterDefinition,
+  EnvironmentParameters,
   isJSONSchemaDefinition,
 } from '../types/environment';
 import { EnvironmentPreview } from '../types/environment';
@@ -35,6 +36,25 @@ interface ConsoleEntry {
     | 'unknown';
   message: string;
   details?: Record<string, unknown>;
+}
+
+// Task definition from bridge
+interface BridgeTask {
+  taskId: number;
+  task: string;
+  params?: {
+    type: string;
+    properties?: Record<string, unknown>;
+    required?: string[];
+  };
+}
+
+// Common selected task type that includes both task and description
+interface SelectedTask {
+  taskId: number;
+  task: string;
+  description: string;
+  params?: ParameterDefinition | EnvironmentParameters;
 }
 
 // Evaluation Status Banner Component
@@ -248,6 +268,10 @@ const EnvironmentLauncher = () => {
     taskIdParam ? parseInt(taskIdParam, 10) : 0
   );
 
+  // Tasks fetched from bridge (priority over JSON)
+  const [bridgeTasks, setBridgeTasks] = useState<BridgeTask[]>([]);
+  const [tasksFromBridge, setTasksFromBridge] = useState(false);
+
   // Parameter state for evaluation
   const [parameters, setParameters] = useState<
     Record<string, string | number | boolean>
@@ -302,18 +326,61 @@ const EnvironmentLauncher = () => {
   };
 
   // Get the currently selected task
-  const selectedTask = useMemo(() => {
+  const selectedTask = useMemo((): SelectedTask => {
+    // Priority 1: Use bridge tasks if available
+    if (tasksFromBridge && bridgeTasks.length > 0) {
+      // Find task by taskId (not array index)
+      const foundTask = bridgeTasks.find(t => t.taskId === selectedTaskIndex);
+      if (foundTask) {
+        return {
+          taskId: foundTask.taskId,
+          task: foundTask.task,
+          description: foundTask.task, // Bridge tasks use task as description
+          params: foundTask.params as ParameterDefinition | undefined,
+        };
+      }
+      // If taskId not found, default to first task
+      const firstTask = bridgeTasks[0];
+      return {
+        taskId: firstTask.taskId,
+        task: firstTask.task,
+        description: firstTask.task,
+        params: firstTask.params as ParameterDefinition | undefined,
+      };
+    }
+
+    // Priority 2: Fallback to environments.json tasks
     if (!environment?.tasks || environment.tasks.length === 0) {
       // Fallback for environments without tasks array
       return {
-        name: environment?.name || environment?.taskName || 'Unknown Task',
+        taskId: 0,
+        task: environment?.name || environment?.taskName || 'Unknown Task',
         description: environment?.description || '',
         params: environment?.params,
       };
     }
     const index = Math.min(selectedTaskIndex, environment.tasks.length - 1);
-    return environment.tasks[index];
-  }, [environment, selectedTaskIndex]);
+    const envTask = environment.tasks[index];
+    // Normalize environment task to have both task and description
+    return {
+      taskId: envTask.taskId ?? index,
+      task: envTask.name || environment?.name || 'Unknown Task',
+      description: envTask.description || environment?.description || '',
+      params: envTask.params,
+    };
+  }, [environment, selectedTaskIndex, bridgeTasks, tasksFromBridge]);
+
+  // Get the current logical index (1-based for display)
+  const currentLogicalIndex = useMemo(() => {
+    if (tasksFromBridge && bridgeTasks.length > 0) {
+      const currentIndex = bridgeTasks.findIndex(
+        t => t.taskId === selectedTaskIndex
+      );
+      return currentIndex === -1 ? 1 : currentIndex + 1;
+    }
+    // For JSON tasks, use 1-based index
+    return selectedTaskIndex + 1;
+  }, [selectedTaskIndex, bridgeTasks, tasksFromBridge]);
 
   // Event type preferences
   const [eventPreferences, setEventPreferences] = useState({
@@ -486,6 +553,30 @@ const EnvironmentLauncher = () => {
     []
   );
 
+  /**
+   * Send reset command to iframe
+   */
+  const sendResetCommand = useCallback(() => {
+    if (!iframeRef.current || environmentStatus !== 'online') {
+      addConsoleEntry('error', 'Cannot reset - iframe not ready', {
+        status: environmentStatus,
+      });
+      return;
+    }
+
+    const command = {
+      type: 'scalewob-command',
+      id: `reset_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+      payload: {
+        command: 'reset',
+        params: {},
+      },
+    };
+
+    iframeRef.current.contentWindow?.postMessage(command, '*');
+    addConsoleEntry('action', 'Reset command sent to environment');
+  }, [iframeRef, environmentStatus, addConsoleEntry]);
+
   // Handle task selection change
   const handleTaskChange = useCallback(
     (newIndex: number) => {
@@ -504,17 +595,19 @@ const EnvironmentLauncher = () => {
       setEvaluationMessage('');
       setEvaluationStartTime(null);
 
+      // Note: Iframe will reload with new taskId - CDN environment handles initialization
+
       // Log task change
       addConsoleEntry(
         'info',
-        `Switched to task: ${environment?.tasks?.[newIndex]?.name || 'Unknown'}`,
+        `Switched to task: ${selectedTask?.task || 'Unknown'}`,
         {
-          taskIndex: newIndex,
-          taskName: environment?.tasks?.[newIndex]?.name,
+          taskId: newIndex,
+          taskName: selectedTask?.task,
         }
       );
     },
-    [environment, setSearchParams, addConsoleEntry]
+    [setSearchParams, addConsoleEntry, selectedTask]
   );
 
   // Auto-scroll to bottom when new entries are added
@@ -580,6 +673,9 @@ const EnvironmentLauncher = () => {
   const startEvaluation = useCallback(() => {
     if (!iframeRef.current) return;
 
+    // Send reset command before refreshing
+    sendResetCommand();
+
     // Switch to Evaluate Mode
     setIsPlayMode(false);
     setIsEvaluationStarted(true);
@@ -618,7 +714,13 @@ const EnvironmentLauncher = () => {
         iframeRef.current.src = cacheBustedSrc;
       }
     }, 100);
-  }, [iframeRef, addConsoleEntry, setConsoleEntries, setEnvironmentStatus]);
+  }, [
+    iframeRef,
+    addConsoleEntry,
+    setConsoleEntries,
+    setEnvironmentStatus,
+    sendResetCommand,
+  ]);
 
   // Function to finish evaluation (same logic as existing evaluate)
   const finishEvaluation = useCallback(() => {
@@ -970,6 +1072,30 @@ const EnvironmentLauncher = () => {
       // Handle ScaleWoB bridge events
       if (message.type === 'scalewob-event') {
         const { eventType, data } = message.payload;
+
+        // Extract tasks from init event
+        if (eventType === 'init' && data.tasks && Array.isArray(data.tasks)) {
+          setBridgeTasks(data.tasks);
+          setTasksFromBridge(true);
+          addConsoleEntry(
+            'success',
+            `Loaded ${data.tasks.length} tasks from environment`,
+            { taskCount: data.tasks.length, source: 'bridge' }
+          );
+
+          // Auto-select first task if current selection is invalid
+          const validTaskIds = data.tasks.map((t: BridgeTask) => t.taskId);
+          if (!validTaskIds.includes(selectedTaskIndex)) {
+            const firstTaskId = data.tasks[0]?.taskId ?? 0;
+            setSelectedTaskIndex(firstTaskId);
+            setSearchParams({ taskId: String(firstTaskId) });
+            addConsoleEntry('info', `Auto-selected task ${firstTaskId}`, {
+              reason: 'Previous selection invalid',
+              previousTaskId: selectedTaskIndex,
+              newTaskId: firstTaskId,
+            });
+          }
+        }
 
         // Map bridge event types to console entry types
         const mapBridgeEventToConsoleType = (
@@ -1510,33 +1636,57 @@ const EnvironmentLauncher = () => {
                           <h3 className="text-sm font-bold text-gray-900">
                             Task Description
                           </h3>
-                          {environment?.tasks &&
-                            environment.tasks.length > 1 && (
-                              <span className="text-xs text-gray-600 font-semibold">
-                                {environment.tasks.length} tasks
-                              </span>
-                            )}
+                          {(tasksFromBridge
+                            ? bridgeTasks.length > 1
+                            : environment?.tasks &&
+                              environment.tasks.length > 1) && (
+                            <span className="text-xs text-gray-600 font-semibold">
+                              {tasksFromBridge
+                                ? `${bridgeTasks.length} tasks`
+                                : `${environment?.tasks.length} tasks`}
+                            </span>
+                          )}
                         </div>
 
                         {/* Task Description - Centered */}
                         <div className="flex items-center justify-center px-4 py-8 min-h-[120px]">
                           <p className="text-sm text-gray-700 leading-relaxed text-center max-w-md">
-                            {selectedTask?.description ||
+                            {selectedTask?.task ||
+                              selectedTask?.description ||
                               environment?.description}
                           </p>
                         </div>
 
                         {/* Navigation Controls - only show if multiple tasks */}
-                        {environment?.tasks && environment.tasks.length > 1 && (
+                        {(tasksFromBridge
+                          ? bridgeTasks.length > 1
+                          : environment?.tasks &&
+                            environment.tasks.length > 1) && (
                           <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border-t-2 border-gray-300">
                             {/* Previous Button */}
                             <button
                               onClick={() => {
-                                const newIndex =
-                                  selectedTaskIndex === 0
-                                    ? environment.tasks.length - 1
-                                    : selectedTaskIndex - 1;
-                                handleTaskChange(newIndex);
+                                if (tasksFromBridge) {
+                                  // Get current task index in bridge tasks array
+                                  const currentIndex = bridgeTasks.findIndex(
+                                    t => t.taskId === selectedTaskIndex
+                                  );
+                                  if (currentIndex === -1) return;
+
+                                  const prevIndex =
+                                    currentIndex === 0
+                                      ? bridgeTasks.length - 1
+                                      : currentIndex - 1;
+                                  const newTaskId =
+                                    bridgeTasks[prevIndex].taskId;
+                                  handleTaskChange(newTaskId);
+                                } else {
+                                  const newIndex =
+                                    selectedTaskIndex === 0
+                                      ? environment!.tasks.length - 1
+                                      : selectedTaskIndex - 1;
+                                  handleTaskChange(newIndex);
+                                }
                               }}
                               className="px-2 py-1.5 bg-white hover:bg-gray-100 border border-gray-300 rounded transition-colors flex items-center justify-center"
                               title="Previous task"
@@ -1560,35 +1710,73 @@ const EnvironmentLauncher = () => {
                             <div className="flex items-center gap-2">
                               <input
                                 type="number"
-                                min="1"
-                                max={environment.tasks.length}
-                                value={selectedTaskIndex + 1}
+                                min={1}
+                                max={
+                                  tasksFromBridge
+                                    ? bridgeTasks.length
+                                    : environment?.tasks.length
+                                }
+                                value={currentLogicalIndex}
                                 onChange={e => {
                                   const value = parseInt(e.target.value, 10);
-                                  if (
-                                    !isNaN(value) &&
-                                    value >= 1 &&
-                                    value <= environment.tasks.length
-                                  ) {
-                                    handleTaskChange(value - 1);
+                                  if (tasksFromBridge) {
+                                    // Convert logical index (1-based) to actual taskId
+                                    const actualIndex = value - 1;
+                                    if (
+                                      !isNaN(value) &&
+                                      actualIndex >= 0 &&
+                                      actualIndex < bridgeTasks.length
+                                    ) {
+                                      const newTaskId =
+                                        bridgeTasks[actualIndex].taskId;
+                                      handleTaskChange(newTaskId);
+                                    }
+                                  } else {
+                                    // For JSON tasks, convert to 0-based index
+                                    if (
+                                      !isNaN(value) &&
+                                      value >= 1 &&
+                                      value <= environment!.tasks.length
+                                    ) {
+                                      handleTaskChange(value - 1);
+                                    }
                                   }
                                 }}
                                 className="w-14 px-2 py-1.5 text-center text-xs font-semibold border border-gray-300 rounded focus:outline-none focus:border-blue-500 bg-white"
                               />
                               <span className="text-xs text-gray-600 font-medium">
-                                of {environment.tasks.length}
+                                of{' '}
+                                {tasksFromBridge
+                                  ? bridgeTasks.length
+                                  : environment?.tasks.length}
                               </span>
                             </div>
 
                             {/* Next Button */}
                             <button
                               onClick={() => {
-                                const newIndex =
-                                  selectedTaskIndex ===
-                                  environment.tasks.length - 1
-                                    ? 0
-                                    : selectedTaskIndex + 1;
-                                handleTaskChange(newIndex);
+                                if (tasksFromBridge) {
+                                  // Get current task index in bridge tasks array
+                                  const currentIndex = bridgeTasks.findIndex(
+                                    t => t.taskId === selectedTaskIndex
+                                  );
+                                  if (currentIndex === -1) return;
+
+                                  const nextIndex =
+                                    currentIndex === bridgeTasks.length - 1
+                                      ? 0
+                                      : currentIndex + 1;
+                                  const newTaskId =
+                                    bridgeTasks[nextIndex].taskId;
+                                  handleTaskChange(newTaskId);
+                                } else {
+                                  const newIndex =
+                                    selectedTaskIndex ===
+                                    environment!.tasks.length - 1
+                                      ? 0
+                                      : selectedTaskIndex + 1;
+                                  handleTaskChange(newIndex);
+                                }
                               }}
                               className="px-2 py-1.5 bg-white hover:bg-gray-100 border border-gray-300 rounded transition-colors flex items-center justify-center"
                               title="Next task"
@@ -1707,7 +1895,14 @@ const EnvironmentLauncher = () => {
                                 normalizeTaskParams(selectedTask.params)
                               )!
                             }
-                            onParametersChange={setParameters}
+                            onParametersChange={params =>
+                              setParameters(
+                                params as Record<
+                                  string,
+                                  string | number | boolean
+                                >
+                              )
+                            }
                             disabled={!isEvaluationStarted}
                             disabledReason="not-started"
                             initialValues={parameters}
@@ -2039,6 +2234,9 @@ const EnvironmentLauncher = () => {
                               environment.platform === 'Mobile Interfaces'
                                 ? 'Mobile'
                                 : 'Desktop';
+
+                            // Don't send reset on load - CDN environment handles its own initialization
+                            // Reset is only sent explicitly when switching tasks or starting evaluation
 
                             // Only show success message if this is not an evaluation refresh
                             if (

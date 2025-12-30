@@ -102,7 +102,8 @@ export interface EnvironmentPreview {
   colorTheme: ColorTheme;
   cdnUrl?: string; // CDN URL for the environment
   params?: EnvironmentParameters; // Optional: fallback for single-task environments
-  tasks: Task[]; // Array of tasks (always present after processing)
+  task_num?: number; // Number of tasks in this environment
+  tasks: Task[]; // Array of tasks (deprecated, always present after processing for backward compatibility)
 }
 
 // Extended interface for environment with React icon component
@@ -160,8 +161,9 @@ export interface RawEnvironmentPreview {
   colorTheme?: ColorTheme;
   cdnUrl?: string; // CDN URL for the environment
   params?: EnvironmentParameters; // Old format or fallback
+  task_num?: number; // Number of tasks in this environment
   tasks?: Array<{
-    // New format: tasks array
+    // New format: tasks array (deprecated, use task_num)
     name?: string;
     description?: string;
     taskId?: number;

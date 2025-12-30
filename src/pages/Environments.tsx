@@ -84,6 +84,68 @@ const generatePlatformIcon = (platform: string): React.ReactNode => {
   );
 };
 
+// Difficulty-specific icons (shown on hover)
+const DifficultyIcons = {
+  Basic: (
+    <svg
+      className="w-full h-full"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+  ),
+  Advanced: (
+    <svg
+      className="w-full h-full"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M13 10V3L4 14h7v7l9-11h-7z"
+      />
+    </svg>
+  ),
+  Expert: (
+    <svg
+      className="w-full h-full"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+      />
+    </svg>
+  ),
+};
+
+const getDifficultyIconStyles = (difficulty: string) => {
+  switch (difficulty) {
+    case 'Basic':
+      return 'bg-blue-50 border-blue-300 text-blue-700';
+    case 'Advanced':
+      return 'bg-orange-50 border-orange-300 text-orange-700';
+    case 'Expert':
+      return 'bg-red-50 border-red-300 text-red-700';
+    default:
+      return 'bg-gray-100 border-gray-300 text-gray-700';
+  }
+};
+
 // Loading state component with skeleton screens
 const LoadingState: React.FC = () => (
   <div className="py-8 bg-white">
@@ -1043,9 +1105,23 @@ const Environments: React.FC = () => {
                           <div className="p-3 md:p-4">
                             <div className="flex items-center justify-between gap-3">
                               <div className="flex items-center space-x-4 flex-1 min-w-0">
-                                <div className="w-8 h-8 md:w-10 md:h-10 rounded border-2 border-gray-300 bg-gray-100 flex items-center justify-center shrink-0">
-                                  <div className="w-4 h-4 md:w-5 md:h-5 text-gray-700">
+                                <div
+                                  className={`w-8 h-8 md:w-10 md:h-10 rounded border-2 flex items-center justify-center shrink-0 group relative transition-colors duration-200 ${getDifficultyIconStyles(
+                                    environment.difficulty
+                                  )}`}
+                                >
+                                  {/* Default: Platform icon */}
+                                  <div className="w-4 h-4 md:w-5 md:h-5 transition-opacity duration-200 group-hover:opacity-0">
                                     {environment.icon}
+                                  </div>
+
+                                  {/* Hover: Difficulty icon */}
+                                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <div className="w-4 h-4 md:w-5 md:h-5">
+                                      {DifficultyIcons[
+                                        environment.difficulty
+                                      ] || DifficultyIcons['Basic']}
+                                    </div>
                                   </div>
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -1053,38 +1129,31 @@ const Environments: React.FC = () => {
                                     <h3 className="text-base md:text-lg font-bold text-gray-900">
                                       {environment.name || environment.taskName}
                                     </h3>
-                                    <span
-                                      className={`px-2 py-1 text-xs font-bold uppercase tracking-wide border inline-block ${
-                                        environment.difficulty === 'Basic'
-                                          ? 'bg-blue-50 text-blue-700 border-blue-300'
-                                          : environment.difficulty ===
-                                              'Advanced'
-                                            ? 'bg-orange-50 text-orange-700 border-orange-300'
-                                            : 'bg-red-50 text-red-700 border-red-300'
-                                      }`}
-                                    >
-                                      {environment.difficulty}
-                                    </span>
                                     {/* Task count badge */}
-                                    {environment.tasks &&
-                                      environment.tasks.length > 1 && (
-                                        <span className="px-2 py-1 text-xs font-bold uppercase tracking-wide border bg-gray-50 text-gray-700 border-gray-300 inline-flex items-center">
-                                          <svg
-                                            className="w-3 h-3 mr-1"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                          >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                                            />
-                                          </svg>
-                                          {environment.tasks.length} tasks
-                                        </span>
-                                      )}
+                                    {(environment.task_num ||
+                                      (environment.tasks &&
+                                        environment.tasks.length) ||
+                                      0) > 1 && (
+                                      <span className="px-2 py-1 text-xs font-bold uppercase tracking-wide border bg-gray-50 text-gray-700 border-gray-300 inline-flex items-center">
+                                        <svg
+                                          className="w-3 h-3 mr-1"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                          />
+                                        </svg>
+                                        {environment.task_num ||
+                                          environment.tasks?.length ||
+                                          0}{' '}
+                                        tasks
+                                      </span>
+                                    )}
                                   </div>
                                   <p className="text-xs md:text-sm text-gray-700 leading-relaxed line-clamp-2">
                                     {environment.tasks?.[0]?.description ||

@@ -1,12 +1,20 @@
 import { ObjectFieldTemplateProps } from '@rjsf/utils';
 import { useState } from 'react';
 
+interface ObjectFieldTemplatePropsWithIdSchema extends ObjectFieldTemplateProps {
+  idSchema?: {
+    $id?: string;
+  };
+}
+
 const ObjectFieldTemplate: React.FC<ObjectFieldTemplateProps> = props => {
   const { title, properties } = props;
 
   const [isExpanded, setIsExpanded] = useState(true);
-  // Access idSchema through props with type assertion
-  const { $id } = (props as any).idSchema || { $id: '' };
+  // Access idSchema through props with proper type
+  const { $id } = (props as ObjectFieldTemplatePropsWithIdSchema).idSchema || {
+    $id: '',
+  };
 
   // Check if this is a nested object (not the root)
   // Root object typically has $id of "root", nested objects have paths like "root_property"

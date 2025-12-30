@@ -1,6 +1,11 @@
 import { FieldTemplateProps } from '@rjsf/utils';
 import Tooltip from '../../common/Tooltip';
 
+interface SchemaItems {
+  type?: string | string[];
+  description?: string;
+}
+
 const FieldTemplate: React.FC<FieldTemplateProps> = props => {
   const { id, label, children, errors, help, required, schema, disabled } =
     props;
@@ -37,9 +42,10 @@ const FieldTemplate: React.FC<FieldTemplateProps> = props => {
     }
   };
 
+  const schemaItems = schema.items as SchemaItems | undefined;
   const typeLabel =
-    isArrayItem && schema.items
-      ? getTypeLabel((schema.items as any).type)
+    isArrayItem && schemaItems
+      ? getTypeLabel(schemaItems.type)
       : getTypeLabel(schema.type);
 
   // For array items, render compact version (no card)
@@ -49,11 +55,10 @@ const FieldTemplate: React.FC<FieldTemplateProps> = props => {
         {children}
         <Tooltip
           content={`${
-            schema.items ? getTypeLabel((schema.items as any).type) : typeLabel
+            schemaItems ? getTypeLabel(schemaItems.type) : typeLabel
           }${
-            (schema.items as any)?.description || schema.description
-              ? ': ' +
-                ((schema.items as any)?.description || schema.description)
+            schemaItems?.description || schema.description
+              ? ': ' + (schemaItems?.description || schema.description)
               : ''
           }`}
           position="top"

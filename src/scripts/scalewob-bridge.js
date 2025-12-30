@@ -50,14 +50,32 @@ class ScaleWoBBridge {
     // Notify parent that environment is ready (legacy format)
     setTimeout(() => {
       this.isReady = true;
+
+      // Prepare init payload with basic environment info
+      const initPayload = {
+        timestamp: Date.now(),
+        environment: window.location.href,
+        title: document.title,
+      };
+
+      // Try to get tasks from environment if available
+      if (typeof window.getTasks === 'function') {
+        try {
+          const tasks = window.getTasks();
+          initPayload.tasks = tasks;
+          this.log('Tasks loaded from environment:', tasks.length);
+        } catch (error) {
+          this.log('Error loading tasks:', error.message);
+          // Continue without tasks - not a fatal error
+        }
+      } else {
+        this.log('getTasks function not available in environment');
+      }
+
       this.sendEvent(
         'init',
         'ScaleWoB Event Tracker initialized successfully',
-        {
-          timestamp: Date.now(),
-          environment: window.location.href,
-          title: document.title,
-        }
+        initPayload
       );
       this.log('ScaleWoB Bridge ready');
     }, 100);
@@ -189,6 +207,12 @@ class ScaleWoBBridge {
       case 'back':
         return this.goBack();
 
+      // Environment management commands
+      case 'reset':
+        return this.resetEnvironment();
+      case 'get-tasks':
+        return this.getEnvironmentTasks();
+
       // System commands
       case 'get-state':
         return this.getEnvironmentState();
@@ -199,6 +223,48 @@ class ScaleWoBBridge {
 
       default:
         throw new Error(`Unknown command: ${command}`);
+    }
+  }
+
+  /**
+   * Reset environment to initial state
+   */
+  resetEnvironment() {
+    if (typeof window.reset !== 'function') {
+      throw new Error('Environment does not have reset() function available');
+    }
+
+    try {
+      window.reset();
+      return {
+        success: true,
+        timestamp: Date.now(),
+        message: 'Environment reset successfully',
+      };
+    } catch (error) {
+      throw new Error(`Reset failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get task list from environment
+   */
+  getEnvironmentTasks() {
+    if (typeof window.getTasks !== 'function') {
+      throw new Error(
+        'Environment does not have getTasks() function available'
+      );
+    }
+
+    try {
+      const tasks = window.getTasks();
+      return {
+        tasks: tasks,
+        count: tasks.length,
+        timestamp: Date.now(),
+      };
+    } catch (error) {
+      throw new Error(`getTasks failed: ${error.message}`);
     }
   }
 
