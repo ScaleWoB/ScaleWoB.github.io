@@ -297,6 +297,9 @@ const EnvironmentLauncher = () => {
   const [evaluationStartTime, setEvaluationStartTime] = useState<number | null>(
     null
   );
+  const [currentEvaluationCommandId, setCurrentEvaluationCommandId] = useState<
+    string | null
+  >(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   // Load environment data from service
@@ -589,6 +592,7 @@ const EnvironmentLauncher = () => {
       setIsEvaluating(false);
       setParameters({});
       setTrajectory([]);
+      setCurrentEvaluationCommandId(null);
 
       // Reset evaluation status banner
       setEvaluationStatus('idle');
@@ -686,6 +690,9 @@ const EnvironmentLauncher = () => {
 
     // Clear trajectory for fresh start
     setTrajectory([]);
+
+    // Clear any previous evaluation request
+    setCurrentEvaluationCommandId(null);
 
     // Set evaluation status to evaluating with start time
     setEvaluationStatus('evaluating');
@@ -786,6 +793,9 @@ const EnvironmentLauncher = () => {
       },
     };
 
+    // Store the command ID so we only process responses to this explicit request
+    setCurrentEvaluationCommandId(command.id);
+
     // Send command to iframe
     iframeRef.current.contentWindow?.postMessage(command, '*');
 
@@ -801,6 +811,7 @@ const EnvironmentLauncher = () => {
       setIsEvaluating(false);
       setIsEvaluationStarted(false);
       setIsPlayMode(true);
+      setCurrentEvaluationCommandId(null);
       evaluationTimeoutRef.current = null;
 
       addConsoleEntry('info', 'Evaluation timeout - states reset', {
@@ -1206,14 +1217,15 @@ const EnvironmentLauncher = () => {
         // to allow Python SDK automation to work properly
 
         // Check if this is an evaluate command response based on:
-        // 1. Command ID matches launcher's pattern (command_*)
+        // 1. Command ID matches the explicit evaluation request we sent
         // 2. Result structure indicates evaluation response
-        // 3. We're currently in evaluation mode
+        // 3. We have an active evaluation request (command ID is set)
 
         const isEvaluateResponse =
-          (id && id.startsWith('command_') && isEvaluationStarted) ||
+          id === currentEvaluationCommandId ||
           (result &&
             typeof result === 'object' &&
+            currentEvaluationCommandId !== null &&
             ('score' in result ||
               'correctness' in result ||
               'evaluation' in result ||
@@ -1308,6 +1320,8 @@ const EnvironmentLauncher = () => {
           setIsEvaluationStarted(false);
           // Return to Play Mode after evaluation completes
           setIsPlayMode(true);
+          // Clear the command ID to allow new evaluations
+          setCurrentEvaluationCommandId(null);
         }
         // For non-evaluate responses, do nothing to allow Python SDK to receive them
       }
