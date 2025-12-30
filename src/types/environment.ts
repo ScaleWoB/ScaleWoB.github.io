@@ -18,6 +18,64 @@ export interface EnvironmentParameters {
   [key: string]: ParameterType;
 }
 
+// JSON Schema types for advanced parameter definitions
+export type JSONSchemaType =
+  | 'string'
+  | 'number'
+  | 'integer'
+  | 'boolean'
+  | 'object'
+  | 'array';
+
+export interface JSONSchemaProperty {
+  type: JSONSchemaType;
+  description?: string;
+  enum?: string[];
+  format?: 'date' | 'time' | 'date-time' | 'email' | 'uri';
+  properties?: Record<string, JSONSchemaProperty>;
+  items?: JSONSchemaProperty; // For array types
+  required?: string[];
+  additionalProperties?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  default?: string | number | boolean | any[];
+  title?: string;
+  minItems?: number; // For arrays
+  maxItems?: number; // For arrays
+}
+
+export interface JSONSchemaDefinition {
+  type: 'object';
+  properties: Record<string, JSONSchemaProperty>;
+  required?: string[];
+  additionalProperties?: boolean;
+}
+
+// Legacy parameter format for backward compatibility
+export interface LegacyParameterDefinition {
+  [key: string]: 'str' | 'number' | 'boolean';
+}
+
+// Union type to support both formats
+export type ParameterDefinition =
+  | JSONSchemaDefinition
+  | LegacyParameterDefinition;
+
+// Type guards to detect parameter format
+export function isJSONSchemaDefinition(
+  params: ParameterDefinition | undefined
+): params is JSONSchemaDefinition {
+  if (!params || typeof params !== 'object' || Array.isArray(params)) {
+    return false;
+  }
+  return 'type' in params && params.type === 'object' && 'properties' in params;
+}
+
+export function isLegacyParameterDefinition(
+  params: ParameterDefinition | undefined
+): params is LegacyParameterDefinition {
+  return !isJSONSchemaDefinition(params);
+}
+
 export interface EnvironmentMetrics {
   completion: number;
   complexity: number;
@@ -25,9 +83,10 @@ export interface EnvironmentMetrics {
 
 // Task definition for multi-task environments
 export interface Task {
-  name: string;
+  name?: string;
   description: string;
-  params?: EnvironmentParameters;
+  taskId?: number;
+  params?: ParameterDefinition;
 }
 
 export interface EnvironmentPreview {
@@ -105,7 +164,8 @@ export interface RawEnvironmentPreview {
     // New format: tasks array
     name?: string;
     description?: string;
-    params?: EnvironmentParameters;
+    taskId?: number;
+    params?: ParameterDefinition;
   }>;
 }
 

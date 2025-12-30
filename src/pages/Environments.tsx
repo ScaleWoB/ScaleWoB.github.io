@@ -393,7 +393,8 @@ const Environments: React.FC = () => {
         const taskMatch =
           env.tasks?.some(
             task =>
-              task.name.toLowerCase().includes(query) ||
+              task.name?.toLowerCase().includes(query) ||
+              false ||
               task.description.toLowerCase().includes(query)
           ) || false;
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Environment Service for ScaleWoB benchmark website
  * Handles loading environment data with proper error handling and state management
@@ -5,6 +6,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 import {
   EnvironmentData,
   EnvironmentPreview,
@@ -12,8 +15,71 @@ import {
   RawEnvironmentData,
   RawEnvironmentPreview,
   Task,
+  JSONSchemaDefinition,
+  LegacyParameterDefinition,
+  ParameterDefinition,
+  isJSONSchemaDefinition,
 } from '../types/environment';
 import { populateEnvironmentUrls } from '../config/environmentUrls';
+
+/**
+ * Convert legacy parameter format to JSON Schema format
+ * @example { "city": "str", "count": "number" } -> { type: "object", properties: { city: { type: "string" }, count: { type: "number" } } }
+ */
+export function convertLegacyToJSONSchema(
+  legacy: LegacyParameterDefinition
+): JSONSchemaDefinition {
+  const properties: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(legacy)) {
+    let type: string;
+    switch (value) {
+      case 'str':
+        type = 'string';
+        break;
+      case 'number':
+        type = 'number';
+        break;
+      case 'boolean':
+        type = 'boolean';
+        break;
+      default:
+        type = 'string';
+    }
+    properties[key] = { type };
+  }
+
+  return { type: 'object', properties };
+}
+
+/**
+ * Normalize parameters to JSON Schema format
+ * Handles both legacy and JSON Schema formats
+ */
+export function normalizeParameters(
+  params: ParameterDefinition | undefined
+): JSONSchemaDefinition | undefined {
+  if (!params) return undefined;
+  if (isJSONSchemaDefinition(params)) return params;
+  return convertLegacyToJSONSchema(params);
+}
+
+/**
+ * Validate parameter values against JSON Schema
+ * Returns validation result with errors if any
+ */
+export function validateParameterValues(
+  schema: JSONSchemaDefinition,
+  values: Record<string, any>
+): { valid: boolean; errors?: any[] } {
+  const ajv = new Ajv({ allErrors: true });
+  addFormats(ajv); // Add support for standard formats like "date", "email", "uri", etc.
+  const validate = ajv.compile(schema);
+  const valid = validate(values);
+
+  if (valid) return { valid: true };
+  return { valid: false, errors: validate.errors || undefined };
+}
 
 /**
  * Configuration for environment data loading
@@ -176,7 +242,7 @@ class EnvironmentDataService {
                     {
                       name: envName,
                       description: env.description || '',
-                      params: env.params,
+                      params: env.params as ParameterDefinition | undefined,
                     },
                   ];
                 }
@@ -202,7 +268,7 @@ class EnvironmentDataService {
                   },
                   colorTheme: env.colorTheme || 'warm',
                   cdnUrl: env.cdnUrl,
-                  params: tasks[0]?.params || env.params, // Default to first task params
+                  params: (tasks[0]?.params as any) || env.params, // Default to first task params
                   tasks: tasks,
                 };
               }
