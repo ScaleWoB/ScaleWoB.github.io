@@ -499,6 +499,11 @@ const EnvironmentLauncher = () => {
       setParameters({});
       setTrajectory([]);
 
+      // Reset evaluation status banner
+      setEvaluationStatus('idle');
+      setEvaluationMessage('');
+      setEvaluationStartTime(null);
+
       // Log task change
       addConsoleEntry(
         'info',
