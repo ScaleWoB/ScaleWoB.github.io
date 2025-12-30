@@ -11,6 +11,7 @@ import {
 import { useDebounce } from '../hooks/useDebounce';
 import Toast from '../components/common/Toast';
 import { EnvironmentGridSkeleton } from '../components/common/Skeleton';
+import DotIndicator from '../components/common/DotIndicator';
 
 // Memoized platform icon components to avoid re-creation on every render
 const PlatformIcons = {
@@ -82,68 +83,6 @@ const generatePlatformIcon = (platform: string): React.ReactNode => {
     PlatformIcons[platform as keyof typeof PlatformIcons] ||
     PlatformIcons.default
   );
-};
-
-// Difficulty-specific icons (shown on hover)
-const DifficultyIcons = {
-  Basic: (
-    <svg
-      className="w-full h-full"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-      />
-    </svg>
-  ),
-  Advanced: (
-    <svg
-      className="w-full h-full"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M13 10V3L4 14h7v7l9-11h-7z"
-      />
-    </svg>
-  ),
-  Expert: (
-    <svg
-      className="w-full h-full"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-      />
-    </svg>
-  ),
-};
-
-const getDifficultyIconStyles = (difficulty: string) => {
-  switch (difficulty) {
-    case 'Basic':
-      return 'bg-blue-50 border-blue-300 text-blue-700';
-    case 'Advanced':
-      return 'bg-orange-50 border-orange-300 text-orange-700';
-    case 'Expert':
-      return 'bg-red-50 border-red-300 text-red-700';
-    default:
-      return 'bg-gray-100 border-gray-300 text-gray-700';
-  }
 };
 
 // Loading state component with skeleton screens
@@ -854,31 +793,49 @@ const Environments: React.FC = () => {
                         Difficulty Level
                       </h3>
                       <div className="space-y-2">
-                        {['all', 'Basic', 'Advanced', 'Expert'].map(
-                          difficulty => (
-                            <button
-                              key={difficulty}
-                              onClick={() => setSelectedDifficulty(difficulty)}
-                              className={`w-full text-left px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                                selectedDifficulty === difficulty
-                                  ? 'bg-gray-900 text-white'
-                                  : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400 hover:bg-gray-50'
-                              }`}
-                            >
-                              {difficulty === 'all' ? 'All Levels' : difficulty}
-                            </button>
-                          )
-                        )}
+                        {[
+                          {
+                            value: 'all',
+                            label: 'All Levels',
+                            level: null as null,
+                          },
+                          { value: 'Basic', label: 'Basic', level: 1 as const },
+                          {
+                            value: 'Advanced',
+                            label: 'Advanced',
+                            level: 2 as const,
+                          },
+                          {
+                            value: 'Expert',
+                            label: 'Expert',
+                            level: 3 as const,
+                          },
+                        ].map(({ value, label, level }) => (
+                          <button
+                            key={value}
+                            onClick={() => setSelectedDifficulty(value)}
+                            className={`w-full text-left px-4 py-2 text-sm font-medium transition-all duration-200 flex items-center justify-between ${
+                              selectedDifficulty === value
+                                ? 'bg-gray-900 text-white'
+                                : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                            }`}
+                          >
+                            <span>{label}</span>
+                            {level !== null && (
+                              <DotIndicator level={level} size="sm" />
+                            )}
+                          </button>
+                        ))}
                       </div>
                     </div>
 
-                    {sortedTagsByFrequency.length > 0 && (
+                    {/* Tags section - hidden for future redesign */}
+                    {/* {sortedTagsByFrequency.length > 0 && (
                       <div>
                         <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
                           Tags
                         </h3>
 
-                        {/* Tags Container - Show top tags or all tags */}
                         <div className="space-y-2">
                           {(showAllTags ? sortedTagsByFrequency : topTags).map(
                             tag => (
@@ -904,7 +861,6 @@ const Environments: React.FC = () => {
                           )}
                         </div>
 
-                        {/* Expand/Collapse Button */}
                         {sortedTagsByFrequency.length > 12 && (
                           <button
                             onClick={() => setShowAllTags(!showAllTags)}
@@ -937,7 +893,7 @@ const Environments: React.FC = () => {
                           </button>
                         )}
                       </div>
-                    )}
+                    )} */}
                   </div>
 
                   <div className="mt-6 pt-6 border-t-2 border-gray-300">
@@ -1100,30 +1056,32 @@ const Environments: React.FC = () => {
                   {filteredAndPaginatedEnvironments.items.map(
                     (environment: EnvironmentPreviewWithIcon) => (
                       <div key={environment.id} className="group">
-                        <div className="bg-gray-50 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 hover:shadow-sm">
+                        <div className="relative bg-gray-50 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 hover:shadow-sm">
+                          {/* Difficulty dot indicator - top left sticker */}
+                          <div className="absolute -top-1 -left-1 z-10">
+                            <DotIndicator
+                              level={
+                                environment.difficulty === 'Basic'
+                                  ? 1
+                                  : environment.difficulty === 'Advanced'
+                                    ? 2
+                                    : 3
+                              }
+                              size="sm"
+                            />
+                          </div>
+
                           {/* Compact Header */}
                           <div className="p-3 md:p-4">
                             <div className="flex items-center justify-between gap-3">
                               <div className="flex items-center space-x-4 flex-1 min-w-0">
-                                <div
-                                  className={`w-8 h-8 md:w-10 md:h-10 rounded border-2 flex items-center justify-center shrink-0 group relative transition-colors duration-200 ${getDifficultyIconStyles(
-                                    environment.difficulty
-                                  )}`}
-                                >
-                                  {/* Default: Platform icon */}
-                                  <div className="w-4 h-4 md:w-5 md:h-5 transition-opacity duration-200 group-hover:opacity-0">
+                                {/* Platform icon */}
+                                <div className="w-8 h-8 md:w-10 md:h-10 rounded border-2 border-gray-300 bg-gray-100 flex items-center justify-center shrink-0">
+                                  <div className="w-4 h-4 md:w-5 md:h-5 text-gray-600">
                                     {environment.icon}
                                   </div>
-
-                                  {/* Hover: Difficulty icon */}
-                                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                    <div className="w-4 h-4 md:w-5 md:h-5">
-                                      {DifficultyIcons[
-                                        environment.difficulty
-                                      ] || DifficultyIcons['Basic']}
-                                    </div>
-                                  </div>
                                 </div>
+
                                 <div className="flex-1 min-w-0">
                                   <div className="flex flex-wrap items-center gap-2 mb-1">
                                     <h3 className="text-base md:text-lg font-bold text-gray-900">
