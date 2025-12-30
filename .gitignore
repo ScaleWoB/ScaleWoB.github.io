@@ -1,4 +1,5 @@
 ## Project ignore
+environments.json
 .leann/
 sdk/
 
