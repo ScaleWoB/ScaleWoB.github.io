@@ -429,104 +429,91 @@ const EnvironmentLauncher = () => {
     }));
   };
 
-  // Get event info for UI display
-  const getEventInfo = (eventType: string) => {
-    const eventInfo: Record<
-      string,
-      { label: string; description: string; category: string }
-    > = {
-      // System messages
-      info: {
-        label: 'System Info',
-        description: 'System information messages',
-        category: 'System',
-      },
-      error: {
-        label: 'Errors',
-        description: 'Error and exception messages',
-        category: 'System',
-      },
-      success: {
-        label: 'Success',
-        description: 'Success confirmation messages',
-        category: 'System',
-      },
-      action: {
-        label: 'Actions',
-        description: 'General action messages',
-        category: 'System',
-      },
-      init: {
-        label: 'Initialization',
-        description: 'System initialization events',
-        category: 'System',
-      },
-
-      // User interactions
-      click: {
-        label: 'Click Events',
-        description: 'Mouse clicks on elements',
-        category: 'Interactions',
-      },
-      keypress: {
-        label: 'Keyboard',
-        description: 'Key presses and typing',
-        category: 'Interactions',
-      },
-      scroll: {
-        label: 'Scrolling',
-        description: 'Page scroll events',
-        category: 'Interactions',
-      },
-      focus: {
-        label: 'Focus',
-        description: 'Element focus events',
-        category: 'Interactions',
-      },
-      blur: {
-        label: 'Blur',
-        description: 'Element blur events',
-        category: 'Interactions',
-      },
-      submit: {
-        label: 'Form Submit',
-        description: 'Form submission events',
-        category: 'Interactions',
-      },
-      touch: {
-        label: 'Touch',
-        description: 'Touch and gesture events',
-        category: 'Interactions',
-      },
-      drag: {
-        label: 'Drag',
-        description: 'Mouse drag gestures',
-        category: 'Interactions',
-      },
-      navigation: {
-        label: 'Navigation',
-        description: 'Page navigation events',
-        category: 'Interactions',
-      },
-      'dom-change': {
-        label: 'DOM Changes',
-        description: 'DOM mutation events',
-        category: 'Interactions',
-      },
-      unknown: {
-        label: 'Unknown',
-        description: 'Uncategorized events',
-        category: 'Other',
-      },
-    };
-
-    return (
-      eventInfo[eventType] || {
-        label: eventType,
-        description: 'Unknown event type',
-        category: 'Other',
-      }
-    );
+  // Static event info - defined outside component to avoid recreation on every render
+  const EVENT_INFO_MAP: Record<
+    string,
+    { label: string; description: string; category: string }
+  > = {
+    info: {
+      label: 'System Info',
+      description: 'System information messages',
+      category: 'System',
+    },
+    error: {
+      label: 'Errors',
+      description: 'Error and exception messages',
+      category: 'System',
+    },
+    success: {
+      label: 'Success',
+      description: 'Success confirmation messages',
+      category: 'System',
+    },
+    action: {
+      label: 'Actions',
+      description: 'General action messages',
+      category: 'System',
+    },
+    init: {
+      label: 'Initialization',
+      description: 'System initialization events',
+      category: 'System',
+    },
+    click: {
+      label: 'Click Events',
+      description: 'Mouse clicks on elements',
+      category: 'Interactions',
+    },
+    keypress: {
+      label: 'Keyboard',
+      description: 'Key presses and typing',
+      category: 'Interactions',
+    },
+    scroll: {
+      label: 'Scrolling',
+      description: 'Page scroll events',
+      category: 'Interactions',
+    },
+    focus: {
+      label: 'Focus',
+      description: 'Element focus events',
+      category: 'Interactions',
+    },
+    blur: {
+      label: 'Blur',
+      description: 'Element blur events',
+      category: 'Interactions',
+    },
+    submit: {
+      label: 'Form Submit',
+      description: 'Form submission events',
+      category: 'Interactions',
+    },
+    touch: {
+      label: 'Touch',
+      description: 'Touch and gesture events',
+      category: 'Interactions',
+    },
+    drag: {
+      label: 'Drag',
+      description: 'Mouse drag gestures',
+      category: 'Interactions',
+    },
+    navigation: {
+      label: 'Navigation',
+      description: 'Page navigation events',
+      category: 'Interactions',
+    },
+    'dom-change': {
+      label: 'DOM Changes',
+      description: 'DOM mutation events',
+      category: 'Interactions',
+    },
+    unknown: {
+      label: 'Unknown',
+      description: 'Uncategorized events',
+      category: 'Other',
+    },
   };
 
   // Check if event type should be displayed
@@ -1956,7 +1943,9 @@ const EnvironmentLauncher = () => {
                             ].includes(type)
                           )
                           .map(([eventType, isEnabled]) => {
-                            const info = getEventInfo(eventType);
+                            const info =
+                              EVENT_INFO_MAP[eventType] ||
+                              EVENT_INFO_MAP.unknown;
                             return (
                               <div
                                 key={eventType}
@@ -2019,7 +2008,9 @@ const EnvironmentLauncher = () => {
                               ].includes(type)
                           )
                           .map(([eventType, isEnabled]) => {
-                            const info = getEventInfo(eventType);
+                            const info =
+                              EVENT_INFO_MAP[eventType] ||
+                              EVENT_INFO_MAP.unknown;
                             return (
                               <div
                                 key={eventType}
@@ -2226,6 +2217,7 @@ const EnvironmentLauncher = () => {
                         <iframe
                           ref={iframeRef}
                           src={getIframeSrc()}
+                          loading="lazy"
                           className="absolute inset-0 w-full h-full bg-white"
                           style={{
                             width: '100%',
