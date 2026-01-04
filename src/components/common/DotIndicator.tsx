@@ -97,4 +97,4 @@ const DotIndicator: React.FC<DotIndicatorProps> = ({
   );
 };
 
-export default DotIndicator;
+export default React.memo(DotIndicator);

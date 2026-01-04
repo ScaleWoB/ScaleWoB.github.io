@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   useEnvironmentPreviews,
@@ -299,11 +305,11 @@ const Environments: React.FC = () => {
   }, []);
 
   // Tag toggle function
-  const toggleTag = (tag: string) => {
+  const toggleTag = useCallback((tag: string) => {
     setSelectedTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
-  };
+  }, []);
 
   // Handle page input change
   const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -321,7 +327,6 @@ const Environments: React.FC = () => {
     ) {
       setCurrentPage(pageNum);
     } else {
-      // Reset to current page if invalid
       setPageInput(String(currentPage));
     }
   };

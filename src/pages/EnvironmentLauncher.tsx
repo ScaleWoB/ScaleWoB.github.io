@@ -1,4 +1,12 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  lazy,
+  Suspense,
+} from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   useEnvironmentData,
@@ -11,11 +19,15 @@ import {
   isJSONSchemaDefinition,
 } from '../types/environment';
 import { EnvironmentPreview } from '../types/environment';
-import ParameterInput from '../components/common/ParameterInput';
 import { ToastMessage, ToastContainer } from '../components/common/Toast';
 import EvaluationStatusBanner from '../components/common/EvaluationStatusBanner';
 import ConsoleIcon from '../components/common/ConsoleIcon';
 import { ConsoleEntryType } from '../components/common/consoleIconConstants';
+
+// Lazy load ParameterInput to avoid loading rjsf/lodash when not needed
+const ParameterInput = lazy(
+  () => import('../components/common/ParameterInput')
+);
 
 interface ConsoleEntry {
   id: string;
@@ -1457,24 +1469,30 @@ const EnvironmentLauncher = () => {
                               .length > 0
                           );
                         })() && (
-                          <ParameterInput
-                            schema={
-                              normalizeParameters(
-                                normalizeTaskParams(selectedTask.params)
-                              )!
+                          <Suspense
+                            fallback={
+                              <div className="animate-pulse bg-gray-100 h-32 rounded border-2 border-gray-300" />
                             }
-                            onParametersChange={params =>
-                              setParameters(
-                                params as Record<
-                                  string,
-                                  string | number | boolean
-                                >
-                              )
-                            }
-                            disabled={!isEvaluationStarted}
-                            disabledReason="not-started"
-                            initialValues={parameters}
-                          />
+                          >
+                            <ParameterInput
+                              schema={
+                                normalizeParameters(
+                                  normalizeTaskParams(selectedTask.params)
+                                )!
+                              }
+                              onParametersChange={params =>
+                                setParameters(
+                                  params as Record<
+                                    string,
+                                    string | number | boolean
+                                  >
+                                )
+                              }
+                              disabled={!isEvaluationStarted}
+                              disabledReason="not-started"
+                              initialValues={parameters}
+                            />
+                          </Suspense>
                         )}
                     </div>
                   </div>
