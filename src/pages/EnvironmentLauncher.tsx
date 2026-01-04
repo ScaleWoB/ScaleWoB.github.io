@@ -13,6 +13,9 @@ import {
 import { EnvironmentPreview } from '../types/environment';
 import ParameterInput from '../components/common/ParameterInput';
 import { ToastMessage, ToastContainer } from '../components/common/Toast';
+import EvaluationStatusBanner from '../components/common/EvaluationStatusBanner';
+import ConsoleIcon from '../components/common/ConsoleIcon';
+import { ConsoleEntryType } from '../components/common/consoleIconConstants';
 
 interface ConsoleEntry {
   id: string;
@@ -57,181 +60,17 @@ interface SelectedTask {
   params?: ParameterDefinition | EnvironmentParameters;
 }
 
-// Evaluation Status Banner Component
-interface EvaluationStatusBannerProps {
-  status: 'idle' | 'evaluating' | 'success' | 'failed';
-  message: string;
-  eventsCount: number;
-  startTime: number | null;
-  onDismiss: () => void;
-}
-
-const EvaluationStatusBanner: React.FC<EvaluationStatusBannerProps> = ({
-  status,
-  message,
-  eventsCount,
-  startTime,
-  onDismiss,
-}) => {
-  const [currentTime, setCurrentTime] = useState(0);
-
-  // Update duration timer while evaluating
-  useEffect(() => {
-    let interval: number | undefined;
-    if (status === 'evaluating' && startTime) {
-      interval = window.setInterval(() => {
-        setCurrentTime(Date.now() - startTime);
-      }, 100);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [status, startTime]);
-
-  // Auto-dismiss success after 5 seconds
-  useEffect(() => {
-    let timeout: number | undefined;
-    if (status === 'success') {
-      timeout = window.setTimeout(() => {
-        onDismiss();
-      }, 5000);
-    }
-    return () => {
-      if (timeout) clearTimeout(timeout);
-    };
-  }, [status, onDismiss]);
-
-  const formatDuration = (ms: number) => {
-    if (ms < 1000) return `${ms.toFixed(1)}ms`;
-    return `${(ms / 1000).toFixed(1)}s`;
-  };
-
-  const getBannerConfig = () => {
-    switch (status) {
-      case 'idle':
-        return {
-          bgClass: 'bg-gray-50 border-gray-200',
-          textClass: 'text-gray-700',
-          icon: (
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                clipRule="evenodd"
-              />
-            </svg>
-          ),
-          label: 'Ready to start evaluation',
-        };
-      case 'evaluating':
-        return {
-          bgClass: 'bg-yellow-50 border-yellow-200',
-          textClass: 'text-yellow-800',
-          icon: (
-            <svg
-              className="w-5 h-5 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
-          ),
-          label: 'Evaluating...',
-        };
-      case 'success':
-        return {
-          bgClass: 'bg-green-50 border-green-200',
-          textClass: 'text-green-800',
-          icon: (
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-          ),
-          label: 'Evaluation completed successfully',
-        };
-      case 'failed':
-        return {
-          bgClass: 'bg-red-50 border-red-200',
-          textClass: 'text-red-800',
-          icon: (
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-          ),
-          label: 'Evaluation failed',
-        };
-    }
-  };
-
-  const config = getBannerConfig();
-  const duration = startTime ? currentTime : 0;
-
-  return (
-    <div
-      className={`w-full px-4 py-3 rounded-lg border-2 ${config.bgClass} ${config.textClass} flex items-start justify-between transition-all duration-200`}
-    >
-      <div className="flex items-start space-x-3 flex-1">
-        <div className="flex-shrink-0 mt-0.5">{config.icon}</div>
-        <div className="flex-1 min-w-0">
-          {/* Main status label */}
-          <div className="text-sm font-bold uppercase tracking-wide">
-            {config.label}
-          </div>
-
-          {/* Metrics subtitle - only show for evaluating and success */}
-          {(status === 'evaluating' || status === 'success') && (
-            <div className="flex items-center space-x-3 mt-1 text-xs opacity-80">
-              <span>
-                {eventsCount} event{eventsCount !== 1 ? 's' : ''} captured
-              </span>
-              <span className="text-gray-400">•</span>
-              <span>{formatDuration(duration)}</span>
-            </div>
-          )}
-
-          {/* Error message for failed status */}
-          {message && status === 'failed' && (
-            <p className="text-xs mt-1 opacity-90">{message}</p>
-          )}
-        </div>
-      </div>
-      {(status === 'failed' || status === 'success') && (
-        <button
-          onClick={onDismiss}
-          className="flex-shrink-0 ml-3 mt-0.5 opacity-60 hover:opacity-100 transition-opacity"
-          aria-label="Dismiss"
-        >
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-      )}
-    </div>
-  );
+// Static console entry styles - defined outside component to avoid recreation
+const CONSOLE_ENTRY_STYLES: Record<string, string> = {
+  action:
+    'relative bg-white border-l-4 border-blue-500 text-gray-900 hover:border-blue-600 hover:bg-blue-50 transition-all duration-200',
+  info: 'relative bg-white border-l-4 border-gray-400 text-gray-900 hover:border-gray-500 hover:bg-gray-50 transition-all duration-200',
+  error:
+    'relative bg-white border-l-4 border-red-500 text-gray-900 hover:border-red-600 hover:bg-red-50 transition-all duration-200',
+  success:
+    'relative bg-white border-l-4 border-green-500 text-gray-900 hover:border-green-600 hover:bg-green-50 transition-all duration-200',
+  default:
+    'relative bg-white border-l-4 border-gray-400 text-gray-900 hover:border-gray-500 hover:bg-gray-50 transition-all duration-200',
 };
 
 const EnvironmentLauncher = () => {
@@ -609,57 +448,6 @@ const EnvironmentLauncher = () => {
     }
   }, [consoleEntries]);
 
-  // Enhanced styling functions
-  const getConsoleEntryStyle = (type: ConsoleEntry['type']) => {
-    switch (type) {
-      case 'action':
-        return 'relative bg-white border-l-4 border-blue-500 text-gray-900 hover:border-blue-600 hover:bg-blue-50 transition-all duration-200';
-      case 'info':
-        return 'relative bg-white border-l-4 border-gray-400 text-gray-900 hover:border-gray-500 hover:bg-gray-50 transition-all duration-200';
-      case 'error':
-        return 'relative bg-white border-l-4 border-red-500 text-gray-900 hover:border-red-600 hover:bg-red-50 transition-all duration-200';
-      case 'success':
-        return 'relative bg-white border-l-4 border-green-500 text-gray-900 hover:border-green-600 hover:bg-green-50 transition-all duration-200';
-      default:
-        return 'relative bg-white border-l-4 border-gray-400 text-gray-900 hover:border-gray-500 hover:bg-gray-50 transition-all duration-200';
-    }
-  };
-
-  const getBadgeStyle = (type: ConsoleEntry['type']) => {
-    switch (type) {
-      case 'action':
-        return 'bg-blue-500 text-white';
-      case 'info':
-        return 'bg-gray-500 text-white';
-      case 'error':
-        return 'bg-red-500 text-white';
-      case 'success':
-        return 'bg-green-500 text-white';
-      case 'click':
-        return 'bg-blue-600 text-white';
-      case 'keypress':
-        return 'bg-green-600 text-white';
-      case 'scroll':
-        return 'bg-purple-500 text-white';
-      case 'focus':
-        return 'bg-yellow-500 text-white';
-      case 'blur':
-        return 'bg-orange-500 text-white';
-      case 'submit':
-        return 'bg-indigo-500 text-white';
-      case 'touch':
-        return 'bg-pink-500 text-white';
-      case 'drag':
-        return 'bg-purple-600 text-white';
-      case 'navigation':
-        return 'bg-cyan-500 text-white';
-      case 'dom-change':
-        return 'bg-teal-500 text-white';
-      default:
-        return 'bg-gray-500 text-white';
-    }
-  };
-
   // Function to start evaluation (refresh + start recording)
   const startEvaluation = useCallback(() => {
     if (!iframeRef.current) return;
@@ -817,233 +605,6 @@ const EnvironmentLauncher = () => {
     trajectory,
     evaluationTimeoutRef,
   ]);
-
-  const getConsoleIcon = (type: ConsoleEntry['type']) => {
-    const backgroundColor = getBadgeStyle(type).split(' ')[0];
-
-    // SVG icons for each event type
-    const svgIcons: Record<string, React.ReactNode> = {
-      action: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      info: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      error: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      success: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      click: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-        </svg>
-      ),
-      keypress: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      scroll: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-        </svg>
-      ),
-      focus: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      blur: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-          <path
-            fillRule="evenodd"
-            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      submit: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      touch: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-        </svg>
-      ),
-      drag: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path d="M10 3L6 7h3v6H6l4 4 4-4h-3V7h3l-4-4z" />
-        </svg>
-      ),
-      navigation: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      'dom-change': (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      init: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-      unknown: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-    };
-
-    const icon = svgIcons[type] || svgIcons.unknown;
-
-    return (
-      <span
-        className={`inline-flex items-center justify-center w-6 h-6 ${backgroundColor} text-white rounded-full shadow-sm`}
-      >
-        {icon}
-      </span>
-    );
-  };
 
   // Get the current iframe source URL - CDN only
   const getIframeSrc = useCallback(() => {
@@ -1356,6 +917,8 @@ const EnvironmentLauncher = () => {
 
   // Calculate and update scale based on container size
   useEffect(() => {
+    let debounceTimer: number | undefined;
+
     const calculateScale = () => {
       if (!containerRef.current) return;
 
@@ -1363,41 +926,45 @@ const EnvironmentLauncher = () => {
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
 
-      // Add padding/margin buffer (30px on each side for padding)
       const bufferWidth = 60;
       const bufferHeight = 60;
 
       const availableWidth = containerWidth - bufferWidth;
       const availableHeight = containerHeight - bufferHeight;
 
-      // Calculate scale ratios for both dimensions
       const scaleX = availableWidth / platformDimensions.width;
       const scaleY = availableHeight / platformDimensions.height;
 
-      // Use the smaller scale to ensure it fits in both dimensions
-      const newScale = Math.min(scaleX, scaleY, 1); // Cap at 1 to avoid upscaling
+      const newScale = Math.min(scaleX, scaleY, 1);
 
       setScale(newScale);
     };
 
-    // Use requestAnimationFrame to ensure DOM is ready and calculate immediately
+    const debouncedCalculate = () => {
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+      debounceTimer = window.setTimeout(calculateScale, 16);
+    };
+
     const rafId = requestAnimationFrame(() => {
       calculateScale();
     });
 
-    // Add resize listener
-    const resizeObserver = new ResizeObserver(calculateScale);
+    const resizeObserver = new ResizeObserver(debouncedCalculate);
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
     }
 
-    // Also listen to window resize as fallback
-    window.addEventListener('resize', calculateScale);
+    window.addEventListener('resize', debouncedCalculate);
 
     return () => {
       cancelAnimationFrame(rafId);
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
       resizeObserver.disconnect();
-      window.removeEventListener('resize', calculateScale);
+      window.removeEventListener('resize', debouncedCalculate);
     };
   }, [platformDimensions.width, platformDimensions.height]);
 
@@ -2076,14 +1643,16 @@ const EnvironmentLauncher = () => {
                       .map(entry => (
                         <div
                           key={entry.id}
-                          className={`${getConsoleEntryStyle(entry.type)} p-2 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100`}
+                          className={`${CONSOLE_ENTRY_STYLES[entry.type] || CONSOLE_ENTRY_STYLES.default} p-2 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100`}
                           onClick={() => toggleEntryExpansion(entry.id)}
                         >
                           <div className="flex flex-col">
                             {/* Icon + message row */}
                             <div className="flex items-start justify-between">
                               <div className="flex items-start space-x-2 flex-1">
-                                {getConsoleIcon(entry.type)}
+                                <ConsoleIcon
+                                  type={entry.type as ConsoleEntryType}
+                                />
                                 <div className="flex-1 min-w-0">
                                   <div className="text-xs font-medium">
                                     {entry.message}
