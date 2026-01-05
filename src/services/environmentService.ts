@@ -19,6 +19,7 @@ import {
   LegacyParameterDefinition,
   ParameterDefinition,
   isJSONSchemaDefinition,
+  ExtractedConstFields,
 } from '../types/environment';
 import { populateEnvironmentUrls } from '../config/environmentUrls';
 
@@ -79,6 +80,50 @@ export function validateParameterValues(
 
   if (valid) return { valid: true };
   return { valid: false, errors: validate.errors || undefined };
+}
+
+/**
+ * Extract const fields from JSON Schema and return schema for UI + const values
+ * Const fields are hidden from the UI but automatically included in evaluation
+ *
+ * @example
+ * Input: { type: 'object', properties: { taskId: { type: 'integer', const: 0 }, name: { type: 'string' } } }
+ * Output: {
+ *   schemaForUI: { type: 'object', properties: { name: { type: 'string' } } },
+ *   constFields: { taskId: 0 }
+ * }
+ */
+export function extractConstFields(
+  schema: JSONSchemaDefinition
+): ExtractedConstFields {
+  const constFields: Record<string, string | number | boolean> = {};
+  const uiProperties: Record<string, any> = {};
+
+  // Iterate through schema properties
+  for (const [key, property] of Object.entries(schema.properties)) {
+    if (property.const !== undefined) {
+      // This is a const field - extract its value
+      constFields[key] = property.const;
+    } else {
+      // This is an editable field - keep it for UI
+      uiProperties[key] = property;
+    }
+  }
+
+  // Filter out const fields from required array
+  const uiRequired = schema.required?.filter(
+    field => !Object.keys(constFields).includes(field)
+  );
+
+  return {
+    schemaForUI: {
+      type: 'object',
+      properties: uiProperties,
+      ...(uiRequired && uiRequired.length > 0 ? { required: uiRequired } : {}),
+      additionalProperties: schema.additionalProperties,
+    },
+    constFields,
+  };
 }
 
 /**

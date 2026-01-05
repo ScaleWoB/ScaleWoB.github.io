@@ -12,6 +12,7 @@ import {
   useEnvironmentData,
   normalizeParameters,
   validateParameterValues,
+  extractConstFields,
 } from '../services/environmentService';
 import {
   ParameterDefinition,
@@ -128,6 +129,11 @@ const EnvironmentLauncher = () => {
     Record<string, string | number | boolean>
   >({});
 
+  // Const fields extracted from schema (hidden from UI but included in evaluation)
+  const [constFields, setConstFields] = useState<
+    Record<string, string | number | boolean>
+  >({});
+
   // Flag to track when we're doing an evaluation refresh (to avoid duplicate success messages)
   const [isEvaluationRefresh, setIsEvaluationRefresh] = useState(false);
 
@@ -223,6 +229,26 @@ const EnvironmentLauncher = () => {
       params: envTask.params,
     };
   }, [environment, selectedTaskIndex, bridgeTasks, tasksFromBridge]);
+
+  // Extract const fields from selected task params
+  const taskSchema = useMemo(() => {
+    return normalizeParameters(normalizeTaskParams(selectedTask?.params));
+  }, [selectedTask]);
+
+  const { schemaForUI, constFields: extractedConstFields } = useMemo(() => {
+    if (!taskSchema) {
+      return {
+        schemaForUI: { type: 'object' as const, properties: {} },
+        constFields: {},
+      };
+    }
+    return extractConstFields(taskSchema);
+  }, [taskSchema]);
+
+  // Update const fields state when extracted fields change
+  useEffect(() => {
+    setConstFields(extractedConstFields);
+  }, [extractedConstFields]);
 
   // Get the current logical index (1-based for display)
   const currentLogicalIndex = useMemo(() => {
@@ -528,6 +554,13 @@ const EnvironmentLauncher = () => {
     // Prevent multiple finish clicks by checking if already evaluating
     if (isEvaluating) return;
 
+    // Merge user parameters with const fields
+    // Const fields override any user-provided values (safety measure)
+    const allParameters = {
+      ...parameters,
+      ...constFields,
+    };
+
     // Check if selected task requires parameters and validate them
     const taskParams = normalizeTaskParams(selectedTask?.params);
     if (taskParams && Object.keys(taskParams).length > 0) {
@@ -536,7 +569,7 @@ const EnvironmentLauncher = () => {
       if (normalizedSchema) {
         const { valid, errors } = validateParameterValues(
           normalizedSchema,
-          parameters
+          allParameters
         );
 
         if (!valid) {
@@ -551,7 +584,7 @@ const EnvironmentLauncher = () => {
           addConsoleEntry(
             'error',
             `Parameter validation failed: ${errorMessages}`,
-            { errors, parameters }
+            { errors, allParameters }
           );
           return;
         }
@@ -573,7 +606,7 @@ const EnvironmentLauncher = () => {
       payload: {
         command: 'evaluate',
         params: {
-          ...parameters,
+          ...allParameters,
           taskId: selectedTaskIndex,
         },
         trajectory: trajectory,
@@ -587,9 +620,10 @@ const EnvironmentLauncher = () => {
     iframeRef.current.contentWindow?.postMessage(command, '*');
 
     addConsoleEntry('action', 'Evaluation command sent - recording finished', {
-      parametersProvided: Object.keys(parameters).length > 0,
-      parameterCount: Object.keys(parameters).length,
-      parameters: Object.keys(parameters).length > 0 ? parameters : undefined,
+      parametersProvided: Object.keys(allParameters).length > 0,
+      parameterCount: Object.keys(allParameters).length,
+      parameters:
+        Object.keys(allParameters).length > 0 ? allParameters : undefined,
     });
 
     // Set a timeout as a fallback to reset states in case message doesn't arrive
@@ -614,6 +648,7 @@ const EnvironmentLauncher = () => {
     selectedTask,
     selectedTaskIndex,
     parameters,
+    constFields,
     trajectory,
     evaluationTimeoutRef,
   ]);
@@ -1458,42 +1493,28 @@ const EnvironmentLauncher = () => {
                       />
 
                       {/* Evaluation Parameters - Only show if selected task requires parameters */}
-                      {selectedTask?.params &&
-                        (() => {
-                          const normalizedSchema = normalizeParameters(
-                            normalizeTaskParams(selectedTask.params)
-                          );
-                          return (
-                            normalizedSchema &&
-                            Object.keys(normalizedSchema.properties || {})
-                              .length > 0
-                          );
-                        })() && (
-                          <Suspense
-                            fallback={
-                              <div className="animate-pulse bg-gray-100 h-32 rounded border-2 border-gray-300" />
+                      {Object.keys(schemaForUI.properties || {}).length > 0 && (
+                        <Suspense
+                          fallback={
+                            <div className="animate-pulse bg-gray-100 h-32 rounded border-2 border-gray-300" />
+                          }
+                        >
+                          <ParameterInput
+                            schema={schemaForUI}
+                            onParametersChange={params =>
+                              setParameters(
+                                params as Record<
+                                  string,
+                                  string | number | boolean
+                                >
+                              )
                             }
-                          >
-                            <ParameterInput
-                              schema={
-                                normalizeParameters(
-                                  normalizeTaskParams(selectedTask.params)
-                                )!
-                              }
-                              onParametersChange={params =>
-                                setParameters(
-                                  params as Record<
-                                    string,
-                                    string | number | boolean
-                                  >
-                                )
-                              }
-                              disabled={!isEvaluationStarted}
-                              disabledReason="not-started"
-                              initialValues={parameters}
-                            />
-                          </Suspense>
-                        )}
+                            disabled={!isEvaluationStarted}
+                            disabledReason="not-started"
+                            initialValues={parameters}
+                          />
+                        </Suspense>
+                      )}
                     </div>
                   </div>
                 </>

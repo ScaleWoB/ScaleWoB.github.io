@@ -41,6 +41,7 @@ export interface JSONSchemaProperty {
   title?: string;
   minItems?: number; // For arrays
   maxItems?: number; // For arrays
+  const?: string | number | boolean; // Const value for readonly fields
 }
 
 export interface JSONSchemaDefinition {
@@ -59,6 +60,12 @@ export interface LegacyParameterDefinition {
 export type ParameterDefinition =
   | JSONSchemaDefinition
   | LegacyParameterDefinition;
+
+// Result type for extractConstFields function
+export interface ExtractedConstFields {
+  schemaForUI: JSONSchemaDefinition;
+  constFields: Record<string, string | number | boolean>;
+}
 
 // Type guards to detect parameter format
 export function isJSONSchemaDefinition(
