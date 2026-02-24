@@ -6,7 +6,7 @@ const LeaderboardHome: React.FC = () => {
     <div className="bg-white">
       {/* Header Section - Newspaper Style */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           {/* Newspaper Header */}
           <div className="py-8 border-b-2 border-gray-400">
             <div className="flex items-start justify-between">
@@ -37,7 +37,7 @@ const LeaderboardHome: React.FC = () => {
 
       {/* Leaderboard Table Section */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
               Agent Rankings
@@ -427,7 +427,7 @@ const LeaderboardHome: React.FC = () => {
 
       {/* Statistics Section - Newspaper Style */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
               Competition Statistics
@@ -475,7 +475,7 @@ const LeaderboardHome: React.FC = () => {
 
       {/* Join Competition Section - Newspaper Style */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
               Join The Competition
@@ -483,7 +483,7 @@ const LeaderboardHome: React.FC = () => {
           </div>
 
           <div className="py-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
               <div className="bg-gray-50 border-2 border-gray-300 p-6 md:p-8">
                 <div className="text-lg font-bold text-gray-900 mb-4 text-center">
                   Participate in ScaleWoB Evaluation

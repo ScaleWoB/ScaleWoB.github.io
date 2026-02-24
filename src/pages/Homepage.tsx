@@ -1,15 +1,49 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import NewsCard from '../components/common/NewsCard';
 
+const DEMO_MAX_HEIGHT = 750;
+const ANDROID_RATIO = 1440 / 3120;
+const MAC_RATIO = 3024 / 1964;
+const TOTAL_RATIO = ANDROID_RATIO + MAC_RATIO;
+
 const Homepage: React.FC = () => {
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
+  const demoContainerRef = useRef<HTMLDivElement>(null);
+  const [demoHeight, setDemoHeight] = useState(DEMO_MAX_HEIGHT);
+
+  useEffect(() => {
+    const container = demoContainerRef.current;
+    if (!container) return;
+
+    const updateDemoSize = () => {
+      const containerWidth = container.clientWidth;
+      const styles = window.getComputedStyle(container);
+      const gapValue = styles.columnGap || styles.gap || '0px';
+      const gapPx = Number.parseFloat(gapValue) || 0;
+      const availableWidth = Math.max(containerWidth - gapPx, 0);
+      const height = Math.min(DEMO_MAX_HEIGHT, availableWidth / TOTAL_RATIO);
+
+      setDemoHeight(Math.max(height, 0));
+    };
+
+    updateDemoSize();
+    const observer = new ResizeObserver(updateDemoSize);
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const androidWidth = demoHeight * ANDROID_RATIO;
+  const macWidth = demoHeight * MAC_RATIO;
 
   return (
     <div className="bg-white">
       {/* Header Section - Newspaper Style */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           {/* Newspaper Header */}
           <div className="py-8 border-b-2 border-gray-400">
             <div className="flex items-start justify-between">
@@ -43,9 +77,163 @@ const Homepage: React.FC = () => {
             </div>
           </div>
 
+          {/* Demo Environments Section */}
+          <div className="py-8 border-b-2 border-gray-300">
+            <div className="mx-auto px-0">
+              <div className="text-2xl font-bold text-gray-800 mb-3 uppercase tracking-wide text-center">
+                🔥 Explore In Simulated World-of-Bits! 🔥
+              </div>
+              <p className="text-sm text-gray-600 mb-6 text-center px-6 max-w-3xl mx-auto">
+                In order to gain better experience, you are recommended to open
+                the virtual environments in an individual browser tab. You may
+                need toggling mobile simulation for android env to behave
+                correctly.
+              </p>
+              <div
+                ref={demoContainerRef}
+                className="flex flex-col md:flex-row gap-2 justify-center items-start"
+              >
+                {/* Mobile Hints - Only visible on small screens */}
+                <div className="flex md:hidden w-full flex-col gap-4 items-center justify-center py-12 px-6 text-center">
+                  <svg
+                    className="w-16 h-16 text-gray-400 mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <div className="text-lg font-semibold text-gray-800 mb-2">
+                    Interactive Demos Available
+                  </div>
+                  <p className="text-sm text-gray-600 mb-6 max-w-xs">
+                    View on a larger screen for the best experience.
+                  </p>
+                  <div className="flex flex-col gap-3 w-full max-w-xs">
+                    <a
+                      href="https://niumascript.com/os/android/index.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-6 py-3 bg-gray-900 text-white text-sm font-bold uppercase tracking-wide hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                      Open Virtual Android Env
+                    </a>
+                    <a
+                      href="https://niumascript.com/os/mac/index.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-6 py-3 border-2 border-gray-800 text-gray-800 text-sm font-bold uppercase tracking-wide hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                      Open Virtual Mac Env
+                    </a>
+                  </div>
+                </div>
+                {/* Android Demo - Vertical */}
+                <div className="hidden md:flex flex-col items-center">
+                  <iframe
+                    src="https://niumascript.com/os/android/index.html"
+                    className="border-2 border-gray-300 shadow-lg mb-3"
+                    style={{
+                      height: `${demoHeight}px`,
+                      width: `${androidWidth}px`,
+                    }}
+                    title="Android Environment Demo"
+                    loading="lazy"
+                  />
+                  <a
+                    href="https://niumascript.com/os/android/index.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-gray-900 hover:text-gray-700 underline flex items-center gap-1 transition-colors"
+                  >
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                    Virtual Android Env
+                  </a>
+                </div>
+                {/* Mac Demo - Horizontal */}
+                <div className="hidden md:flex flex-col items-center">
+                  <iframe
+                    src="https://niumascript.com/os/mac/index.html"
+                    className="border-2 border-gray-300 shadow-lg mb-3"
+                    style={{
+                      height: `${demoHeight}px`,
+                      width: `${macWidth}px`,
+                    }}
+                    title="Mac Environment Demo"
+                    loading="lazy"
+                  />
+                  <a
+                    href="https://niumascript.com/os/mac/index.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-gray-900 hover:text-gray-700 underline flex items-center gap-1 transition-colors"
+                  >
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                    Virtual Mac Env
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Main Article Area */}
           <div className="py-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               <div className="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">
                 About
               </div>
@@ -154,7 +342,7 @@ const Homepage: React.FC = () => {
 
       {/* News Section - Newspaper Style */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           {/* Section Header */}
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
@@ -217,7 +405,7 @@ const Homepage: React.FC = () => {
 
       {/* Features Section - Newspaper Columns */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           {/* Section Header */}
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
@@ -280,7 +468,7 @@ const Homepage: React.FC = () => {
 
       {/* Statistics Section - Newspaper Style */}
       <div className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
               Platform Statistics

@@ -94,7 +94,7 @@ const generatePlatformIcon = (platform: string): React.ReactNode => {
 // Loading state component with skeleton screens
 const LoadingState: React.FC = () => (
   <div className="py-8 bg-white">
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar skeleton */}
         <div className="hidden lg:block lg:w-64">
@@ -128,7 +128,7 @@ interface ErrorStateProps {
 
 const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
   <div className="py-16 bg-white">
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
       <div className="text-center">
         <div className="w-20 h-20 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center mx-auto mb-6">
           <svg
@@ -476,7 +476,7 @@ const Environments: React.FC = () => {
       <div className="bg-white">
         {/* Header Section - Newspaper Style - Sticky */}
         <div className="sticky top-0 bg-white z-20 shadow-sm">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             {/* Newspaper Header */}
             <div className="py-6">
               <div className="flex items-start justify-between">
@@ -521,7 +521,7 @@ const Environments: React.FC = () => {
       <div className="bg-white">
         {/* Header Section - Newspaper Style - Sticky */}
         <div className="sticky top-0 bg-white z-20 shadow-sm">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             {/* Newspaper Header */}
             <div className="py-6">
               <div className="flex items-start justify-between">
@@ -565,7 +565,7 @@ const Environments: React.FC = () => {
     <div className="bg-white">
       {/* Header Section - Newspaper Style - Sticky */}
       <div className="sticky top-0 bg-white z-20 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           {/* Newspaper Header */}
           <div className="py-8 border-b-2 border-gray-400">
             <div className="flex items-start justify-between">
@@ -602,7 +602,7 @@ const Environments: React.FC = () => {
 
       {/* Filter Section - Newspaper Style - Sticky */}
       <div className="sticky top-32 md:top-36 bg-white z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 md:py-8">
             {/* Mobile Filter Section */}
             <div className="lg:hidden mb-6">
