@@ -475,7 +475,7 @@ const Environments: React.FC = () => {
     return (
       <div className="bg-white">
         {/* Header Section - Newspaper Style - Sticky */}
-        <div className="sticky top-0 bg-white z-20 shadow-sm">
+        <div className="sticky top-14 bg-white z-20 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             {/* Newspaper Header */}
             <div className="py-6">
@@ -520,7 +520,7 @@ const Environments: React.FC = () => {
     return (
       <div className="bg-white">
         {/* Header Section - Newspaper Style - Sticky */}
-        <div className="sticky top-0 bg-white z-20 shadow-sm">
+        <div className="sticky top-14 bg-white z-20 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
             {/* Newspaper Header */}
             <div className="py-6">
@@ -564,7 +564,7 @@ const Environments: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Header Section - Newspaper Style - Sticky */}
-      <div className="sticky top-0 bg-white z-20 shadow-sm">
+      <div className="sticky top-14 bg-white z-20 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           {/* Newspaper Header */}
           <div className="py-8 border-b-2 border-gray-400">
@@ -601,7 +601,7 @@ const Environments: React.FC = () => {
       </div>
 
       {/* Filter Section - Newspaper Style - Sticky */}
-      <div className="sticky top-32 md:top-36 bg-white z-10">
+      <div className="sticky top-[11.5rem] md:top-[12.5rem] bg-white z-10">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 md:py-8">
             {/* Mobile Filter Section */}
@@ -732,7 +732,7 @@ const Environments: React.FC = () => {
 
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Left Sidebar Filters - Desktop Only - Sticky */}
-              <div className="hidden lg:block lg:w-64 lg:sticky lg:top-40 lg:h-fit">
+              <div className="hidden lg:block lg:w-64 lg:sticky lg:top-[13.5rem] lg:h-fit">
                 <div className="bg-gray-50 border-2 border-gray-300 p-6 shadow-sm">
                   <div className="text-sm font-bold uppercase text-gray-700 mb-4">
                     Filter Options
