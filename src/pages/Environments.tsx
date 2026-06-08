@@ -18,6 +18,7 @@ import { useDebounce } from '../hooks/useDebounce';
 import Toast from '../components/common/Toast';
 import { EnvironmentGridSkeleton } from '../components/common/Skeleton';
 import DotIndicator from '../components/common/DotIndicator';
+import { useI18n } from '../i18n/useI18n';
 
 // Memoized platform icon components to avoid re-creation on every render
 const PlatformIcons = {
@@ -127,47 +128,55 @@ interface ErrorStateProps {
 }
 
 const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
-  <div className="py-16 bg-white">
-    <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-      <div className="text-center">
-        <div className="w-20 h-20 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center mx-auto mb-6">
-          <svg
-            className="w-10 h-10 text-gray-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+  <ErrorStateContent error={error} onRetry={onRetry} />
+);
+
+const ErrorStateContent: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
+  const { t } = useI18n();
+
+  return (
+    <div className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-gray-100 rounded-lg border-2 border-gray-300 flex items-center justify-center mx-auto mb-6">
+            <svg
+              className="w-10 h-10 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2 uppercase tracking-wide">
+            {t('environments.failedTitle')}
+          </h3>
+          <p className="text-lg text-gray-700 mb-6">
+            {error || t('environments.failedFallback')}
+          </p>
+          <button
+            onClick={onRetry}
+            className="px-8 py-3 bg-gray-900 text-white text-sm font-bold uppercase tracking-wide hover:bg-gray-800 transition-colors duration-200"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+            {t('environments.tryAgain')}
+          </button>
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2 uppercase tracking-wide">
-          Failed to Load Environments
-        </h3>
-        <p className="text-lg text-gray-700 mb-6">
-          {error ||
-            'An unexpected error occurred while loading environment data.'}
-        </p>
-        <button
-          onClick={onRetry}
-          className="px-8 py-3 bg-gray-900 text-white text-sm font-bold uppercase tracking-wide hover:bg-gray-800 transition-colors duration-200"
-        >
-          Try Again
-        </button>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const PAGE_SIZE = 20;
 
 const Environments: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useI18n();
 
   // Initialize state from URL params
   const [selectedPlatform, setSelectedPlatform] = useState<string>(
@@ -197,6 +206,26 @@ const Environments: React.FC = () => {
   );
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [showAllTags, setShowAllTags] = useState<boolean>(false);
+
+  const platformLabels: Record<string, string> = {
+    all: t('environments.allPlatforms'),
+    'Web Applications': t('environments.webApplications'),
+    'Desktop Apps': t('environments.desktopApps'),
+    'Mobile Interfaces': t('environments.mobileInterfaces'),
+  };
+
+  const difficultyLabels: Record<string, string> = {
+    all: t('environments.allLevels'),
+    Basic: t('environments.basic'),
+    Advanced: t('environments.advanced'),
+    Expert: t('environments.expert'),
+  };
+
+  const getPlatformLabel = (platform: string) =>
+    platformLabels[platform] || platform;
+
+  const getDifficultyLabel = (difficulty: string) =>
+    difficultyLabels[difficulty] || difficulty;
 
   // Track whether we're restoring state from sessionStorage
   const isRestoringState = useRef(false);
@@ -482,10 +511,10 @@ const Environments: React.FC = () => {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-2 leading-none">
-                    Environments
+                    {t('environments.title')}
                   </h1>
                   <div className="text-lg font-medium text-gray-700">
-                    View Environments Available in ScaleWoB
+                    {t('environments.subtitle')}
                   </div>
                 </div>
                 {/* Environment Icon */}
@@ -527,10 +556,10 @@ const Environments: React.FC = () => {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-2 leading-none">
-                    Environments
+                    {t('environments.title')}
                   </h1>
                   <div className="text-lg font-medium text-gray-700">
-                    View Environments Available in ScaleWoB
+                    {t('environments.subtitle')}
                   </div>
                 </div>
                 {/* Environment Icon */}
@@ -571,10 +600,10 @@ const Environments: React.FC = () => {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-2 leading-none">
-                  Environments
+                  {t('environments.title')}
                 </h1>
                 <div className="text-lg font-medium text-gray-700">
-                  View Environments Available in ScaleWoB
+                  {t('environments.subtitle')}
                 </div>
               </div>
               {/* Gallery Icon */}
@@ -609,16 +638,17 @@ const Environments: React.FC = () => {
               <div className="bg-gray-50 border-2 border-gray-300 p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-sm font-bold uppercase text-gray-700">
-                    Filters
+                    {t('environments.filters')}
                   </div>
                   <div className="text-sm font-black text-gray-900">
-                    {filteredAndPaginatedEnvironments.totalCount} results
+                    {filteredAndPaginatedEnvironments.totalCount}{' '}
+                    {t('environments.resultsLower')}
                   </div>
                 </div>
 
                 <input
                   type="text"
-                  placeholder="Search environments..."
+                  placeholder={t('environments.searchPlaceholder')}
                   className="w-full px-4 py-2 mb-4 border-2 border-gray-300 text-sm focus:outline-none focus:border-gray-400"
                   value={searchInput}
                   onChange={e => setSearchInput(e.target.value)}
@@ -629,11 +659,17 @@ const Environments: React.FC = () => {
                     value={sortBy}
                     onChange={e => setSortBy(e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-300 bg-white text-gray-700 focus:outline-none focus:border-gray-400 mb-2"
-                    aria-label="Sort environments"
+                    aria-label={t('environments.sortAria')}
                   >
-                    <option value="name">Sort: Name (A-Z)</option>
-                    <option value="difficulty">Sort: Difficulty</option>
-                    <option value="platform">Sort: Platform</option>
+                    <option value="name">
+                      {t('environments.sortNameMobile')}
+                    </option>
+                    <option value="difficulty">
+                      {t('environments.sortDifficultyMobile')}
+                    </option>
+                    <option value="platform">
+                      {t('environments.sortPlatformMobile')}
+                    </option>
                   </select>
                 </div>
 
@@ -643,10 +679,18 @@ const Environments: React.FC = () => {
                     onChange={e => setSelectedPlatform(e.target.value)}
                     className="flex-1 px-3 py-2 text-sm border border-gray-300 bg-white text-gray-700 focus:outline-none focus:border-gray-400"
                   >
-                    <option value="all">All Platforms</option>
-                    <option value="Web Applications">Web Applications</option>
-                    <option value="Desktop Apps">Desktop Apps</option>
-                    <option value="Mobile Interfaces">Mobile Interfaces</option>
+                    <option value="all">
+                      {t('environments.allPlatforms')}
+                    </option>
+                    <option value="Web Applications">
+                      {t('environments.webApplications')}
+                    </option>
+                    <option value="Desktop Apps">
+                      {t('environments.desktopApps')}
+                    </option>
+                    <option value="Mobile Interfaces">
+                      {t('environments.mobileInterfaces')}
+                    </option>
                   </select>
 
                   <select
@@ -654,17 +698,19 @@ const Environments: React.FC = () => {
                     onChange={e => setSelectedDifficulty(e.target.value)}
                     className="flex-1 px-3 py-2 text-sm border border-gray-300 bg-white text-gray-700 focus:outline-none focus:border-gray-400"
                   >
-                    <option value="all">All Levels</option>
-                    <option value="Basic">Basic</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="Expert">Expert</option>
+                    <option value="all">{t('environments.allLevels')}</option>
+                    <option value="Basic">{t('environments.basic')}</option>
+                    <option value="Advanced">
+                      {t('environments.advanced')}
+                    </option>
+                    <option value="Expert">{t('environments.expert')}</option>
                   </select>
                 </div>
 
                 {sortedTagsByFrequency.length > 0 && (
                   <div className="mb-4">
                     <div className="text-xs font-bold uppercase text-gray-700 mb-2">
-                      Tags
+                      {t('environments.tags')}
                     </div>
 
                     {/* Mobile Tags Container */}
@@ -680,7 +726,7 @@ const Environments: React.FC = () => {
                               checked={selectedTags.includes(tag)}
                               onChange={() => toggleTag(tag)}
                               className="w-4 h-4 border-2 border-gray-300"
-                              aria-label={`Filter by tag: ${tag}`}
+                              aria-label={`${t('environments.tagChip')}: ${tag}`}
                             />
                             <span className="text-sm font-medium text-gray-700 flex-1">
                               {tag}
@@ -700,12 +746,14 @@ const Environments: React.FC = () => {
                         className="w-full mt-2 px-3 py-2 text-xs font-bold uppercase tracking-wide text-gray-700 border-2 border-gray-300 hover:bg-gray-100 transition-all duration-200"
                         aria-expanded={showAllTags}
                         aria-label={
-                          showAllTags ? 'Show fewer tags' : 'Show all tags'
+                          showAllTags
+                            ? t('environments.showFewer')
+                            : t('environments.showAll')
                         }
                       >
                         {showAllTags
-                          ? `Show fewer (${topTags.length})`
-                          : `Show all (${sortedTagsByFrequency.length})`}
+                          ? `${t('environments.showFewer')} (${topTags.length})`
+                          : `${t('environments.showAll')} (${sortedTagsByFrequency.length})`}
                       </button>
                     )}
                   </div>
@@ -724,7 +772,7 @@ const Environments: React.FC = () => {
                     }}
                     className="w-full px-3 py-2 text-sm border-2 border-gray-300 text-gray-700 font-bold uppercase tracking-wide hover:bg-gray-100 transition-colors"
                   >
-                    Clear Filters
+                    {t('environments.clearFilters')}
                   </button>
                 )}
               </div>
@@ -735,41 +783,45 @@ const Environments: React.FC = () => {
               <div className="hidden lg:block lg:w-64 lg:sticky lg:top-[13.5rem] lg:h-fit">
                 <div className="bg-gray-50 border-2 border-gray-300 p-6 shadow-sm">
                   <div className="text-sm font-bold uppercase text-gray-700 mb-4">
-                    Filter Options
+                    {t('environments.filterOptions')}
                   </div>
 
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder="Search environments"
+                    placeholder={t('environments.searchPlaceholderShort')}
                     className="w-full px-4 py-2 mb-6 border-2 border-gray-300 text-sm focus:outline-none focus:border-gray-400"
                     value={searchInput}
                     onChange={e => setSearchInput(e.target.value)}
-                    aria-label="Search environments"
+                    aria-label={t('environments.searchPlaceholderShort')}
                   />
 
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
-                        Sort By
+                        {t('environments.sortBy')}
                       </h3>
                       <select
                         value={sortBy}
                         onChange={e => setSortBy(e.target.value)}
                         className="w-full px-4 py-2 text-sm border-2 border-gray-300 bg-white text-gray-700 focus:outline-none focus:border-gray-400"
-                        aria-label="Sort environments"
+                        aria-label={t('environments.sortAria')}
                       >
-                        <option value="name">Name (A-Z)</option>
-                        <option value="difficulty">
-                          Difficulty (Easy → Hard)
+                        <option value="name">
+                          {t('environments.sortName')}
                         </option>
-                        <option value="platform">Platform</option>
+                        <option value="difficulty">
+                          {t('environments.sortDifficulty')}
+                        </option>
+                        <option value="platform">
+                          {t('environments.sortPlatform')}
+                        </option>
                       </select>
                     </div>
 
                     <div>
                       <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
-                        Platform
+                        {t('environments.platform')}
                       </h3>
                       <div className="space-y-2">
                         {[
@@ -787,7 +839,7 @@ const Environments: React.FC = () => {
                                 : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400 hover:bg-gray-50'
                             }`}
                           >
-                            {platform === 'all' ? 'All Platforms' : platform}
+                            {getPlatformLabel(platform)}
                           </button>
                         ))}
                       </div>
@@ -795,24 +847,28 @@ const Environments: React.FC = () => {
 
                     <div>
                       <h3 className="text-sm font-bold uppercase text-gray-700 mb-3">
-                        Difficulty Level
+                        {t('environments.difficultyLevel')}
                       </h3>
                       <div className="space-y-2">
                         {[
                           {
                             value: 'all',
-                            label: 'All Levels',
+                            label: t('environments.allLevels'),
                             level: null as null,
                           },
-                          { value: 'Basic', label: 'Basic', level: 1 as const },
+                          {
+                            value: 'Basic',
+                            label: t('environments.basic'),
+                            level: 1 as const,
+                          },
                           {
                             value: 'Advanced',
-                            label: 'Advanced',
+                            label: t('environments.advanced'),
                             level: 2 as const,
                           },
                           {
                             value: 'Expert',
-                            label: 'Expert',
+                            label: t('environments.expert'),
                             level: 3 as const,
                           },
                         ].map(({ value, label, level }) => (
@@ -903,18 +959,20 @@ const Environments: React.FC = () => {
 
                   <div className="mt-6 pt-6 border-t-2 border-gray-300">
                     <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
-                      Results
+                      {t('environments.results')}
                     </div>
                     <div className="text-lg font-black text-gray-900">
                       {filteredAndPaginatedEnvironments.totalCount}
                     </div>
                     <div className="text-xs text-gray-600">
                       {filteredAndPaginatedEnvironments.totalCount !== 1
-                        ? 'environments'
-                        : 'environment'}
+                        ? t('environments.environmentPlural')
+                        : t('environments.environmentSingular')}
                       {filteredAndPaginatedEnvironments.totalCount !==
                         environmentsWithIcons.length &&
-                        ` of ${environmentsWithIcons.length} total`}
+                        ` ${t('environments.ofTotal', {
+                          count: environmentsWithIcons.length,
+                        })}`}
                     </div>
                   </div>
                 </div>
@@ -930,7 +988,7 @@ const Environments: React.FC = () => {
                   <div className="mb-6 bg-gray-50 border-2 border-gray-300 p-4">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs font-bold uppercase text-gray-700 tracking-wide">
-                        Active Filters:
+                        {t('environments.activeFilters')}
                       </span>
 
                       {/* Search chip */}
@@ -940,7 +998,8 @@ const Environments: React.FC = () => {
                           className="inline-flex items-center px-3 py-1 bg-gray-900 text-white text-xs font-medium uppercase tracking-wide hover:bg-gray-800 transition-colors group"
                         >
                           <span className="mr-2">
-                            Search: &quot;{debouncedSearch}&quot;
+                            {t('environments.searchChip')}: &quot;
+                            {debouncedSearch}&quot;
                           </span>
                           <svg
                             className="w-3 h-3 group-hover:scale-110 transition-transform"
@@ -965,7 +1024,8 @@ const Environments: React.FC = () => {
                           className="inline-flex items-center px-3 py-1 bg-gray-900 text-white text-xs font-medium uppercase tracking-wide hover:bg-gray-800 transition-colors group"
                         >
                           <span className="mr-2">
-                            Platform: {selectedPlatform}
+                            {t('environments.platformChip')}:{' '}
+                            {getPlatformLabel(selectedPlatform)}
                           </span>
                           <svg
                             className="w-3 h-3 group-hover:scale-110 transition-transform"
@@ -990,7 +1050,8 @@ const Environments: React.FC = () => {
                           className="inline-flex items-center px-3 py-1 bg-gray-900 text-white text-xs font-medium uppercase tracking-wide hover:bg-gray-800 transition-colors group"
                         >
                           <span className="mr-2">
-                            Difficulty: {selectedDifficulty}
+                            {t('environments.difficultyChip')}:{' '}
+                            {getDifficultyLabel(selectedDifficulty)}
                           </span>
                           <svg
                             className="w-3 h-3 group-hover:scale-110 transition-transform"
@@ -1015,7 +1076,9 @@ const Environments: React.FC = () => {
                           onClick={() => toggleTag(tag)}
                           className="inline-flex items-center px-3 py-1 bg-gray-900 text-white text-xs font-medium uppercase tracking-wide hover:bg-gray-800 transition-colors group"
                         >
-                          <span className="mr-2">Tag: {tag}</span>
+                          <span className="mr-2">
+                            {t('environments.tagChip')}: {tag}
+                          </span>
                           <svg
                             className="w-3 h-3 group-hover:scale-110 transition-transform"
                             fill="none"
@@ -1042,15 +1105,17 @@ const Environments: React.FC = () => {
                         }}
                         className="inline-flex items-center px-3 py-1 border-2 border-gray-800 text-gray-800 text-xs font-bold uppercase tracking-wide hover:bg-gray-100 transition-colors ml-auto"
                       >
-                        Clear All
+                        {t('environments.clearAll')}
                       </button>
                     </div>
 
                     {/* Results count */}
                     <div className="mt-3 pt-3 border-t border-gray-300">
                       <span className="text-sm font-semibold text-gray-700">
-                        Showing {filteredAndPaginatedEnvironments.totalCount} of{' '}
-                        {environmentsWithIcons.length} environments
+                        {t('environments.showing', {
+                          shown: filteredAndPaginatedEnvironments.totalCount,
+                          total: environmentsWithIcons.length,
+                        })}
                       </span>
                     </div>
                   </div>
@@ -1114,7 +1179,7 @@ const Environments: React.FC = () => {
                                         {environment.task_num ||
                                           environment.tasks?.length ||
                                           0}{' '}
-                                        tasks
+                                        {t('environments.tasks')}
                                       </span>
                                     )}
                                   </div>
@@ -1136,8 +1201,8 @@ const Environments: React.FC = () => {
                                       setTimeout(() => setCopiedId(null), 2000);
                                     }}
                                     className="p-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 flex items-center justify-center border border-gray-300 group relative"
-                                    title="Copy environment ID"
-                                    aria-label="Copy environment ID"
+                                    title={t('environments.copyIdTitle')}
+                                    aria-label={t('environments.copyIdAria')}
                                   >
                                     <svg
                                       className="w-4 h-4 group-hover:scale-110 transition-transform duration-200"
@@ -1170,7 +1235,7 @@ const Environments: React.FC = () => {
                                   }}
                                   className="px-3 py-1.5 md:px-4 md:py-2 bg-gray-900 text-white text-sm font-bold uppercase tracking-wide hover:bg-gray-800 transition-colors flex items-center justify-center group"
                                 >
-                                  Launch
+                                  {t('environments.launch')}
                                   <svg
                                     className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
                                     fill="none"
@@ -1204,11 +1269,11 @@ const Environments: React.FC = () => {
                       disabled={currentPage === 1}
                       className="px-4 py-2 border-2 border-gray-300 text-gray-700 text-sm font-bold uppercase tracking-wide hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                     >
-                      Previous
+                      {t('environments.previous')}
                     </button>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-gray-900">
-                        Page
+                        {t('environments.page')}
                       </span>
                       <form
                         onSubmit={handlePageInputSubmit}
@@ -1224,7 +1289,8 @@ const Environments: React.FC = () => {
                           className="w-16 px-2 py-1 border-2 border-gray-300 text-center text-sm font-bold text-gray-900 focus:outline-none focus:border-gray-400"
                         />
                         <span className="text-sm font-bold text-gray-900">
-                          of {filteredAndPaginatedEnvironments.totalPages}
+                          {t('environments.of')}{' '}
+                          {filteredAndPaginatedEnvironments.totalPages}
                         </span>
                       </form>
                     </div>
@@ -1243,7 +1309,7 @@ const Environments: React.FC = () => {
                       }
                       className="px-4 py-2 border-2 border-gray-300 text-gray-700 text-sm font-bold uppercase tracking-wide hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                     >
-                      Next
+                      {t('environments.next')}
                     </button>
                   </div>
                 )}
@@ -1267,10 +1333,10 @@ const Environments: React.FC = () => {
                       </svg>
                     </div>
                     <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 uppercase tracking-wide">
-                      No Environments Found
+                      {t('environments.emptyTitle')}
                     </h3>
                     <p className="text-sm md:text-base text-gray-700 mb-4 md:mb-6 max-w-md mx-auto">
-                      Try adjusting your filter selections to see more results.
+                      {t('environments.emptyDescription')}
                     </p>
                     <button
                       onClick={() => {
@@ -1281,7 +1347,7 @@ const Environments: React.FC = () => {
                       }}
                       className="px-6 py-2 md:px-8 md:py-3 bg-gray-900 text-white text-sm font-bold uppercase tracking-wide hover:bg-gray-800 transition-colors"
                     >
-                      Clear All Filters
+                      {t('environments.clearAllFilters')}
                     </button>
                   </div>
                 )}
@@ -1294,7 +1360,7 @@ const Environments: React.FC = () => {
       {/* Toast notification for copy action */}
       {showToast && copiedId && (
         <Toast
-          message="Environment ID copied to clipboard!"
+          message={t('environments.copyToast')}
           type="success"
           onClose={() => setShowToast(false)}
         />

@@ -1,11 +1,15 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useI18n } from '../../i18n/useI18n';
+import { languageLabels, Language } from '../../i18n/translations';
 
 const Navigation: React.FC = () => {
+  const { language, setLanguage, t } = useI18n();
+
   const navItems = [
-    { name: 'Home', path: '/' },
-    { name: 'Leaderboards', path: '/leaderboard' },
-    { name: 'Environments', path: '/environments' },
+    { name: t('nav.home'), path: '/' },
+    { name: t('nav.leaderboards'), path: '/leaderboard' },
+    { name: t('nav.environments'), path: '/environments' },
   ];
 
   return (
@@ -19,24 +23,46 @@ const Navigation: React.FC = () => {
           >
             ScaleWoB
           </NavLink>
-          <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-            {navItems.map(item => (
-              <NavLink
-                key={item.name}
-                to={item.path}
-                end={item.path === '/'}
-                className={({ isActive }) =>
-                  `px-3 py-1.5 text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                    isActive
-                      ? 'bg-gray-800 text-white'
+          <div className="flex items-center gap-3 min-w-0">
+            <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+              {navItems.map(item => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.path === '/'}
+                  className={({ isActive }) =>
+                    `px-3 py-1.5 text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      isActive
+                        ? 'bg-gray-800 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`
+                  }
+                >
+                  {item.name}
+                </NavLink>
+              ))}
+            </nav>
+            <div
+              className="flex shrink-0 border border-gray-300 bg-white"
+              aria-label={t('nav.language')}
+            >
+              {(['zh', 'en'] as Language[]).map(option => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setLanguage(option)}
+                  className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wide transition-colors ${
+                    language === option
+                      ? 'bg-gray-900 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
-                  }`
-                }
-              >
-                {item.name}
-              </NavLink>
-            ))}
-          </nav>
+                  }`}
+                  aria-pressed={language === option}
+                >
+                  {languageLabels[option]}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </header>

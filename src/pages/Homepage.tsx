@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import NewsCard from '../components/common/NewsCard';
+import { useI18n } from '../i18n/useI18n';
 
 const DEMO_MAX_HEIGHT = 750;
 const ANDROID_RATIO = 1440 / 3120;
@@ -11,6 +12,7 @@ const Homepage: React.FC = () => {
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
   const demoContainerRef = useRef<HTMLDivElement>(null);
   const [demoHeight, setDemoHeight] = useState(DEMO_MAX_HEIGHT);
+  const { t } = useI18n();
 
   useEffect(() => {
     const container = demoContainerRef.current;
@@ -52,8 +54,7 @@ const Homepage: React.FC = () => {
                   ScaleWoB
                 </h1>
                 <div className="text-lg font-medium text-gray-700">
-                  Scalable World of Bits - Synthetic Computer-Use Environments
-                  for GUI Agents
+                  {t('home.subtitle')}
                 </div>
               </div>
               {/* GitHub-style Avatar */}
@@ -81,13 +82,10 @@ const Homepage: React.FC = () => {
           <div className="py-8 border-b-2 border-gray-300">
             <div className="mx-auto px-0">
               <div className="text-2xl font-bold text-gray-800 mb-3 uppercase tracking-wide text-center">
-                🔥 Explore In Simulated World-of-Bits! 🔥
+                🔥 {t('home.demoTitle')} 🔥
               </div>
               <p className="text-sm text-gray-600 mb-6 text-center px-6 max-w-3xl mx-auto">
-                In order to gain better experience, you are recommended to open
-                the virtual environments in an individual browser tab. You may
-                need toggling mobile simulation for android env to behave
-                correctly.
+                {t('home.demoDescription')}
               </p>
               <div
                 ref={demoContainerRef}
@@ -109,10 +107,10 @@ const Homepage: React.FC = () => {
                     />
                   </svg>
                   <div className="text-lg font-semibold text-gray-800 mb-2">
-                    Interactive Demos Available
+                    {t('home.mobileDemoTitle')}
                   </div>
                   <p className="text-sm text-gray-600 mb-6 max-w-xs">
-                    View on a larger screen for the best experience.
+                    {t('home.mobileDemoDescription')}
                   </p>
                   <div className="flex flex-col gap-3 w-full max-w-xs">
                     <a
@@ -134,7 +132,7 @@ const Homepage: React.FC = () => {
                           d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                         />
                       </svg>
-                      Open Virtual Android Env
+                      {t('home.openAndroid')}
                     </a>
                     <a
                       href="https://niumascript.com/os/mac/index.html"
@@ -155,7 +153,7 @@ const Homepage: React.FC = () => {
                           d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                         />
                       </svg>
-                      Open Virtual Mac Env
+                      {t('home.openMac')}
                     </a>
                   </div>
                 </div>
@@ -190,7 +188,7 @@ const Homepage: React.FC = () => {
                         d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                       />
                     </svg>
-                    Virtual Android Env
+                    {t('home.androidEnv')}
                   </a>
                 </div>
                 {/* Mac Demo - Horizontal */}
@@ -224,7 +222,7 @@ const Homepage: React.FC = () => {
                         d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                       />
                     </svg>
-                    Virtual Mac Env
+                    {t('home.macEnv')}
                   </a>
                 </div>
               </div>
@@ -235,19 +233,10 @@ const Homepage: React.FC = () => {
           <div className="py-8">
             <div className="max-w-5xl mx-auto">
               <div className="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">
-                About
+                {t('home.about')}
               </div>
               <p className="text-base text-gray-700 leading-relaxed mb-8 wrap-break-words">
-                GUI agents require training and evaluation in diverse
-                interactive computer-use environments, yet high-quality such
-                environments remain scarce. ScaleWoB addresses this gap through
-                semi-automated environment synthesis. Each environment in
-                ScaleWoB is proposed by domain experts & crowd workers and
-                developed with AI, featuring realistic interfaces and content,
-                and capable of executing complex tasks with verifiable,
-                rule-based rewards. ScaleWoB now offers a large and varied
-                collection of 1000+ tasks and environments spanning three major
-                platforms including mobile, web and desktop.
+                {t('home.aboutText')}
               </p>
             </div>
 
@@ -260,7 +249,7 @@ const Homepage: React.FC = () => {
                 to="/environments"
                 className="px-8 py-3 bg-gray-900 text-white text-sm font-bold uppercase tracking-wide hover:bg-gray-800 transition-colors flex items-center justify-center group"
               >
-                View Environments
+                {t('home.viewEnvironments')}
                 <svg
                   className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
                   fill="none"
@@ -280,7 +269,7 @@ const Homepage: React.FC = () => {
                   onClick={() => setShowLanguageOptions(!showLanguageOptions)}
                   className={`w-full px-8 py-3 border-2 border-gray-800 text-gray-800 text-sm font-bold uppercase tracking-wide hover:bg-gray-100 transition-colors flex items-center justify-center group ${showLanguageOptions ? 'bg-gray-100' : ''}`}
                 >
-                  Create Environment
+                  {t('home.createEnvironment')}
                   <svg
                     className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
                     fill="none"
@@ -303,7 +292,7 @@ const Homepage: React.FC = () => {
                       rel="noopener noreferrer"
                       className="block px-6 py-3 text-sm font-bold uppercase tracking-wide text-gray-800 hover:bg-gray-100 transition-colors border-b border-gray-300"
                     >
-                      中文版本
+                      {t('home.formChinese')}
                     </a>
                     <a
                       href="https://lw572lx3ee.feishu.cn/share/base/form/shrcnoK335CJpC0tKwORe5Gfwme"
@@ -311,7 +300,7 @@ const Homepage: React.FC = () => {
                       rel="noopener noreferrer"
                       className="block px-6 py-3 text-sm font-bold uppercase tracking-wide text-gray-800 hover:bg-gray-100 transition-colors"
                     >
-                      ENGLISH
+                      {t('home.formEnglish')}
                     </a>
                   </div>
                 )}
@@ -320,7 +309,7 @@ const Homepage: React.FC = () => {
                 to="/leaderboard"
                 className="px-8 py-3 border-2 border-gray-800 text-gray-800 text-sm font-bold uppercase tracking-wide hover:bg-gray-100 transition-colors flex items-center justify-center group"
               >
-                View Leaderboard
+                {t('home.viewLeaderboard')}
                 <svg
                   className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
                   fill="none"
@@ -346,7 +335,7 @@ const Homepage: React.FC = () => {
           {/* Section Header */}
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
-              Latest News
+              {t('home.latestNews')}
             </div>
           </div>
 
@@ -355,11 +344,11 @@ const Homepage: React.FC = () => {
             <div className="space-y-3">
               {/* News Item 1 - SDK Release (Released) */}
               <NewsCard
-                category="SDK"
+                category={t('news.sdkCategory')}
                 categoryColor="green"
                 date="2025.11.26"
-                title="Python SDK for Agent Development"
-                description="Official Python SDK to streamline agent development and evaluation on ScaleWoB environments. Includes utilities for environment interaction and result analysis."
+                title={t('news.sdkTitle')}
+                description={t('news.sdkDescription')}
                 actions={[
                   {
                     label: 'GitHub',
@@ -379,22 +368,22 @@ const Homepage: React.FC = () => {
 
               {/* News Item 2 - Dataset Release (Coming Soon - Disabled) */}
               <NewsCard
-                category="Dataset"
+                category={t('news.datasetCategory')}
                 categoryColor="blue"
-                status="Coming Soon"
-                title="ScaleWoB Dataset v1.0"
-                description="Initial release of the ScaleWoB dataset featuring 1000+ diverse GUI agent tasks across web, mobile, and desktop platforms. Available for download and research use."
+                status={t('news.datasetStatus')}
+                title={t('news.datasetTitle')}
+                description={t('news.datasetDescription')}
                 isDisabled={true}
                 icon="database"
               />
 
               {/* News Item 3 - Paper Release (Coming Soon - Disabled) */}
               <NewsCard
-                category="Paper"
+                category={t('news.paperCategory')}
                 categoryColor="purple"
-                status="Coming Soon"
-                title="Research Paper Publication"
-                description="Comprehensive research paper detailing the ScaleWoB methodology, benchmark design, and evaluation results. Includes baseline performance analysis."
+                status={t('news.paperStatus')}
+                title={t('news.paperTitle')}
+                description={t('news.paperDescription')}
                 isDisabled={true}
                 icon="document"
               />
@@ -409,7 +398,7 @@ const Homepage: React.FC = () => {
           {/* Section Header */}
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
-              Key Features
+              {t('home.keyFeatures')}
             </div>
           </div>
 
@@ -421,12 +410,10 @@ const Homepage: React.FC = () => {
                 <div className="space-y-4 md:space-y-6">
                   <div>
                     <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
-                      AI-Generated Environments
+                      {t('home.featureAiTitle')}
                     </h4>
                     <p className="text-sm md:text-base text-gray-700 leading-relaxed wrap-break-words">
-                      Unique testing environment generated dynamically for each
-                      task, enabling large-scale and diverse agent environment
-                      simulation.
+                      {t('home.featureAiText')}
                     </p>
                   </div>
                 </div>
@@ -437,11 +424,10 @@ const Homepage: React.FC = () => {
                 <div className="space-y-4 md:space-y-6">
                   <div>
                     <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
-                      Stable and Fast Execution
+                      {t('home.featureFastTitle')}
                     </h4>
                     <p className="text-sm md:text-base text-gray-700 leading-relaxed wrap-break-words">
-                      Lightweight frontend and backend with synthetic in-app
-                      data, making the tests fast and reproducible.
+                      {t('home.featureFastText')}
                     </p>
                   </div>
                 </div>
@@ -452,11 +438,10 @@ const Homepage: React.FC = () => {
                 <div className="space-y-4 md:space-y-6">
                   <div>
                     <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
-                      Cross-Platform Testing
+                      {t('home.featureCrossTitle')}
                     </h4>
                     <p className="text-sm md:text-base text-gray-700 leading-relaxed wrap-break-words">
-                      Comprehensive evaluation framework supporting web, desktop
-                      and mobile platforms within unified testing interface.
+                      {t('home.featureCrossText')}
                     </p>
                   </div>
                 </div>
@@ -471,7 +456,7 @@ const Homepage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
-              Platform Statistics
+              {t('home.platformStats')}
             </div>
           </div>
 
@@ -480,7 +465,7 @@ const Homepage: React.FC = () => {
               <div className="text-center">
                 <div className="text-4xl font-black text-gray-900 mb-2">3+</div>
                 <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Platforms
+                  {t('home.statPlatforms')}
                 </div>
               </div>
               <div className="text-center">
@@ -488,13 +473,13 @@ const Homepage: React.FC = () => {
                   50K+
                 </div>
                 <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Tasks
+                  {t('home.statTasks')}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-black text-gray-900 mb-2">∞</div>
                 <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Environments
+                  {t('home.statEnvironments')}
                 </div>
               </div>
               <div className="text-center">
@@ -502,7 +487,7 @@ const Homepage: React.FC = () => {
                   100%
                 </div>
                 <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  AI Generated
+                  {t('home.statAiGenerated')}
                 </div>
               </div>
             </div>

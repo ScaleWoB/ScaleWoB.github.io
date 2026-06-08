@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useI18n } from '../../i18n/useI18n';
 
 interface EvaluationStatusBannerProps {
   status: 'idle' | 'evaluating' | 'success' | 'failed';
@@ -16,6 +17,7 @@ const EvaluationStatusBanner: React.FC<EvaluationStatusBannerProps> = ({
   onDismiss,
 }) => {
   const [currentTime, setCurrentTime] = useState(0);
+  const { t } = useI18n();
 
   useEffect(() => {
     let interval: number | undefined;
@@ -61,7 +63,7 @@ const EvaluationStatusBanner: React.FC<EvaluationStatusBannerProps> = ({
               />
             </svg>
           ),
-          label: 'Ready to start evaluation',
+          label: t('evaluation.ready'),
         };
       case 'evaluating':
         return {
@@ -88,7 +90,7 @@ const EvaluationStatusBanner: React.FC<EvaluationStatusBannerProps> = ({
               />
             </svg>
           ),
-          label: 'Evaluating...',
+          label: t('evaluation.evaluating'),
         };
       case 'success':
         return {
@@ -103,7 +105,7 @@ const EvaluationStatusBanner: React.FC<EvaluationStatusBannerProps> = ({
               />
             </svg>
           ),
-          label: 'Evaluation completed successfully',
+          label: t('evaluation.success'),
         };
       case 'failed':
         return {
@@ -118,7 +120,7 @@ const EvaluationStatusBanner: React.FC<EvaluationStatusBannerProps> = ({
               />
             </svg>
           ),
-          label: 'Evaluation failed',
+          label: t('evaluation.failed'),
         };
     }
   };
@@ -139,7 +141,10 @@ const EvaluationStatusBanner: React.FC<EvaluationStatusBannerProps> = ({
           {(status === 'evaluating' || status === 'success') && (
             <div className="flex items-center space-x-3 mt-1 text-xs opacity-80">
               <span>
-                {eventsCount} event{eventsCount !== 1 ? 's' : ''} captured
+                {t('evaluation.captured', {
+                  count: eventsCount,
+                  plural: eventsCount !== 1 ? 's' : '',
+                })}
               </span>
               <span className="text-gray-400">•</span>
               <span>{formatDuration(duration)}</span>
@@ -154,7 +159,7 @@ const EvaluationStatusBanner: React.FC<EvaluationStatusBannerProps> = ({
         <button
           onClick={onDismiss}
           className="flex-shrink-0 ml-3 mt-0.5 opacity-60 hover:opacity-100 transition-opacity"
-          aria-label="Dismiss"
+          aria-label={t('evaluation.dismiss')}
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path

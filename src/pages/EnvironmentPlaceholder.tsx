@@ -1,9 +1,11 @@
 import { useParams } from 'react-router-dom';
 import { useEnvironmentData } from '../services/environmentService';
 import { EnvironmentPreview } from '../types/environment';
+import { useI18n } from '../i18n/useI18n';
 
 const EnvironmentPlaceholder = () => {
   const { envId } = useParams<{ envId: string }>();
+  const { t } = useI18n();
 
   // Load environment data from service
   const { data: environmentData, loading, error } = useEnvironmentData();
@@ -14,9 +16,9 @@ const EnvironmentPlaceholder = () => {
       // Fallback data
       return {
         id: 'unknown',
-        name: 'Unknown Environment',
-        taskName: 'Unknown Environment',
-        description: 'Environment not found',
+        name: t('placeholder.unknownEnvironment'),
+        taskName: t('placeholder.unknownEnvironment'),
+        description: t('placeholder.notFound'),
         platform: 'Web Applications',
         difficulty: 'Basic',
         tags: [],
@@ -25,8 +27,8 @@ const EnvironmentPlaceholder = () => {
         colorTheme: 'warm',
         tasks: [
           {
-            name: 'Unknown Task',
-            description: 'Environment not found',
+            name: t('placeholder.unknownTask'),
+            description: t('placeholder.notFound'),
           },
         ],
       };
@@ -35,6 +37,32 @@ const EnvironmentPlaceholder = () => {
       environmentData.environments.find(env => env.id === id) ||
       environmentData.environments[0]
     );
+  };
+
+  const getPlatformLabel = (platform: string) => {
+    switch (platform) {
+      case 'Web Applications':
+        return t('environments.webApplications');
+      case 'Desktop Apps':
+        return t('environments.desktopApps');
+      case 'Mobile Interfaces':
+        return t('environments.mobileInterfaces');
+      default:
+        return platform;
+    }
+  };
+
+  const getDifficultyLabel = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Basic':
+        return t('environments.basic');
+      case 'Advanced':
+        return t('environments.advanced');
+      case 'Expert':
+        return t('environments.expert');
+      default:
+        return difficulty;
+    }
   };
 
   const environment = getEnvironment(envId || '');
@@ -58,7 +86,7 @@ const EnvironmentPlaceholder = () => {
       <div className="min-h-screen bg-white flex items-center justify-center p-8">
         <div className="max-w-2xl w-full text-center">
           <div className="w-8 h-8 border-2 border-gray-800 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading environment data...</p>
+          <p className="text-gray-600">{t('placeholder.loadingData')}</p>
         </div>
       </div>
     );
@@ -73,14 +101,14 @@ const EnvironmentPlaceholder = () => {
             <span className="text-2xl">❌</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Error Loading Data
+            {t('placeholder.errorLoadingData')}
           </h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-gray-800 text-white rounded-sm hover:bg-gray-700 transition-colors"
           >
-            Try Again
+            {t('placeholder.tryAgain')}
           </button>
         </div>
       </div>
@@ -106,12 +134,12 @@ const EnvironmentPlaceholder = () => {
           <div className="flex items-center justify-center space-x-4 mb-6">
             <div className="flex items-center space-x-2 text-sm text-gray-600">
               <span>💻</span>
-              <span>{environment.platform}</span>
+              <span>{getPlatformLabel(environment.platform)}</span>
             </div>
             <span
               className={`px-3 py-1 rounded-sm text-xs font-medium border ${getDifficultyColor(environment.difficulty)}`}
             >
-              {environment.difficulty}
+              {getDifficultyLabel(environment.difficulty)}
             </span>
           </div>
 
@@ -123,21 +151,21 @@ const EnvironmentPlaceholder = () => {
           {/* Coming Soon Message */}
           <div className="bg-gray-50 rounded-sm p-6 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-3">
-              Environment Coming Soon
+              {t('placeholder.comingSoonTitle')}
             </h2>
             <p className="text-gray-600 mb-4">
-              This environment is currently under development. We&apos;re
-              working hard to bring you an interactive demo experience for this
-              task.
+              {t('placeholder.comingSoonDescription')}
             </p>
             <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
               <div className="w-4 h-4 border-2 border-gray-800 border-t-transparent rounded-full animate-spin"></div>
-              <span>Environment in progress...</span>
+              <span>{t('placeholder.inProgress')}</span>
             </div>
           </div>
 
           {/* Environment ID */}
-          <div className="text-xs text-gray-400">Environment ID: {envId}</div>
+          <div className="text-xs text-gray-400">
+            {t('placeholder.environmentId')} {envId}
+          </div>
 
           {/* Available Demo Hint */}
           {(() => {
@@ -148,10 +176,10 @@ const EnvironmentPlaceholder = () => {
                 <p className="text-sm text-blue-800">
                   💡{' '}
                   <strong>
-                    Try the &quot;{demoEnv.name || demoEnv.taskName}&quot;
-                    environment
+                    {t('placeholder.tryDemoPrefix')} &quot;
+                    {demoEnv.name || demoEnv.taskName}&quot;{' '}
+                    {t('placeholder.tryDemoSuffix')}
                   </strong>{' '}
-                  for a fully interactive demo experience.
                 </p>
               </div>
             ) : null;
@@ -161,12 +189,12 @@ const EnvironmentPlaceholder = () => {
         {/* Additional Info */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
-            Want to see this environment sooner?
+            {t('placeholder.contactPrompt')}
             <a
               href="#"
               className="text-gray-800 hover:text-gray-700 ml-1 font-medium"
             >
-              Contact us
+              {t('placeholder.contactUs')}
             </a>
           </p>
         </div>

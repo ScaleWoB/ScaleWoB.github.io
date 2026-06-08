@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useI18n } from '../../i18n/useI18n';
 
 export interface ToastProps {
   message: string;
@@ -14,6 +15,7 @@ const Toast: React.FC<ToastProps> = ({
   onClose,
 }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const { t } = useI18n();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -81,7 +83,7 @@ const Toast: React.FC<ToastProps> = ({
             setTimeout(onClose, 300);
           }}
           className="flex-shrink-0 text-white hover:text-gray-200 transition-colors"
-          aria-label="Close notification"
+          aria-label={t('toast.close')}
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path
