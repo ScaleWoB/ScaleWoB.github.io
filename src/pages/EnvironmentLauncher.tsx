@@ -24,6 +24,7 @@ import { ToastMessage, ToastContainer } from '../components/common/Toast';
 import EvaluationStatusBanner from '../components/common/EvaluationStatusBanner';
 import ConsoleIcon from '../components/common/ConsoleIcon';
 import { ConsoleEntryType } from '../components/common/consoleIconConstants';
+import { useI18n } from '../i18n/useI18n';
 
 // Lazy load ParameterInput to avoid loading rjsf/lodash when not needed
 const ParameterInput = lazy(
@@ -90,6 +91,7 @@ const EnvironmentLauncher = () => {
   const { envId } = useParams<{ envId: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useI18n();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const consoleContentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -214,7 +216,10 @@ const EnvironmentLauncher = () => {
       // Fallback for environments without tasks array
       return {
         taskId: 0,
-        task: environment?.name || environment?.taskName || 'Unknown Task',
+        task:
+          environment?.name ||
+          environment?.taskName ||
+          t('placeholder.unknownTask'),
         description: environment?.description || '',
         params: environment?.params,
       };
@@ -224,11 +229,11 @@ const EnvironmentLauncher = () => {
     // Normalize environment task to have both task and description
     return {
       taskId: envTask.taskId ?? index,
-      task: envTask.name || environment?.name || 'Unknown Task',
+      task: envTask.name || environment?.name || t('placeholder.unknownTask'),
       description: envTask.description || environment?.description || '',
       params: envTask.params,
     };
-  }, [environment, selectedTaskIndex, bridgeTasks, tasksFromBridge]);
+  }, [environment, selectedTaskIndex, bridgeTasks, tasksFromBridge, t]);
 
   // Extract const fields from selected task params
   const taskSchema = useMemo(() => {
@@ -312,83 +317,83 @@ const EnvironmentLauncher = () => {
     { label: string; description: string; category: string }
   > = {
     info: {
-      label: 'System Info',
-      description: 'System information messages',
+      label: t('event.systemInfo'),
+      description: t('event.systemInfoDescription'),
       category: 'System',
     },
     error: {
-      label: 'Errors',
-      description: 'Error and exception messages',
+      label: t('event.errors'),
+      description: t('event.errorsDescription'),
       category: 'System',
     },
     success: {
-      label: 'Success',
-      description: 'Success confirmation messages',
+      label: t('event.success'),
+      description: t('event.successDescription'),
       category: 'System',
     },
     action: {
-      label: 'Actions',
-      description: 'General action messages',
+      label: t('event.actions'),
+      description: t('event.actionsDescription'),
       category: 'System',
     },
     init: {
-      label: 'Initialization',
-      description: 'System initialization events',
+      label: t('event.initialization'),
+      description: t('event.initializationDescription'),
       category: 'System',
     },
     click: {
-      label: 'Click Events',
-      description: 'Mouse clicks on elements',
+      label: t('event.clickEvents'),
+      description: t('event.clickEventsDescription'),
       category: 'Interactions',
     },
     keypress: {
-      label: 'Keyboard',
-      description: 'Key presses and typing',
+      label: t('event.keyboard'),
+      description: t('event.keyboardDescription'),
       category: 'Interactions',
     },
     scroll: {
-      label: 'Scrolling',
-      description: 'Page scroll events',
+      label: t('event.scrolling'),
+      description: t('event.scrollingDescription'),
       category: 'Interactions',
     },
     focus: {
-      label: 'Focus',
-      description: 'Element focus events',
+      label: t('event.focus'),
+      description: t('event.focusDescription'),
       category: 'Interactions',
     },
     blur: {
-      label: 'Blur',
-      description: 'Element blur events',
+      label: t('event.blur'),
+      description: t('event.blurDescription'),
       category: 'Interactions',
     },
     submit: {
-      label: 'Form Submit',
-      description: 'Form submission events',
+      label: t('event.formSubmit'),
+      description: t('event.formSubmitDescription'),
       category: 'Interactions',
     },
     touch: {
-      label: 'Touch',
-      description: 'Touch and gesture events',
+      label: t('event.touch'),
+      description: t('event.touchDescription'),
       category: 'Interactions',
     },
     drag: {
-      label: 'Drag',
-      description: 'Mouse drag gestures',
+      label: t('event.drag'),
+      description: t('event.dragDescription'),
       category: 'Interactions',
     },
     navigation: {
-      label: 'Navigation',
-      description: 'Page navigation events',
+      label: t('event.navigation'),
+      description: t('event.navigationDescription'),
       category: 'Interactions',
     },
     'dom-change': {
-      label: 'DOM Changes',
-      description: 'DOM mutation events',
+      label: t('event.domChanges'),
+      description: t('event.domChangesDescription'),
       category: 'Interactions',
     },
     unknown: {
-      label: 'Unknown',
-      description: 'Uncategorized events',
+      label: t('event.unknown'),
+      description: t('event.unknownDescription'),
       category: 'Other',
     },
   };
@@ -425,7 +430,7 @@ const EnvironmentLauncher = () => {
    */
   const sendResetCommand = useCallback(() => {
     if (!iframeRef.current || environmentStatus !== 'online') {
-      addConsoleEntry('error', 'Cannot reset - iframe not ready', {
+      addConsoleEntry('error', t('launcher.cannotReset'), {
         status: environmentStatus,
       });
       return;
@@ -441,8 +446,8 @@ const EnvironmentLauncher = () => {
     };
 
     iframeRef.current.contentWindow?.postMessage(command, '*');
-    addConsoleEntry('action', 'Reset command sent to environment');
-  }, [iframeRef, environmentStatus, addConsoleEntry]);
+    addConsoleEntry('action', t('launcher.resetSent'));
+  }, [iframeRef, environmentStatus, addConsoleEntry, t]);
 
   // Handle task selection change
   const handleTaskChange = useCallback(
@@ -468,14 +473,16 @@ const EnvironmentLauncher = () => {
       // Log task change
       addConsoleEntry(
         'info',
-        `Switched to task: ${selectedTask?.task || 'Unknown'}`,
+        t('launcher.switchedTask', {
+          task: selectedTask?.task || t('launcher.unknown'),
+        }),
         {
           taskId: newIndex,
           taskName: selectedTask?.task,
         }
       );
     },
-    [setSearchParams, addConsoleEntry, selectedTask]
+    [setSearchParams, addConsoleEntry, selectedTask, t]
   );
 
   // Auto-scroll to bottom when new entries are added
@@ -513,10 +520,7 @@ const EnvironmentLauncher = () => {
     setEvaluationMessage('');
 
     // Log evaluation start
-    addConsoleEntry(
-      'action',
-      'Starting evaluation - switching to Evaluate Mode'
-    );
+    addConsoleEntry('action', t('launcher.evaluationStart'));
 
     // Set loading state first to ensure overlay shows
     setEnvironmentStatus('loading');
@@ -540,6 +544,7 @@ const EnvironmentLauncher = () => {
     setConsoleEntries,
     setEnvironmentStatus,
     sendResetCommand,
+    t,
   ]);
 
   // Function to finish evaluation (same logic as existing evaluate)
@@ -579,11 +584,11 @@ const EnvironmentLauncher = () => {
                 err =>
                   `${err.instancePath.substring(1) || 'field'}: ${err.message}`
               )
-              .join(', ') || 'Validation failed';
+              .join(', ') || t('launcher.validationFallback');
 
           addConsoleEntry(
             'error',
-            `Parameter validation failed: ${errorMessages}`,
+            t('launcher.validationFailed', { errors: errorMessages }),
             { errors, allParameters }
           );
           return;
@@ -619,7 +624,7 @@ const EnvironmentLauncher = () => {
     // Send command to iframe
     iframeRef.current.contentWindow?.postMessage(command, '*');
 
-    addConsoleEntry('action', 'Evaluation command sent - recording finished', {
+    addConsoleEntry('action', t('launcher.evaluationSent'), {
       parametersProvided: Object.keys(allParameters).length > 0,
       parameterCount: Object.keys(allParameters).length,
       parameters:
@@ -635,7 +640,7 @@ const EnvironmentLauncher = () => {
       setCurrentEvaluationCommandId(null);
       evaluationTimeoutRef.current = null;
 
-      addConsoleEntry('info', 'Evaluation timeout - states reset', {
+      addConsoleEntry('info', t('launcher.evaluationTimeout'), {
         timeout: 10000,
       });
     }, 10000); // 10 second timeout
@@ -651,6 +656,7 @@ const EnvironmentLauncher = () => {
     constFields,
     trajectory,
     evaluationTimeoutRef,
+    t,
   ]);
 
   // Get the current iframe source URL - CDN only
@@ -658,13 +664,13 @@ const EnvironmentLauncher = () => {
     const currentEnvId = envId || '';
 
     if (!currentEnvId) {
-      throw new Error('No environment ID provided');
+      throw new Error(t('launcher.noEnvironmentId'));
     }
 
     // Construct CDN URL with taskId parameter
     const baseUrl = `https://niumascript.com/scalewob-env/${currentEnvId}/index.html`;
     return `${baseUrl}?taskId=${selectedTaskIndex}`;
-  }, [envId, selectedTaskIndex]);
+  }, [envId, selectedTaskIndex, t]);
 
   // Set up message listener for ScaleWoB bridge communication
   useEffect(() => {
@@ -685,7 +691,7 @@ const EnvironmentLauncher = () => {
           setTasksFromBridge(true);
           addConsoleEntry(
             'success',
-            `Loaded ${data.tasks.length} tasks from environment`,
+            t('launcher.loadedTasks', { count: data.tasks.length }),
             { taskCount: data.tasks.length, source: 'bridge' }
           );
 
@@ -695,11 +701,15 @@ const EnvironmentLauncher = () => {
             const firstTaskId = data.tasks[0]?.taskId ?? 0;
             setSelectedTaskIndex(firstTaskId);
             setSearchParams({ taskId: String(firstTaskId) });
-            addConsoleEntry('info', `Auto-selected task ${firstTaskId}`, {
-              reason: 'Previous selection invalid',
-              previousTaskId: selectedTaskIndex,
-              newTaskId: firstTaskId,
-            });
+            addConsoleEntry(
+              'info',
+              t('launcher.autoSelectedTask', { taskId: firstTaskId }),
+              {
+                reason: 'Previous selection invalid',
+                previousTaskId: selectedTaskIndex,
+                newTaskId: firstTaskId,
+              }
+            );
           }
         }
 
@@ -740,22 +750,30 @@ const EnvironmentLauncher = () => {
 
           switch (eventType) {
             case 'ready':
-              return `ScaleWoB Bridge ready: ${data.environment}`;
+              return t('launcher.bridgeReady', {
+                environment: String(data.environment || ''),
+              });
             case 'init':
-              return 'ScaleWoB Event Tracker initialized successfully';
+              return t('launcher.trackerReady');
             case 'user-action': {
-              const action = (data as { action?: string }).action || 'unknown';
+              const action =
+                (data as { action?: string }).action || t('launcher.unknown');
               const target =
                 (data as { target?: { tagName?: string } }).target?.tagName ||
                 'element';
-              return `User action: ${action} on ${target}`;
+              return t('launcher.userAction', { action, target });
             }
             case 'navigation':
-              return `Navigation: ${data.path}`;
+              return t('launcher.navigation', {
+                path: String(data.path || ''),
+              });
             case 'dom-change':
-              return `DOM changed: ${data.type} (${data.count} items)`;
+              return t('launcher.domChanged', {
+                type: String(data.type || ''),
+                count: String(data.count || 0),
+              });
             default:
-              return `Event: ${eventType}`;
+              return t('launcher.event', { eventType });
           }
         };
 
@@ -796,7 +814,7 @@ const EnvironmentLauncher = () => {
         if (eventPreferences[eventType as keyof typeof eventPreferences]) {
           addConsoleEntry(
             eventType as ConsoleEntry['type'],
-            message.message || 'Unknown action',
+            message.message || t('launcher.unknownAction'),
             message.details
           );
         }
@@ -835,7 +853,7 @@ const EnvironmentLauncher = () => {
                 : true;
 
             if (evaluationSuccess) {
-              addConsoleEntry('success', 'Test passed', result);
+              addConsoleEntry('success', t('launcher.testPassed'), result);
               // Set status to success
               setEvaluationStatus('success');
               setEvaluationMessage('');
@@ -845,7 +863,9 @@ const EnvironmentLauncher = () => {
                 ...prev,
                 {
                   id: toastId,
-                  message: `✓ Evaluation successful - ${trajectory.length} events captured`,
+                  message: `✓ ${t('launcher.toastSuccess', {
+                    count: trajectory.length,
+                  })}`,
                   type: 'success',
                   duration: 5000,
                 },
@@ -854,13 +874,13 @@ const EnvironmentLauncher = () => {
                 setToasts(prev => prev.filter(t => t.id !== toastId));
               }, 5000);
             } else {
-              addConsoleEntry('error', 'Test failed', result);
+              addConsoleEntry('error', t('launcher.testFailed'), result);
               // Set status to failed
               setEvaluationStatus('failed');
               const errorMessage =
                 typeof result === 'object' && result?.error
                   ? String(result.error)
-                  : 'Evaluation failed';
+                  : t('launcher.evaluationFailed');
               setEvaluationMessage(errorMessage);
               // Add error toast
               const toastId = `toast-${Date.now()}`;
@@ -868,7 +888,7 @@ const EnvironmentLauncher = () => {
                 ...prev,
                 {
                   id: toastId,
-                  message: `✗ Evaluation failed - View console for details`,
+                  message: `✗ ${t('launcher.toastFailedDetails')}`,
                   type: 'error',
                   duration: 7000,
                 },
@@ -879,14 +899,14 @@ const EnvironmentLauncher = () => {
             }
           } else {
             // Handle command execution failure
-            addConsoleEntry('error', 'Evaluation command failed', {
+            addConsoleEntry('error', t('launcher.evaluationCommandFailed'), {
               error,
               result,
             });
             // Set status to failed
             setEvaluationStatus('failed');
             setEvaluationMessage(
-              error ? String(error) : 'Evaluation command failed'
+              error ? String(error) : t('launcher.evaluationCommandFailed')
             );
             // Add error toast
             const toastId = `toast-${Date.now()}`;
@@ -894,7 +914,9 @@ const EnvironmentLauncher = () => {
               ...prev,
               {
                 id: toastId,
-                message: `✗ Evaluation failed - ${error || 'Unknown error'}`,
+                message: `✗ ${t('launcher.toastFailedError', {
+                  error: String(error || t('launcher.unknownError')),
+                })}`,
                 type: 'error',
                 duration: 7000,
               },
@@ -934,6 +956,7 @@ const EnvironmentLauncher = () => {
     setIsEvaluating,
     isEvaluationStarted,
     isEvaluating,
+    t,
   ]);
 
   // Cleanup timeout on unmount
@@ -1024,10 +1047,10 @@ const EnvironmentLauncher = () => {
             <span className="text-2xl">❌</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Environment Not Found
+            {t('launcher.environmentNotFound')}
           </h2>
           <p className="text-gray-600 mb-4">
-            Environment &quot;{envId}&quot; is not available.
+            {t('launcher.environmentUnavailable', { id: envId || '' })}
           </p>
           <button
             onClick={() => navigate('/environments')}
@@ -1046,7 +1069,7 @@ const EnvironmentLauncher = () => {
                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
               />
             </svg>
-            Back to Environments
+            {t('launcher.backToEnvironments')}
           </button>
         </div>
       </div>
@@ -1080,7 +1103,7 @@ const EnvironmentLauncher = () => {
                       d="M10 19l-7-7m0 0l7-7m-7 7h18"
                     />
                   </svg>
-                  Back
+                  {t('launcher.back')}
                 </button>
 
                 <h1 className="text-lg font-bold text-gray-900 truncate">
@@ -1103,7 +1126,11 @@ const EnvironmentLauncher = () => {
                       isPlayMode ? 'bg-green-500 animate-pulse' : 'bg-blue-500'
                     }`}
                   ></div>
-                  <span>{isPlayMode ? 'Play' : 'Evaluate'}</span>
+                  <span>
+                    {isPlayMode
+                      ? t('launcher.modePlay')
+                      : t('launcher.modeEvaluate')}
+                  </span>
                 </div>
               </div>
 
@@ -1130,10 +1157,10 @@ const EnvironmentLauncher = () => {
                   ></div>
                   <span>
                     {environmentStatus === 'loading'
-                      ? 'Loading'
+                      ? t('launcher.statusLoading')
                       : environmentStatus === 'online'
-                        ? 'Live'
-                        : 'Offline'}
+                        ? t('launcher.statusLive')
+                        : t('launcher.statusOffline')}
                   </span>
                 </div>
               </div>
@@ -1155,7 +1182,7 @@ const EnvironmentLauncher = () => {
                       ? 'bg-blue-600 text-white'
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
-                  title="Functions"
+                  title={t('launcher.functions')}
                 >
                   <svg
                     className="w-5 h-5"
@@ -1182,7 +1209,7 @@ const EnvironmentLauncher = () => {
                       ? 'bg-blue-600 text-white'
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
-                  title="Filters"
+                  title={t('launcher.filters')}
                 >
                   <svg
                     className="w-5 h-5"
@@ -1209,7 +1236,7 @@ const EnvironmentLauncher = () => {
                       ? 'bg-blue-600 text-white'
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
-                  title="Event Console"
+                  title={t('launcher.eventConsole')}
                 >
                   <svg
                     className="w-5 h-5"
@@ -1238,7 +1265,7 @@ const EnvironmentLauncher = () => {
                 <>
                   <div className="p-4 border-b-2 border-gray-300 bg-gray-100">
                     <h2 className="text-sm font-bold uppercase text-gray-700">
-                      Functions
+                      {t('launcher.functions')}
                     </h2>
                   </div>
                   <div className="flex-1 overflow-y-auto flex flex-col min-h-0">
@@ -1249,7 +1276,7 @@ const EnvironmentLauncher = () => {
                         {/* Header */}
                         <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b-2 border-gray-300">
                           <h3 className="text-sm font-bold text-gray-900">
-                            Task Description
+                            {t('launcher.taskDescription')}
                           </h3>
                           {(tasksFromBridge
                             ? bridgeTasks.length > 1
@@ -1257,8 +1284,8 @@ const EnvironmentLauncher = () => {
                               environment.tasks.length > 1) && (
                             <span className="text-xs text-gray-600 font-semibold">
                               {tasksFromBridge
-                                ? `${bridgeTasks.length} tasks`
-                                : `${environment?.tasks.length} tasks`}
+                                ? `${bridgeTasks.length} ${t('environments.tasks')}`
+                                : `${environment?.tasks.length} ${t('environments.tasks')}`}
                             </span>
                           )}
                         </div>
@@ -1304,7 +1331,7 @@ const EnvironmentLauncher = () => {
                                 }
                               }}
                               className="px-2 py-1.5 bg-white hover:bg-gray-100 border border-gray-300 rounded transition-colors flex items-center justify-center"
-                              title="Previous task"
+                              title={t('launcher.previousTask')}
                             >
                               <svg
                                 className="w-3.5 h-3.5 text-gray-700"
@@ -1360,7 +1387,7 @@ const EnvironmentLauncher = () => {
                                 className="w-14 px-2 py-1.5 text-center text-xs font-semibold border border-gray-300 rounded focus:outline-none focus:border-blue-500 bg-white"
                               />
                               <span className="text-xs text-gray-600 font-medium">
-                                of{' '}
+                                {t('environments.of')}{' '}
                                 {tasksFromBridge
                                   ? bridgeTasks.length
                                   : environment?.tasks.length}
@@ -1394,7 +1421,7 @@ const EnvironmentLauncher = () => {
                                 }
                               }}
                               className="px-2 py-1.5 bg-white hover:bg-gray-100 border border-gray-300 rounded transition-colors flex items-center justify-center"
-                              title="Next task"
+                              title={t('launcher.nextTask')}
                             >
                               <svg
                                 className="w-3.5 h-3.5 text-gray-700"
@@ -1446,8 +1473,8 @@ const EnvironmentLauncher = () => {
                             />
                           </svg>
                           {isEvaluationStarted && !isEvaluating
-                            ? 'In Progress'
-                            : 'Start'}
+                            ? t('launcher.inProgress')
+                            : t('launcher.start')}
                         </button>
 
                         {/* Finish Evaluation Button */}
@@ -1476,7 +1503,7 @@ const EnvironmentLauncher = () => {
                               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                             />
                           </svg>
-                          Finish
+                          {t('launcher.finish')}
                         </button>
                       </div>
 
@@ -1525,7 +1552,7 @@ const EnvironmentLauncher = () => {
                 <>
                   <div className="p-4 border-b-2 border-gray-300 bg-gray-100">
                     <h2 className="text-sm font-bold uppercase text-gray-700">
-                      Event Filters
+                      {t('launcher.eventFilters')}
                     </h2>
                   </div>
 
@@ -1535,7 +1562,7 @@ const EnvironmentLauncher = () => {
                     <div>
                       <h4 className="text-xs font-bold uppercase text-gray-700 mb-3 flex items-center border-b border-gray-300 pb-2">
                         <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                        System Messages
+                        {t('launcher.systemMessages')}
                       </h4>
                       <div className="space-y-2">
                         {Object.entries(eventPreferences)
@@ -1599,7 +1626,7 @@ const EnvironmentLauncher = () => {
                     <div>
                       <h4 className="text-xs font-bold uppercase text-gray-700 mb-3 flex items-center border-b border-gray-300 pb-2">
                         <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                        User Interactions
+                        {t('launcher.userInteractions')}
                       </h4>
                       <div className="space-y-2">
                         {Object.entries(eventPreferences)
@@ -1668,7 +1695,7 @@ const EnvironmentLauncher = () => {
                 <>
                   <div className="p-4 border-b-2 border-gray-300 bg-gray-100">
                     <h2 className="text-sm font-bold uppercase text-gray-700">
-                      Event Console
+                      {t('launcher.eventConsole')}
                     </h2>
                   </div>
 
@@ -1765,10 +1792,10 @@ const EnvironmentLauncher = () => {
                           </svg>
                         </div>
                         <h3 className="text-xs font-bold text-gray-900 mb-1 uppercase tracking-wide">
-                          No Events Yet
+                          {t('launcher.noEvents')}
                         </h3>
                         <p className="text-xs text-gray-600">
-                          Waiting for activity...
+                          {t('launcher.waitingActivity')}
                         </p>
                       </div>
                     )}
@@ -1839,15 +1866,15 @@ const EnvironmentLauncher = () => {
                                 ? 'auto'
                                 : 'none',
                           }}
-                          title="Environment"
+                          title={t('launcher.iframeTitle')}
                           onLoad={() => {
                             setEnvironmentStatus('online');
                             const source = 'CDN';
                             const isTestEnv = envId?.includes('test');
                             const platformType =
                               environment.platform === 'Mobile Interfaces'
-                                ? 'Mobile'
-                                : 'Desktop';
+                                ? t('launcher.platformMobile')
+                                : t('launcher.platformDesktop');
 
                             // Don't send reset on load - CDN environment handles its own initialization
                             // Reset is only sent explicitly when switching tasks or starting evaluation
@@ -1859,7 +1886,10 @@ const EnvironmentLauncher = () => {
                             ) {
                               addConsoleEntry(
                                 'success',
-                                `${platformType} environment loaded successfully from ${source}`
+                                t('launcher.loadedFromCdn', {
+                                  platform: platformType,
+                                  source,
+                                })
                               );
                             }
 
@@ -1873,7 +1903,7 @@ const EnvironmentLauncher = () => {
                               if (eventPreferences.info) {
                                 addConsoleEntry(
                                   'info',
-                                  'Bridge-enabled environment loaded - Waiting for ScaleWoB Bridge initialization...',
+                                  t('launcher.bridgeWaiting'),
                                   {
                                     bridgeExpected: true,
                                     environmentType: 'test',
@@ -1884,7 +1914,7 @@ const EnvironmentLauncher = () => {
                             } else if (eventPreferences.info) {
                               addConsoleEntry(
                                 'info',
-                                'CDN environment loaded - Full event tracking enabled via ScaleWoB Bridge',
+                                t('launcher.cdnTracking'),
                                 {
                                   source: 'cdn',
                                 }
@@ -1896,7 +1926,7 @@ const EnvironmentLauncher = () => {
                             if (eventPreferences.error) {
                               addConsoleEntry(
                                 'error',
-                                'Failed to load environment from CDN'
+                                t('launcher.loadFailedCdn')
                               );
                             }
                           }}
@@ -1912,14 +1942,14 @@ const EnvironmentLauncher = () => {
                               {/* Loading Status Text */}
                               <div className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wide">
                                 {environmentStatus === 'loading'
-                                  ? 'Loading'
-                                  : 'Offline'}
+                                  ? t('launcher.statusLoading')
+                                  : t('launcher.statusOffline')}
                               </div>
 
                               <div className="text-xs text-gray-600 leading-tight">
                                 {environmentStatus === 'loading'
-                                  ? 'Environment is loading. Please wait...'
-                                  : 'Failed to load environment. Please try again.'}
+                                  ? t('launcher.loadingDescription')
+                                  : t('launcher.offlineDescription')}
                               </div>
 
                               {/* Additional loading indicator */}

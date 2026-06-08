@@ -1,7 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { useI18n } from '../../i18n/useI18n';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useI18n();
 
   return (
     <footer className="bg-white">
@@ -13,40 +16,39 @@ const Footer: React.FC = () => {
               ScaleWoB
             </h3>
             <p className="text-xs leading-relaxed text-gray-600">
-              A GUI agent benchmark featuring AI-generated testing environments
-              for fair evaluation of graphical interface agents.
+              {t('footer.about')}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wide mb-3">
-              Navigation
+              {t('footer.navigation')}
             </h3>
             <ul className="space-y-2 text-xs">
               <li>
-                <a
-                  href="/"
+                <Link
+                  to="/"
                   className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
-                  Home
-                </a>
+                  {t('nav.home')}
+                </Link>
               </li>
               <li>
-                <a
-                  href="/leaderboard"
+                <Link
+                  to="/leaderboard"
                   className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
-                  Leaderboard
-                </a>
+                  {t('footer.leaderboard')}
+                </Link>
               </li>
               <li>
-                <a
-                  href="/environments"
+                <Link
+                  to="/environments"
                   className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
-                  Environments
-                </a>
+                  {t('nav.environments')}
+                </Link>
               </li>
             </ul>
           </div>
@@ -54,7 +56,7 @@ const Footer: React.FC = () => {
           {/* Resources */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wide mb-3">
-              Resources
+              {t('footer.resources')}
             </h3>
             <ul className="space-y-2 text-xs">
               <li>
@@ -64,18 +66,14 @@ const Footer: React.FC = () => {
                   rel="noopener noreferrer"
                   className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
-                  GitHub Repository
+                  {t('footer.github')}
                 </a>
               </li>
               <li>
-                <span className="text-gray-500">
-                  Documentation (Coming Soon)
-                </span>
+                <span className="text-gray-500">{t('footer.docsSoon')}</span>
               </li>
               <li>
-                <span className="text-gray-500">
-                  Research Papers (Coming Soon)
-                </span>
+                <span className="text-gray-500">{t('footer.papersSoon')}</span>
               </li>
             </ul>
           </div>
@@ -84,11 +82,11 @@ const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
-            <p>© {currentYear} ScaleWoB. All rights reserved.</p>
+            <p>
+              © {currentYear} ScaleWoB. {t('footer.rights')}
+            </p>
             <div className="mt-2 md:mt-0">
-              <span className="tracking-tight">
-                Built with precision for fair GUI agent evaluation
-              </span>
+              <span className="tracking-tight">{t('footer.tagline')}</span>
             </div>
           </div>
         </div>

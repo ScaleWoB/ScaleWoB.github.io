@@ -1,7 +1,28 @@
 import React, { useState } from 'react';
+import { useI18n } from '../i18n/useI18n';
+
+interface LeaderboardEntry {
+  agent: string;
+  accuracy: number;
+}
+
+const TOTAL_TASKS = 120;
+const LEADERBOARD_ENTRIES: LeaderboardEntry[] = [
+  { agent: 'seed-1.8', accuracy: 42.5 },
+  { agent: 'Gemini 3 Pro', accuracy: 38.75 },
+  { agent: 'UI-TARS-1.5', accuracy: 29.58 },
+  { agent: 'MAI-UI-8B', accuracy: 19.58 },
+  { agent: 'GUI-Owl-1.5-8B', accuracy: 9.17 },
+];
 
 const LeaderboardHome: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'open' | 'closed'>('open');
+  const { t } = useI18n();
+  const leaderboardEntries = LEADERBOARD_ENTRIES;
+  const averageAccuracy =
+    leaderboardEntries.reduce((sum, entry) => sum + entry.accuracy, 0) /
+    leaderboardEntries.length;
+
   return (
     <div className="bg-white">
       {/* Header Section - Newspaper Style */}
@@ -12,10 +33,10 @@ const LeaderboardHome: React.FC = () => {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-2 leading-none">
-                  Leaderboard
+                  {t('leaderboard.title')}
                 </h1>
                 <div className="text-lg font-medium text-gray-700">
-                  Benchmarking Results of GUI Agents on ScaleWoB
+                  {t('leaderboard.subtitle')}
                 </div>
               </div>
               {/* Trophy Icon */}
@@ -40,7 +61,7 @@ const LeaderboardHome: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
-              Agent Rankings
+              {t('leaderboard.agentRankings')}
             </div>
           </div>
 
@@ -51,12 +72,12 @@ const LeaderboardHome: React.FC = () => {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <div className="text-sm font-bold uppercase text-gray-700">
-                    Benchmark Rankings
+                    {t('leaderboard.rankings')}
                   </div>
                   <p className="text-sm text-gray-600 mt-1">
                     {activeTab === 'open'
-                      ? 'Self-submitted results on public ScaleWoB environments'
-                      : 'Verified results on our private ScaleWoB environments'}
+                      ? t('leaderboard.openDescription')
+                      : t('leaderboard.closedDescription')}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -68,7 +89,7 @@ const LeaderboardHome: React.FC = () => {
                         : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
                     }`}
                   >
-                    Submitted
+                    {t('leaderboard.submitted')}
                   </button>
                   <button
                     onClick={() => setActiveTab('closed')}
@@ -78,48 +99,49 @@ const LeaderboardHome: React.FC = () => {
                         : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
                     }`}
                   >
-                    Verified
+                    {t('leaderboard.verified')}
                   </button>
                   <div className="text-xs font-medium text-gray-600 ml-4">
-                    <span className="uppercase tracking-wide">Updated:</span>{' '}
-                    Just now
+                    <span className="uppercase tracking-wide">
+                      {t('leaderboard.updated')}
+                    </span>{' '}
+                    {t('leaderboard.justNow')}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Open Benchmark Table */}
-            {activeTab === 'open' && (
+            {(activeTab === 'open' || activeTab === 'closed') && (
               <>
                 {/* Desktop Table Header */}
                 <div className="bg-white border-b border-gray-300 hidden md:block">
                   <div className="grid grid-cols-12 gap-4 p-4">
                     <div className="col-span-1 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Rank
+                      {t('leaderboard.rank')}
                     </div>
                     <div className="col-span-3 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Agent
+                      {t('leaderboard.agent')}
                     </div>
                     <div className="col-span-2 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Accuracy
+                      {t('leaderboard.accuracy')}
                     </div>
                     <div className="col-span-2 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Speed
+                      {t('leaderboard.speed')}
                     </div>
                     <div className="col-span-2 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Completion
+                      {t('leaderboard.completion')}
                     </div>
                     <div className="col-span-2 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Score
+                      {t('leaderboard.score')}
                     </div>
                   </div>
                 </div>
 
                 {/* Table Body */}
                 <div className="bg-white">
-                  {Array.from({ length: 5 }).map((_, index) => (
+                  {leaderboardEntries.map((entry, index) => (
                     <div
-                      key={index}
+                      key={entry.agent}
                       className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
                     >
                       {/* Desktop Layout */}
@@ -147,33 +169,23 @@ const LeaderboardHome: React.FC = () => {
                           </div>
                           <div className="flex flex-col">
                             <div className="font-bold text-gray-900 text-sm truncate">
-                              Agent {String.fromCharCode(65 + index)}-
-                              {index + 1}
-                            </div>
-                            <div className="text-xs text-gray-600">
-                              Team {index + 1}
+                              {entry.agent}
                             </div>
                           </div>
                         </div>
                         <div className="col-span-2 flex items-center">
                           <div className="text-sm font-bold text-gray-900">
-                            {(95 - index * 2).toFixed(1)}%
+                            {entry.accuracy.toFixed(2)}%
                           </div>
                         </div>
                         <div className="col-span-2 flex items-center">
-                          <div className="text-sm font-bold text-gray-900">
-                            {Math.floor(20 + index * 5)}s
-                          </div>
+                          <div className="min-h-5 text-sm font-bold text-gray-900"></div>
                         </div>
                         <div className="col-span-2 flex items-center">
-                          <div className="text-sm font-bold text-gray-900">
-                            {(98 - index * 3).toFixed(1)}%
-                          </div>
+                          <div className="min-h-5 text-sm font-bold text-gray-900"></div>
                         </div>
                         <div className="col-span-2 flex items-center">
-                          <div className="text-base font-black text-gray-900">
-                            {(92 - index * 4).toFixed(1)}
-                          </div>
+                          <div className="min-h-5 text-base font-black text-gray-900"></div>
                         </div>
                       </div>
 
@@ -204,8 +216,7 @@ const LeaderboardHome: React.FC = () => {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="font-bold text-gray-900 text-sm truncate">
-                                  Agent {String.fromCharCode(65 + index)}-
-                                  {index + 1}
+                                  {entry.agent}
                                 </div>
                               </div>
                             </div>
@@ -214,204 +225,32 @@ const LeaderboardHome: React.FC = () => {
                             <div className="grid grid-cols-3 gap-2 text-xs">
                               <div className="text-center">
                                 <div className="font-semibold text-gray-600">
-                                  Acc
+                                  {t('leaderboard.acc')}
                                 </div>
                                 <div className="font-bold text-gray-900">
-                                  {(95 - index * 2).toFixed(1)}%
+                                  {entry.accuracy.toFixed(2)}%
                                 </div>
                               </div>
                               <div className="text-center">
                                 <div className="font-semibold text-gray-600">
-                                  Speed
+                                  {t('leaderboard.speed')}
                                 </div>
-                                <div className="font-bold text-gray-900">
-                                  {Math.floor(20 + index * 5)}s
-                                </div>
+                                <div className="min-h-4 font-bold text-gray-900"></div>
                               </div>
                               <div className="text-center">
                                 <div className="font-semibold text-gray-600">
-                                  Comp
+                                  {t('leaderboard.comp')}
                                 </div>
-                                <div className="font-bold text-gray-900">
-                                  {(98 - index * 3).toFixed(1)}%
-                                </div>
+                                <div className="min-h-4 font-bold text-gray-900"></div>
                               </div>
                             </div>
 
                             {/* Mobile Score */}
                             <div className="mt-2 pt-2 border-t border-gray-200 flex justify-between items-center">
                               <span className="text-xs font-semibold text-gray-600">
-                                Score
+                                {t('leaderboard.score')}
                               </span>
-                              <span className="text-lg font-black text-gray-900">
-                                {(92 - index * 4).toFixed(1)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Closed Benchmark Table */}
-            {activeTab === 'closed' && (
-              <>
-                {/* Desktop Table Header */}
-                <div className="bg-white border-b border-gray-300 hidden md:block">
-                  <div className="grid grid-cols-12 gap-4 p-4">
-                    <div className="col-span-1 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Rank
-                    </div>
-                    <div className="col-span-3 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Organization
-                    </div>
-                    <div className="col-span-2 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Accuracy
-                    </div>
-                    <div className="col-span-2 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Speed
-                    </div>
-                    <div className="col-span-2 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Completion
-                    </div>
-                    <div className="col-span-2 font-bold text-gray-900 text-sm uppercase tracking-wide">
-                      Score
-                    </div>
-                  </div>
-                </div>
-
-                {/* Table Body */}
-                <div className="bg-white">
-                  {Array.from({ length: 3 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                    >
-                      {/* Desktop Layout */}
-                      <div className="hidden md:grid grid-cols-12 gap-4 p-4">
-                        <div className="col-span-1 flex items-center">
-                          <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-black">
-                            {index + 1}
-                          </div>
-                        </div>
-                        <div className="col-span-3 flex items-center">
-                          <div className="w-8 h-8 rounded border border-gray-400 bg-gray-800 flex items-center justify-center mr-3">
-                            <svg
-                              className="w-4 h-4 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                              />
-                            </svg>
-                          </div>
-                          <div className="flex flex-col">
-                            <div className="font-bold text-gray-900 text-sm truncate">
-                              {['DeepMind', 'OpenAI', 'Anthropic'][index]}
-                            </div>
-                            <div className="text-xs text-gray-600">
-                              Authorized Partner
-                            </div>
-                          </div>
-                        </div>
-                        <div className="col-span-2 flex items-center">
-                          <div className="text-sm font-bold text-gray-900">
-                            {(97 - index * 1.5).toFixed(1)}%
-                          </div>
-                        </div>
-                        <div className="col-span-2 flex items-center">
-                          <div className="text-sm font-bold text-gray-900">
-                            {Math.floor(15 + index * 3)}s
-                          </div>
-                        </div>
-                        <div className="col-span-2 flex items-center">
-                          <div className="text-sm font-bold text-gray-900">
-                            {(99 - index * 2).toFixed(1)}%
-                          </div>
-                        </div>
-                        <div className="col-span-2 flex items-center">
-                          <div className="text-base font-black text-gray-900">
-                            {(95 - index * 3).toFixed(1)}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Mobile Layout */}
-                      <div className="md:hidden p-3">
-                        <div className="flex items-start space-x-3">
-                          <div className="shrink-0">
-                            <div className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-black">
-                              {index + 1}
-                            </div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <div className="w-6 h-6 rounded border border-gray-400 bg-gray-800 flex items-center justify-center">
-                                <svg
-                                  className="w-3 h-3 text-white"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                                  />
-                                </svg>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-bold text-gray-900 text-sm truncate">
-                                  {['DeepMind', 'OpenAI', 'Anthropic'][index]}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Mobile Stats Grid */}
-                            <div className="grid grid-cols-3 gap-2 text-xs">
-                              <div className="text-center">
-                                <div className="font-semibold text-gray-600">
-                                  Acc
-                                </div>
-                                <div className="font-bold text-gray-900">
-                                  {(97 - index * 1.5).toFixed(1)}%
-                                </div>
-                              </div>
-                              <div className="text-center">
-                                <div className="font-semibold text-gray-600">
-                                  Speed
-                                </div>
-                                <div className="font-bold text-gray-900">
-                                  {Math.floor(15 + index * 3)}s
-                                </div>
-                              </div>
-                              <div className="text-center">
-                                <div className="font-semibold text-gray-600">
-                                  Comp
-                                </div>
-                                <div className="font-bold text-gray-900">
-                                  {(99 - index * 2).toFixed(1)}%
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Mobile Score */}
-                            <div className="mt-2 pt-2 border-t border-gray-200 flex justify-between items-center">
-                              <span className="text-xs font-semibold text-gray-600">
-                                Score
-                              </span>
-                              <span className="text-lg font-black text-gray-900">
-                                {(95 - index * 3).toFixed(1)}
-                              </span>
+                              <span className="min-h-6 text-lg font-black text-gray-900"></span>
                             </div>
                           </div>
                         </div>
@@ -430,7 +269,7 @@ const LeaderboardHome: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
-              Competition Statistics
+              {t('leaderboard.competitionStats')}
             </div>
           </div>
 
@@ -438,34 +277,32 @@ const LeaderboardHome: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-black text-gray-900 mb-2">
-                  42
+                  {leaderboardEntries.length}
                 </div>
                 <div className="text-xs md:text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Total Agents
+                  {t('leaderboard.totalAgents')}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-black text-gray-900 mb-2">
-                  87.5%
+                  {averageAccuracy.toFixed(2)}%
                 </div>
                 <div className="text-xs md:text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Average Accuracy
+                  {t('leaderboard.averageAccuracy')}
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-black text-gray-900 mb-2">
-                  156
+                  {TOTAL_TASKS}
                 </div>
                 <div className="text-xs md:text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Test Environments
+                  {t('leaderboard.totalTasks')}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-black text-gray-900 mb-2">
-                  79.2
-                </div>
+                <div className="min-h-10 text-3xl md:text-4xl font-black text-gray-900 mb-2"></div>
                 <div className="text-xs md:text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Average Score
+                  {t('leaderboard.averageScore')}
                 </div>
               </div>
             </div>
@@ -478,7 +315,7 @@ const LeaderboardHome: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="py-6 border-b-2 border-gray-300">
             <div className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
-              Join The Competition
+              {t('leaderboard.joinCompetition')}
             </div>
           </div>
 
@@ -486,12 +323,10 @@ const LeaderboardHome: React.FC = () => {
             <div className="max-w-6xl mx-auto">
               <div className="bg-gray-50 border-2 border-gray-300 p-6 md:p-8">
                 <div className="text-lg font-bold text-gray-900 mb-4 text-center">
-                  Participate in ScaleWoB Evaluation
+                  {t('leaderboard.participateTitle')}
                 </div>
                 <p className="text-sm md:text-base text-gray-700 leading-relaxed wrap-break-words mb-8 text-center">
-                  Submit your GUI agent for evaluation on our AI-generated
-                  testing environments. Choose between open and closed
-                  evaluation tracks based on your research goals.
+                  {t('leaderboard.participateDescription')}
                 </p>
 
                 {/* Track Options */}
@@ -521,14 +356,11 @@ const LeaderboardHome: React.FC = () => {
                         </svg>
                       </div>
                       <h4 className="font-bold text-gray-900 uppercase tracking-wide">
-                        Open Benchmark
+                        {t('leaderboard.openBenchmark')}
                       </h4>
                     </div>
                     <p className="text-sm text-gray-700 leading-relaxed">
-                      Publicly accessible evaluation environment where
-                      researchers can test agents and view results openly.
-                      Perfect for initial development, experimentation, and
-                      collaborative research.
+                      {t('leaderboard.openBenchmarkDescription')}
                     </p>
                   </div>
 
@@ -551,14 +383,11 @@ const LeaderboardHome: React.FC = () => {
                         </svg>
                       </div>
                       <h4 className="font-bold text-gray-900 uppercase tracking-wide">
-                        Closed Benchmark
+                        {t('leaderboard.closedBenchmark')}
                       </h4>
                     </div>
                     <p className="text-sm text-gray-700 leading-relaxed">
-                      Private evaluation track designed to ensure fairness and
-                      prevent overfitting. Only authorized teams can
-                      participate, with controlled access to maintain evaluation
-                      integrity.
+                      {t('leaderboard.closedBenchmarkDescription')}
                     </p>
                   </div>
                 </div>
@@ -569,7 +398,7 @@ const LeaderboardHome: React.FC = () => {
                     disabled
                     className="px-8 py-3 bg-gray-900 text-white text-sm font-bold uppercase tracking-wide cursor-not-allowed opacity-50 flex items-center justify-center"
                   >
-                    Join Open Test
+                    {t('leaderboard.joinOpen')}
                     <svg
                       className="ml-2 w-4 h-4"
                       fill="none"
@@ -588,7 +417,7 @@ const LeaderboardHome: React.FC = () => {
                     disabled
                     className="px-8 py-3 border-2 border-gray-800 text-gray-800 text-sm font-bold uppercase tracking-wide cursor-not-allowed bg-gray-100 opacity-50 flex items-center justify-center"
                   >
-                    Join Closed Test
+                    {t('leaderboard.joinClosed')}
                     <svg
                       className="ml-2 w-4 h-4"
                       fill="none"
@@ -607,7 +436,7 @@ const LeaderboardHome: React.FC = () => {
 
                 <div className="mt-6 pt-6 border-t-2 border-gray-300">
                   <div className="text-xs font-bold uppercase text-gray-600 tracking-wide text-center">
-                    Registration opens soon
+                    {t('leaderboard.registrationSoon')}
                   </div>
                 </div>
               </div>

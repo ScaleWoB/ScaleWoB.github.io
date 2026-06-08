@@ -6,6 +6,7 @@ import Form from '@rjsf/core';
 import { RJSFSchema } from '@rjsf/utils';
 import { ScaleWoBTheme, customValidator } from '../rjsf-theme';
 import { JSONSchemaDefinition } from '../../types/environment';
+import { useI18n } from '../../i18n/useI18n';
 
 interface ParameterInputProps {
   schema: JSONSchemaDefinition;
@@ -22,6 +23,8 @@ const ParameterInput: React.FC<ParameterInputProps> = ({
   disabledReason: _disabledReason = 'both',
   initialValues = {},
 }) => {
+  const { t } = useI18n();
+
   // Hide completely if no properties
   if (!schema.properties || Object.keys(schema.properties).length === 0) {
     return null;
@@ -31,16 +34,15 @@ const ParameterInput: React.FC<ParameterInputProps> = ({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-gray-900">
-          Evaluation Parameters
+          {t('parameters.title')}
         </h3>
         <div className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-          Required Input
+          {t('parameters.required')}
         </div>
       </div>
 
       <div className="text-xs text-gray-600 mb-4">
-        Provide the required parameters for task evaluation. These will be
-        passed to the environment when you click Finish.
+        {t('parameters.description')}
       </div>
 
       <div className="space-y-3">
