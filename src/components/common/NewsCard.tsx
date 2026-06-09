@@ -143,6 +143,14 @@ const NewsCard: React.FC<NewsCardProps> = ({
         return (
           <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-2 17.21l-4.5-4.5 1.41-1.41L10 14.38l6.59-6.59L18 9.21l-8 8z" />
         );
+      case 'download':
+        return (
+          <path d="M12 16.5 6.75 11.25l1.4-1.4L11 12.69V3h2v9.69l2.85-2.84 1.4 1.4L12 16.5ZM5 21a2 2 0 0 1-2-2v-3h2v3h14v-3h2v3a2 2 0 0 1-2 2H5Z" />
+        );
+      case 'document':
+        return (
+          <path d="M6 2h8l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm7 1.5V7h3.5L13 3.5ZM8 11v2h8v-2H8Zm0 4v2h8v-2H8Z" />
+        );
       default:
         return null;
     }
