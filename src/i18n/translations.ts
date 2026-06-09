@@ -20,7 +20,7 @@ export const translations = {
     'footer.resources': 'Resources',
     'footer.github': 'GitHub Repository',
     'footer.docsSoon': 'Documentation (Coming Soon)',
-    'footer.papersSoon': 'Research Papers (Coming Soon)',
+    'footer.papersSoon': 'Research Paper',
     'footer.rights': 'All rights reserved.',
     'footer.tagline': 'Built with precision for fair GUI agent evaluation',
     'home.subtitle':
@@ -58,7 +58,18 @@ export const translations = {
     'home.carXiaomi': 'Xiaomi HyperOS cockpit',
     'home.about': 'About',
     'home.aboutText':
-      'GUI agents require training and evaluation in diverse interactive computer-use environments, yet high-quality such environments remain scarce. ScaleWoB addresses this gap through semi-automated environment synthesis. Each environment in ScaleWoB is proposed by domain experts & crowd workers and developed with AI, featuring realistic interfaces and content, and capable of executing complex tasks with verifiable, rule-based rewards. ScaleWoB now offers a large and varied collection of 1000+ tasks and environments spanning three major platforms including mobile, web and desktop.',
+      'GUI agents require training and evaluation in diverse interactive computer-use environments, yet high-quality such environments remain scarce. ScaleWoB addresses this gap through semi-automated environment synthesis. Each environment in ScaleWoB is proposed by domain experts & crowd workers and developed with AI, featuring realistic interfaces and content, and capable of executing complex tasks with verifiable, rule-based rewards. ScaleWoB now offers a large and varied collection of 5K+ tasks and 100+ environments spanning three major platforms including mobile, web and desktop.',
+    'home.paperBadge': 'Research Paper',
+    'home.paperTitle':
+      'SimuWoB: Simulating Real-World Mobile Apps for Fast and Faithful GUI Agent Benchmarking',
+    'home.paperAuthorsLabel': 'Authors:',
+    'home.paperVenue': 'arXiv:2605.25160',
+    'home.paperDate': 'Submitted May 24, 2026',
+    'home.paperDescription':
+      'Our paper presents SimuWoB, a benchmark platform that simulates real-world mobile apps for efficient, faithful GUI agent evaluation with scalable task construction and verifiable rewards.',
+    'home.paperArxiv': 'arXiv',
+    'home.paperPdf': 'PDF',
+    'home.paperBibtex': 'BibTeX',
     'home.viewEnvironments': 'View Environments',
     'home.createEnvironment': 'Create Environment',
     'home.formChinese': 'Chinese Version',
@@ -90,10 +101,10 @@ export const translations = {
     'news.datasetDescription':
       'Initial release of the ScaleWoB dataset featuring 1000+ diverse GUI agent tasks across web, mobile, and desktop platforms. Available for download and research use.',
     'news.paperCategory': 'Paper',
-    'news.paperStatus': 'Coming Soon',
-    'news.paperTitle': 'Research Paper Publication',
+    'news.paperStatus': 'Released',
+    'news.paperTitle': 'SimuWoB Paper Released',
     'news.paperDescription':
-      'Comprehensive research paper detailing the ScaleWoB methodology, benchmark design, and evaluation results. Includes baseline performance analysis.',
+      'The SimuWoB paper is now available on arXiv with the benchmark design, mobile-app simulation methodology, and GUI agent evaluation setup.',
     'environments.title': 'Environments',
     'environments.subtitle': 'View Environments Available in ScaleWoB',
     'environments.failedTitle': 'Failed to Load Environments',
@@ -332,7 +343,7 @@ export const translations = {
     'footer.resources': '资源',
     'footer.github': 'GitHub 仓库',
     'footer.docsSoon': '文档（即将发布）',
-    'footer.papersSoon': '论文（即将发布）',
+    'footer.papersSoon': '研究论文',
     'footer.rights': '保留所有权利。',
     'footer.tagline': '为公平的 GUI 智能体评测而构建',
     'home.subtitle':
@@ -369,7 +380,18 @@ export const translations = {
     'home.carXiaomi': '小米澎湃 OS 座舱',
     'home.about': '关于',
     'home.aboutText':
-      'GUI 智能体需要在多样化的交互式计算机使用环境中训练和评测，但高质量环境仍然稀缺。ScaleWoB 通过半自动化环境合成来弥补这一缺口。ScaleWoB 中的每个环境由领域专家和众包工作者提出，并借助 AI 开发，具备真实的界面与内容，能够执行复杂任务，并通过可验证的规则奖励进行评测。ScaleWoB 目前提供覆盖移动端、网页端和桌面端三大平台的 1000+ 多样化任务与环境。',
+      'GUI 智能体需要在多样化的交互式计算机使用环境中训练和评测，但高质量环境仍然稀缺。ScaleWoB 通过半自动化环境合成来弥补这一缺口。ScaleWoB 中的每个环境由领域专家和众包工作者提出，并借助 AI 开发，具备真实的界面与内容，能够执行复杂任务，并通过可验证的规则奖励进行评测。ScaleWoB 目前提供覆盖移动端、网页端和桌面端三大平台的 5K+ 多样化任务与 100+ 环境。',
+    'home.paperBadge': '研究论文',
+    'home.paperTitle':
+      'SimuWoB: Simulating Real-World Mobile Apps for Fast and Faithful GUI Agent Benchmarking',
+    'home.paperAuthorsLabel': '作者：',
+    'home.paperVenue': 'arXiv:2605.25160',
+    'home.paperDate': '提交日期：2026 年 5 月 24 日',
+    'home.paperDescription':
+      '我们的论文提出 SimuWoB，一个面向 GUI 智能体评测的基准平台，通过模拟真实移动应用，支持高效、忠实、可扩展的任务构建与可验证奖励。',
+    'home.paperArxiv': 'arXiv',
+    'home.paperPdf': 'PDF',
+    'home.paperBibtex': 'BibTeX',
     'home.viewEnvironments': '查看环境库',
     'home.createEnvironment': '创建环境',
     'home.formChinese': '中文版本',
@@ -401,10 +423,10 @@ export const translations = {
     'news.datasetDescription':
       'ScaleWoB 数据集首个版本，包含覆盖网页、移动和桌面平台的 1000+ 多样化 GUI 智能体任务，可用于下载和研究。',
     'news.paperCategory': '论文',
-    'news.paperStatus': '即将发布',
-    'news.paperTitle': '研究论文发布',
+    'news.paperStatus': '已发布',
+    'news.paperTitle': 'SimuWoB 论文发布',
     'news.paperDescription':
-      '系统介绍 ScaleWoB 方法、基准设计和评测结果的研究论文，并包含基线性能分析。',
+      'SimuWoB 论文现已在 arXiv 发布，介绍基准设计、移动应用仿真方法和 GUI 智能体评测设置。',
     'environments.title': '环境库',
     'environments.subtitle': '查看 ScaleWoB 中可用的评测环境',
     'environments.failedTitle': '环境加载失败',

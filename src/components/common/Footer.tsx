@@ -73,7 +73,14 @@ const Footer: React.FC = () => {
                 <span className="text-gray-500">{t('footer.docsSoon')}</span>
               </li>
               <li>
-                <span className="text-gray-500">{t('footer.papersSoon')}</span>
+                <a
+                  href="https://arxiv.org/abs/2605.25160"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                >
+                  {t('footer.papersSoon')}
+                </a>
               </li>
             </ul>
           </div>

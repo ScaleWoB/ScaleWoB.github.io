@@ -23,6 +23,20 @@ type CarEnvironment = {
   image: string;
 };
 
+const PAPER_URL = 'https://arxiv.org/abs/2605.25160';
+const PAPER_PDF_URL = 'https://arxiv.org/pdf/2605.25160';
+const PAPER_BIBTEX_URL = 'https://arxiv.org/bibtex/2605.25160';
+
+const PAPER_AUTHORS = [
+  'Guohong Liu',
+  'Jialei Ye',
+  'Pengzhi Gao',
+  'Wei Liu',
+  'Jian Luan',
+  'Yunxin Liu',
+  'Yuanchun Li',
+];
+
 const SYSTEM_PREVIEWS: ShowcaseCard[] = [
   {
     id: 'android',
@@ -246,17 +260,17 @@ const Homepage: React.FC = () => {
                   })}
                 </div>
 
-                <div className="border-2 border-gray-900 bg-gray-950 text-white shadow-sm">
+                <div className="border-2 border-gray-900 bg-white text-gray-900 shadow-sm">
                   <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-[0.75fr_1.25fr] lg:items-stretch">
                     <div className="flex flex-col justify-between gap-5">
                       <div>
-                        <div className="text-xs font-bold uppercase text-gold-300">
+                        <div className="text-xs font-bold uppercase text-coral-600">
                           {t('home.carPreviewLabel')}
                         </div>
                         <h3 className="mt-2 text-2xl font-black">
                           {t('home.carShowcaseTitle')}
                         </h3>
-                        <p className="mt-2 text-sm leading-relaxed text-gray-300">
+                        <p className="mt-2 text-sm leading-relaxed text-gray-700">
                           {t('home.carShowcaseText', {
                             car: t(selectedCar.nameKey),
                           })}
@@ -277,10 +291,10 @@ const Homepage: React.FC = () => {
                               type="button"
                               aria-pressed={isSelected}
                               onClick={() => setSelectedCarId(car.id)}
-                              className={`border px-3 py-3 text-sm font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-gold-300 focus:ring-offset-2 focus:ring-offset-gray-950 ${
+                              className={`border-2 px-3 py-3 text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 focus:ring-offset-white ${
                                 isSelected
-                                  ? 'border-gold-300 bg-gold-300 text-gray-950'
-                                  : 'border-white/20 bg-white/5 text-gray-100 hover:border-white/50 hover:bg-white/10'
+                                  ? 'border-gray-900 bg-gray-100 text-gray-950 shadow-[inset_0_-3px_0_#111827]'
+                                  : 'border-gray-300 bg-white text-gray-700 hover:border-gray-500 hover:bg-gray-50 hover:text-gray-950'
                               }`}
                             >
                               {car.brand}
@@ -293,14 +307,14 @@ const Homepage: React.FC = () => {
                         href={selectedCar.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 border-2 border-white bg-white px-4 py-3 text-sm font-bold text-gray-950 transition-colors hover:bg-gold-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-950"
+                        className="inline-flex items-center justify-center gap-2 border-2 border-gray-900 bg-gray-900 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 focus:ring-offset-white"
                       >
                         {t('home.openSelectedCar')}
                         <ExternalLinkIcon className="w-4 h-4" />
                       </a>
                     </div>
 
-                    <div className="relative overflow-hidden rounded-md border-[10px] border-gray-800 bg-gray-900 shadow-2xl">
+                    <div className="relative overflow-hidden rounded-md border-[10px] border-gray-900 bg-white shadow-xl">
                       <img
                         key={selectedCar.id}
                         src={selectedCar.image}
@@ -308,7 +322,7 @@ const Homepage: React.FC = () => {
                         loading="lazy"
                         className="aspect-[16/9] h-full w-full object-cover"
                       />
-                      <div className="absolute left-3 top-3 border border-white/20 bg-gray-950/80 px-3 py-2 text-xs font-bold text-white backdrop-blur-sm">
+                      <div className="absolute left-3 top-3 border-2 border-gray-900 bg-white/90 px-3 py-2 text-xs font-bold text-gray-900 backdrop-blur-sm">
                         {t(selectedCar.nameKey)}
                       </div>
                     </div>
@@ -331,6 +345,63 @@ const Homepage: React.FC = () => {
 
             {/* Divider */}
             <div className="border-b-2 border-gray-300 mb-8"></div>
+
+            {/* Paper Section */}
+            <section className="mb-8 border-2 border-gray-900 bg-gray-50 p-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
+                <div>
+                  <div className="mb-3 inline-flex border-2 border-purple-600 bg-purple-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
+                    {t('home.paperBadge')}
+                  </div>
+                  <h2 className="max-w-4xl text-2xl font-black leading-tight text-gray-900 md:text-3xl">
+                    {t('home.paperTitle')}
+                  </h2>
+                  <div className="mt-4 text-sm leading-relaxed text-gray-700">
+                    <span className="font-bold text-gray-900">
+                      {t('home.paperAuthorsLabel')}
+                    </span>{' '}
+                    {PAPER_AUTHORS.join(', ')}
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm font-semibold text-gray-600">
+                    <span>{t('home.paperVenue')}</span>
+                    <span>{t('home.paperDate')}</span>
+                  </div>
+                  <p className="mt-4 max-w-4xl text-sm leading-relaxed text-gray-700">
+                    {t('home.paperDescription')}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2 sm:flex-row lg:w-40 lg:flex-col">
+                  <a
+                    href={PAPER_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 border-2 border-gray-900 bg-gray-900 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-gray-800"
+                  >
+                    {t('home.paperArxiv')}
+                    <ExternalLinkIcon className="w-3.5 h-3.5" />
+                  </a>
+                  <a
+                    href={PAPER_PDF_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 border-2 border-gray-900 px-4 py-3 text-sm font-bold uppercase tracking-wide text-gray-900 transition-colors hover:bg-gray-100"
+                  >
+                    {t('home.paperPdf')}
+                    <ExternalLinkIcon className="w-3.5 h-3.5" />
+                  </a>
+                  <a
+                    href={PAPER_BIBTEX_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 border-2 border-gray-900 px-4 py-3 text-sm font-bold uppercase tracking-wide text-gray-900 transition-colors hover:bg-gray-100"
+                  >
+                    {t('home.paperBibtex')}
+                    <ExternalLinkIcon className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </section>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
@@ -466,14 +537,28 @@ const Homepage: React.FC = () => {
                 icon="database"
               />
 
-              {/* News Item 3 - Paper Release (Coming Soon - Disabled) */}
+              {/* News Item 3 - Paper Release (Released) */}
               <NewsCard
                 category={t('news.paperCategory')}
                 categoryColor="purple"
+                date="2026.05.24"
                 status={t('news.paperStatus')}
                 title={t('news.paperTitle')}
                 description={t('news.paperDescription')}
-                isDisabled={true}
+                actions={[
+                  {
+                    label: 'arXiv',
+                    url: PAPER_URL,
+                    variant: 'primary',
+                    icon: 'document',
+                  },
+                  {
+                    label: 'PDF',
+                    url: PAPER_PDF_URL,
+                    variant: 'secondary',
+                    icon: 'download',
+                  },
+                ]}
                 icon="document"
               />
             </div>
@@ -559,14 +644,16 @@ const Homepage: React.FC = () => {
               </div>
               <div className="text-center">
                 <div className="text-4xl font-black text-gray-900 mb-2">
-                  50K+
+                  5K+
                 </div>
                 <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   {t('home.statTasks')}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-black text-gray-900 mb-2">∞</div>
+                <div className="text-4xl font-black text-gray-900 mb-2">
+                  100+
+                </div>
                 <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                   {t('home.statEnvironments')}
                 </div>
