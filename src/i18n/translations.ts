@@ -25,16 +25,37 @@ export const translations = {
     'footer.tagline': 'Built with precision for fair GUI agent evaluation',
     'home.subtitle':
       'Scalable World of Bits - Synthetic Computer-Use Environments for GUI Agents',
+    'home.demoEyebrow': 'Live environment previews',
     'home.demoTitle': 'Explore In Simulated World-of-Bits!',
     'home.demoDescription':
-      'In order to gain better experience, you are recommended to open the virtual environments in an individual browser tab. You may need toggling mobile simulation for android env to behave correctly.',
+      'Preview the simulated operating systems here, then open each environment in its own browser tab for full interaction and agent evaluation.',
     'home.mobileDemoTitle': 'Interactive Demos Available',
     'home.mobileDemoDescription':
       'View on a larger screen for the best experience.',
+    'home.openDemo': 'Open environment',
     'home.openAndroid': 'Open Virtual Android Env',
     'home.openMac': 'Open Virtual Mac Env',
     'home.androidEnv': 'Virtual Android Env',
+    'home.androidPreviewLabel': 'Mobile OS',
+    'home.androidPreviewText':
+      'A phone-shaped app launcher preview for mobile GUI tasks and cross-app workflows.',
+    'home.androidDeviceModeHint':
+      'After opening, use your browser developer tools to enable mobile device emulation for the best Android interaction.',
     'home.macEnv': 'Virtual Mac Env',
+    'home.macPreviewLabel': 'Desktop OS',
+    'home.macPreviewText':
+      'A desktop workspace preview for file, window, and productivity-style interaction tasks.',
+    'home.carPreviewLabel': 'New vehicle OS',
+    'home.carShowcaseTitle': 'Vehicle cockpit systems',
+    'home.carShowcaseText':
+      'Choose {car} and open the selected cockpit system in a dedicated tab.',
+    'home.openSelectedCar': 'Open selected system',
+    'home.carSelectorAria': 'Choose vehicle system preview',
+    'home.carByd': 'BYD DiLink cockpit',
+    'home.carLixiang': 'Li Auto Space OS cockpit',
+    'home.carTesila': 'Tesla T-OS cockpit',
+    'home.carWenjie': 'AITO Harmony cockpit',
+    'home.carXiaomi': 'Xiaomi HyperOS cockpit',
     'home.about': 'About',
     'home.aboutText':
       'GUI agents require training and evaluation in diverse interactive computer-use environments, yet high-quality such environments remain scarce. ScaleWoB addresses this gap through semi-automated environment synthesis. Each environment in ScaleWoB is proposed by domain experts & crowd workers and developed with AI, featuring realistic interfaces and content, and capable of executing complex tasks with verifiable, rule-based rewards. ScaleWoB now offers a large and varied collection of 1000+ tasks and environments spanning three major platforms including mobile, web and desktop.',
@@ -316,15 +337,36 @@ export const translations = {
     'footer.tagline': '为公平的 GUI 智能体评测而构建',
     'home.subtitle':
       'Scalable World of Bits - 面向 GUI 智能体的合成计算机使用环境',
+    'home.demoEyebrow': '实时环境预览',
     'home.demoTitle': '在模拟 World-of-Bits 中探索',
     'home.demoDescription':
-      '为了获得更好的体验，建议在独立浏览器标签页中打开虚拟环境。Android 环境可能需要开启移动设备模拟后才能正常交互。',
+      '这里展示各类虚拟系统的静态预览，完整交互会在独立浏览器标签页中打开，便于用户直接操作和评测。',
     'home.mobileDemoTitle': '可交互演示已开放',
     'home.mobileDemoDescription': '请在更大的屏幕上查看以获得最佳体验。',
+    'home.openDemo': '打开环境',
     'home.openAndroid': '打开虚拟 Android 环境',
     'home.openMac': '打开虚拟 Mac 环境',
     'home.androidEnv': '虚拟 Android 环境',
+    'home.androidPreviewLabel': '移动 OS',
+    'home.androidPreviewText':
+      '手机形态的应用启动器预览，适合移动端 GUI 任务和跨应用流程。',
+    'home.androidDeviceModeHint':
+      '跳转后建议在浏览器开发者工具中打开移动端设备模拟，以获得更好的 Android 交互体验。',
     'home.macEnv': '虚拟 Mac 环境',
+    'home.macPreviewLabel': '桌面 OS',
+    'home.macPreviewText':
+      '桌面工作区预览，适合文件、窗口和生产力场景的交互任务。',
+    'home.carPreviewLabel': '新增车载 OS',
+    'home.carShowcaseTitle': '车载座舱系统',
+    'home.carShowcaseText':
+      '当前选择 {car}，可在独立标签页中打开对应车机系统。',
+    'home.openSelectedCar': '打开所选系统',
+    'home.carSelectorAria': '选择车载系统预览',
+    'home.carByd': '比亚迪 DiLink 座舱',
+    'home.carLixiang': '理想空间 OS 座舱',
+    'home.carTesila': '特斯拉 T-OS 座舱',
+    'home.carWenjie': '问界鸿蒙座舱',
+    'home.carXiaomi': '小米澎湃 OS 座舱',
     'home.about': '关于',
     'home.aboutText':
       'GUI 智能体需要在多样化的交互式计算机使用环境中训练和评测，但高质量环境仍然稀缺。ScaleWoB 通过半自动化环境合成来弥补这一缺口。ScaleWoB 中的每个环境由领域专家和众包工作者提出，并借助 AI 开发，具备真实的界面与内容，能够执行复杂任务，并通过可验证的规则奖励进行评测。ScaleWoB 目前提供覆盖移动端、网页端和桌面端三大平台的 1000+ 多样化任务与环境。',
