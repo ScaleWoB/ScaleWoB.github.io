@@ -5,7 +5,7 @@ import type { TranslationKey } from '../i18n/translations';
 import { useI18n } from '../i18n/useI18n';
 
 type ShowcaseCard = {
-  id: 'android' | 'mac';
+  id: 'android' | 'ios' | 'mac';
   nameKey: TranslationKey;
   labelKey: TranslationKey;
   descriptionKey: TranslationKey;
@@ -46,6 +46,16 @@ const SYSTEM_PREVIEWS: ShowcaseCard[] = [
     hintKey: 'home.androidDeviceModeHint',
     href: 'https://niumascript.com/os/android/index.html',
     image: '/previews/android-os.png',
+    frame: 'phone',
+  },
+  {
+    id: 'ios',
+    nameKey: 'home.iosEnv',
+    labelKey: 'home.iosPreviewLabel',
+    descriptionKey: 'home.iosPreviewText',
+    hintKey: 'home.iosDeviceModeHint',
+    href: 'https://niumascript.com/os/ios/os4ios/index.html',
+    image: '/previews/ios-os.png',
     frame: 'phone',
   },
   {
@@ -220,7 +230,7 @@ const Homepage: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                   {SYSTEM_PREVIEWS.map(card => {
                     const title = t(card.nameKey);
 
@@ -232,7 +242,7 @@ const Homepage: React.FC = () => {
                         rel="noopener noreferrer"
                         className="group block border-2 border-gray-900 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
                       >
-                        <div className="grid h-full grid-cols-1 gap-5 md:grid-cols-[minmax(9rem,0.82fr)_1fr] md:items-center">
+                        <div className="grid h-full grid-cols-1 gap-5 md:grid-cols-[minmax(9rem,0.82fr)_1fr] md:items-center lg:grid-cols-1">
                           <DevicePreview card={card} title={title} />
                           <div className="flex min-w-0 flex-1 flex-col">
                             <div className="mb-2 text-xs font-bold uppercase text-gray-500">

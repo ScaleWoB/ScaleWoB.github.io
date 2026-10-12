@@ -41,6 +41,12 @@ export const translations = {
       'A phone-shaped app launcher preview for mobile GUI tasks and cross-app workflows.',
     'home.androidDeviceModeHint':
       'After opening, use your browser developer tools to enable mobile device emulation for the best Android interaction.',
+    'home.iosEnv': 'Virtual iOS Env',
+    'home.iosPreviewLabel': 'Apple Mobile OS',
+    'home.iosPreviewText':
+      'An iOS-style app launcher for mobile GUI tasks and cross-app workflows.',
+    'home.iosDeviceModeHint':
+      'After opening, enable iPhone device emulation in your browser developer tools for the best iOS interaction.',
     'home.macEnv': 'Virtual Mac Env',
     'home.macPreviewLabel': 'Desktop OS',
     'home.macPreviewText':
@@ -363,6 +369,12 @@ export const translations = {
       '手机形态的应用启动器预览，适合移动端 GUI 任务和跨应用流程。',
     'home.androidDeviceModeHint':
       '跳转后建议在浏览器开发者工具中打开移动端设备模拟，以获得更好的 Android 交互体验。',
+    'home.iosEnv': '虚拟 iOS 环境',
+    'home.iosPreviewLabel': '苹果移动 OS',
+    'home.iosPreviewText':
+      'iOS 风格的应用启动器，适合苹果端 GUI 任务和跨应用流程。',
+    'home.iosDeviceModeHint':
+      '跳转后建议在浏览器开发者工具中启用 iPhone 设备模拟，以获得更好的 iOS 交互体验。',
     'home.macEnv': '虚拟 Mac 环境',
     'home.macPreviewLabel': '桌面 OS',
     'home.macPreviewText':
